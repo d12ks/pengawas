@@ -1,0 +1,3424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Pengawas - Manajemen Asesmen SMKN 1 Mondokan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg-main: #E4E9F2;
+      --bg-card: #E4E9F2;
+      --bg-header-glass: rgba(228, 233, 242, 0.92);
+      --text-primary: #0F172A;
+      --text-secondary: #334155;
+      --text-muted: #64748B;
+      --accent: #0284C7;
+      --accent-strong: #0369A1;
+      --accent-soft: rgba(2, 132, 199, 0.12);
+      --success: #059669;
+      --success-soft: rgba(5, 150, 105, 0.14);
+      --warning: #D97706;
+      --warning-soft: rgba(217, 119, 6, 0.15);
+      --danger: #DC2626;
+      --danger-soft: rgba(220, 38, 38, 0.14);
+      --shadow-light: #FFFFFF;
+      --shadow-dark: #B5C1D4;
+      --border-subtle: rgba(255, 255, 255, 0.65);
+      --table-header-bg: #DCE4F0;
+      --table-row-hover: rgba(2, 132, 199, 0.06);
+      --radius-xl: 20px;
+      --radius-lg: 16px;
+      --radius-md: 11px;
+    }
+
+    body.dark-mode {
+      --bg-main: #1E222A;
+      --bg-card: #1E222A;
+      --bg-header-glass: rgba(30, 34, 42, 0.94);
+      --text-primary: #F8FAFC;
+      --text-secondary: #CBD5E1;
+      --text-muted: #94A3B8;
+      --accent: #38BDF8;
+      --accent-strong: #0284C7;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --success: #34D399;
+      --success-soft: rgba(52, 211, 153, 0.15);
+      --warning: #FBBF24;
+      --warning-soft: rgba(251, 191, 36, 0.16);
+      --danger: #F87171;
+      --danger-soft: rgba(248, 113, 113, 0.15);
+      --shadow-light: #282E38;
+      --shadow-dark: #14171C;
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --table-header-bg: #252A34;
+      --table-row-hover: rgba(56, 189, 248, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Custom Scrollbar Profesional */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.35);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.55);
+    }
+
+    /* Neuromorphic Card & Controls */
+    .neu-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+      border: 1px solid var(--border-subtle);
+      padding: 20px;
+    }
+
+    .neu-card-compact {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      box-shadow: 4px 4px 9px var(--shadow-dark), -4px -4px 9px var(--shadow-light);
+      border: 1px solid var(--border-subtle);
+      padding: 14px 16px;
+    }
+
+    .neu-inset {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+      border: 1px solid transparent;
+      color: var(--text-primary);
+      padding: 10px 13px;
+      width: 100%;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .neu-inset:focus {
+      border-color: var(--accent);
+    }
+
+    .neu-btn {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 9px 15px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+      box-shadow: 3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
+      transition: all 0.16s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .neu-btn:hover {
+      transform: translateY(-1px);
+      color: var(--accent);
+    }
+
+    .neu-btn:active, .neu-btn.active {
+      transform: translateY(0);
+      box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+      color: var(--accent);
+    }
+
+    .neu-btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #FFFFFF !important;
+      border: none;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
+    }
+
+    .neu-btn-primary:hover {
+      filter: brightness(1.06);
+      color: #FFFFFF !important;
+    }
+
+    .neu-btn-success {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: #FFFFFF !important;
+      border: none;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+
+    .neu-btn-warning {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: #FFFFFF !important;
+      border: none;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+    }
+
+    .neu-btn-danger {
+      color: var(--danger) !important;
+    }
+
+    /* ==========================================================================
+       APP SHELL PROFESIONAL: HEADER & MENU NAVIGASI FIXED / TIDAK IKUT SCROLL
+       ========================================================================== */
+    .dashboard-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .sticky-header-zone {
+      flex: 0 0 auto;
+      z-index: 1200;
+      background: var(--bg-header-glass);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.07);
+      padding: 12px 24px;
+    }
+
+    .header-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .topbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 1.08rem;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      line-height: 1.25;
+    }
+
+    .brand-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .event-pill-active {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.74rem;
+    }
+
+    /* Baris Menu Navigasi & Input Event (Tetap di Atas / Tidak Ikut Ter-scroll) */
+    .nav-bar-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-tab-btn {
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 9px 15px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+      box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+      transition: all 0.16s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .nav-tab-btn:hover {
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .nav-tab-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #FFFFFF !important;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.32);
+    }
+
+    .nav-tab-badge {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      background: rgba(15, 23, 42, 0.12);
+      color: inherit;
+    }
+
+    .nav-tab-btn.active .nav-tab-badge {
+      background: rgba(255, 255, 255, 0.24);
+      color: #FFFFFF;
+    }
+
+    .event-inline-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      flex: 1 1 340px;
+      justify-content: flex-end;
+    }
+
+    .event-inline-label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    /* Area Konten Utama yang Di-scroll Independen */
+    .workspace-scroll-area {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 20px 24px 48px 24px;
+    }
+
+    .workspace-container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .sticky-header-zone {
+        padding: 10px 14px;
+      }
+      .workspace-scroll-area {
+        padding: 14px 14px 40px 14px;
+      }
+      .nav-tabs {
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+      }
+      .event-inline-box {
+        width: 100%;
+        justify-content: stretch;
+      }
+    }
+
+    /* ==========================================================================
+       SUMMARY STATS BAR & GRID SYSTEM RESPONSIF
+       ========================================================================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .stat-value {
+      font-size: 1.22rem;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .stat-label {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .section-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    /* Tabel Profesional dengan Sticky Header */
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: var(--bg-card);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+      vertical-align: middle;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--table-header-bg);
+      font-weight: 800;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-size: 0.73rem;
+      letter-spacing: 0.4px;
+      box-shadow: 0 1px 0 rgba(148, 163, 184, 0.3);
+    }
+
+    tbody tr:hover {
+      background: var(--table-row-hover);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 1px solid rgba(148, 163, 184, 0.32);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+
+    .badge-substitute {
+      background: var(--warning-soft);
+      color: var(--warning);
+      border: 1px solid rgba(217, 119, 6, 0.35);
+    }
+
+    .badge-role {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .badge-success {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    /* Empty State Profesional ("Belum ada jadwal tersimpan") */
+    .empty-schedule-box {
+      padding: 48px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border-radius: var(--radius-lg);
+      box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
+      border: 1px dashed rgba(148, 163, 184, 0.45);
+      margin-top: 8px;
+    }
+
+    .empty-schedule-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.9rem;
+    }
+
+    .empty-schedule-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .empty-schedule-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      max-width: 480px;
+      line-height: 1.5;
+    }
+
+    /* Kartu Daftar Hari Tanggal Efektif & Pilihan Sesi per Hari */
+    .date-chip-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .date-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.82rem;
+    }
+
+    .date-chip-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .date-chip-summary {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--success);
+      background: var(--success-soft);
+      padding: 3px 9px;
+      border-radius: 6px;
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .day-sesi-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 2px;
+    }
+
+    .day-sesi-pill {
+      padding: 4px 9px;
+      border-radius: 7px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid rgba(2, 132, 199, 0.35);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      transition: all 0.12s ease;
+    }
+
+    .day-sesi-pill.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #FFFFFF;
+      border-color: transparent;
+    }
+
+    .date-chip-remove {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: none;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Preview Kertas A4 1 Lembar 1 Ruang */
+    .qr-a4-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .a4-sheet-preview {
+      background: #FFFFFF;
+      color: #0F172A;
+      aspect-ratio: 210 / 297;
+      width: 100%;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .a4-outer-frame {
+      width: 100%;
+      height: 100%;
+      border: 3px double #1E3A8A;
+      border-radius: 8px;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      background: radial-gradient(circle at center, #FFFFFF 0%, #F8FAFC 100%);
+    }
+
+    .a4-inner-frame {
+      width: 100%;
+      height: 100%;
+      border: 1.5px solid #D97706;
+      border-radius: 4px;
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .a4-event-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #1E3A8A;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      line-height: 1.35;
+      max-width: 90%;
+      overflow-wrap: break-word;
+    }
+
+    .a4-room-name {
+      font-size: 2.75rem;
+      font-weight: 900;
+      color: #0F172A;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.15;
+      margin: 8px auto 0 auto;
+      padding: 16px 18px;
+      border: 2.5px solid #D97706;
+      background: rgba(217, 119, 6, 0.08);
+      border-radius: 10px;
+      width: 86%;
+      max-width: 86%;
+      box-sizing: border-box;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .a4-qr-wrapper {
+      width: 34%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border: 2px solid #1E3A8A;
+      border-radius: 10px;
+      background: #FFFFFF;
+      box-shadow: 0 6px 14px rgba(30, 58, 138, 0.12);
+    }
+
+    .a4-qr-box canvas, .a4-qr-box img {
+      width: 100% !important;
+      height: auto !important;
+      display: block;
+    }
+
+    .toast-banner {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 9999;
+      max-width: 430px;
+      padding: 13px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+      display: none;
+    }
+
+    .password-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 1rem;
+      padding: 4px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .form-row > * {
+      flex: 1 1 130px;
+    }
+
+    /* Popup Kalender Bahasa Indonesia */
+    .indo-cal-popup {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 3000;
+      width: 320px;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.28), 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+      border: 1px solid var(--accent);
+      padding: 14px;
+      user-select: none;
+    }
+
+    .indo-cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .indo-cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .indo-cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .indo-cal-day {
+      aspect-ratio: 1;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+      transition: all 0.12s ease;
+      position: relative;
+    }
+
+    .indo-cal-day:hover:not(:disabled) {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .indo-cal-day.selected {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #FFFFFF;
+    }
+
+    .indo-cal-day.in-schedule {
+      border: 1.5px solid var(--success);
+    }
+
+    .indo-cal-day.in-schedule::after {
+      content: "✓";
+      position: absolute;
+      bottom: 1px;
+      right: 3px;
+      font-size: 0.58rem;
+      color: var(--success);
+      font-weight: 900;
+    }
+
+    .indo-cal-day.selected.in-schedule::after {
+      color: #FFFFFF;
+    }
+
+    .indo-cal-day.weekend {
+      color: var(--danger);
+      opacity: 0.5;
+      box-shadow: none;
+    }
+
+    .indo-cal-day.empty {
+      background: transparent;
+      box-shadow: none;
+      cursor: default;
+    }
+
+    /* Animasi Loading Proses Data */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(15, 23, 42, 0.52);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .loading-card {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: var(--radius-lg);
+      padding: 24px 32px;
+      min-width: 280px;
+      max-width: 400px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+      animation: popInLoad 0.18s ease-out;
+    }
+
+    @keyframes popInLoad {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .loading-spinner-wrap {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-ring-outer {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 4px solid rgba(2, 132, 199, 0.18);
+      border-top-color: var(--accent);
+      border-right-color: var(--accent);
+      animation: spinLoader 0.85s linear infinite;
+    }
+
+    .loading-ring-inner {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3.5px solid rgba(217, 119, 6, 0.18);
+      border-bottom-color: var(--warning);
+      border-left-color: var(--warning);
+      animation: spinLoaderReverse 1.1s linear infinite;
+    }
+
+    @keyframes spinLoader {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spinLoaderReverse {
+      to { transform: rotate(-360deg); }
+    }
+
+    .loading-title {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.2px;
+    }
+
+    .loading-subtitle {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .loading-bar-track {
+      width: 100%;
+      height: 5px;
+      background: rgba(100, 116, 139, 0.2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .loading-bar-fill {
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--warning));
+      border-radius: 999px;
+      animation: slideLoadBar 1.15s ease-in-out infinite;
+    }
+
+    @keyframes slideLoadBar {
+      0% { transform: translateX(-110%); }
+      100% { transform: translateX(240%); }
+    }
+
+    /* Login Wrapper Center */
+    .login-shell {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+    }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast-banner"></div>
+
+  <!-- ANIMASI LOADING PROSES DATA -->
+  <div id="loadingOverlay" class="loading-overlay" aria-live="polite">
+    <div class="loading-card">
+      <div class="loading-spinner-wrap">
+        <div class="loading-ring-outer"></div>
+        <div class="loading-ring-inner"></div>
+      </div>
+      <div id="loadingTitleText" class="loading-title">Memproses Data...</div>
+      <div id="loadingSubText" class="loading-subtitle">Mohon tunggu sebentar, sedang menyinkronkan data</div>
+      <div class="loading-bar-track">
+        <div class="loading-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN VIEW -->
+  <div id="loginView" class="login-shell">
+    <div class="neu-card login-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div class="brand-group">
+          <div class="brand-logo-badge">📋</div>
+          <div>
+            <div class="brand-title">Portal Admin Pengawas</div>
+            <div class="brand-sub">Manajemen Asesmen SMKN 1 Mondokan</div>
+          </div>
+        </div>
+        <button class="neu-btn" onclick="toggleTheme()" id="themeBtnLogin" title="Ganti Tema">🌙</button>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:6px;">Username Administrator</label>
+        <input id="adminUser" class="neu-inset" type="text" placeholder="Masukkan username admin" />
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:6px;">Password Administrator</label>
+        <div class="password-wrap">
+          <input id="adminPass" class="neu-inset" type="password" placeholder="Masukkan password" onkeydown="if(event.key==='Enter') handleAdminLogin()" />
+          <button type="button" class="eye-btn" onclick="togglePassVisibility('adminPass', this)">👁️</button>
+        </div>
+      </div>
+
+      <button class="neu-btn neu-btn-primary" style="width:100%; padding:12px;" onclick="handleAdminLogin()">
+        🔐 Masuk Dashboard Admin
+      </button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW (FIXED HEADER & MENU NAVIGASI TIDAK IKUT TER-SCROLL) -->
+  <div id="dashboardView" class="dashboard-shell hidden">
+    <!-- ZONA HEADER & NAVIGASI TETAP DI ATAS (STICKY / FIXED) -->
+    <div class="sticky-header-zone">
+      <div class="header-inner">
+        <!-- Baris 1: Identitas Sistem & Tombol Aksi Cepat -->
+        <div class="topbar-row">
+          <div class="brand-group">
+            <div class="brand-logo-badge">📋</div>
+            <div>
+              <div class="brand-title">Dashboard Admin Pengawas Asesmen • SMKN 1 Mondokan</div>
+              <div class="brand-sub">
+                <span>Status Event:</span>
+                <span class="event-pill-active" id="activeEventHeader">Memuat Event...</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button class="neu-btn" onclick="syncFromSpreadsheet()" title="Sinkronisasi Data Spreadsheet">
+              🔄 <span>Sinkronisasi</span>
+            </button>
+            <button class="neu-btn" onclick="toggleTheme()" id="themeBtnDash" title="Ganti Mode Terang/Gelap">🌙</button>
+            <button class="neu-btn neu-btn-danger" onclick="logoutAdmin()" title="Keluar dari Dashboard">
+              🚪 <span>Keluar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Baris 2: Tombol Menu Navigasi (TIDAK IKUT TER-SCROLL) & Input Nama Event -->
+        <div class="nav-bar-row">
+          <nav class="nav-tabs" aria-label="Menu Navigasi Utama">
+            <button id="tabBtnJadwal" class="nav-tab-btn active" onclick="switchTab('jadwal')">
+              <span>🗓️ Buat Jadwal Pengawas</span>
+            </button>
+            <button id="tabBtnLihatJadwal" class="nav-tab-btn" onclick="switchTab('lihatJadwal')">
+              <span>📅 Lihat Jadwal</span>
+              <span id="navJadwalCountBadge" class="nav-tab-badge">0</span>
+            </button>
+            <button id="tabBtnLabel" class="nav-tab-btn" onclick="switchTab('label')">
+              <span>🏷️ Buat Label Ruang</span>
+              <span id="navRuangCountBadge" class="nav-tab-badge">0</span>
+            </button>
+            <button id="tabBtnPresensi" class="nav-tab-btn" onclick="switchTab('presensi')">
+              <span>✅ Presensi Pengawas</span>
+              <span id="navPresensiCountBadge" class="nav-tab-badge">0</span>
+            </button>
+          </nav>
+
+          <div class="event-inline-box">
+            <span class="event-inline-label">🎯 Nama Event:</span>
+            <input id="eventNameInput" class="neu-inset" type="text" placeholder="Ketik Nama Event Jadwal Ujian..." style="max-width: 310px; flex: 1 1 200px; padding: 8px 12px;" />
+            <button class="neu-btn neu-btn-primary" style="padding: 8px 14px;" onclick="saveEventName()">💾 Simpan Event</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZONA KONTEN HALAMAN (HANYA BAGIAN INI YANG BERGERAK SAAT DI-SCROLL) -->
+    <main class="workspace-scroll-area" id="mainScrollWorkspace">
+      <div class="workspace-container">
+
+        <!-- BARIS RINGKASAN STATISTIK PROFESIONAL -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: var(--accent-soft); color: var(--accent);">👩‍🏫</div>
+            <div>
+              <div class="stat-value" id="statGuruCount">0 Guru</div>
+              <div class="stat-label">Total Guru Pengawas Terdaftar</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: var(--warning-soft); color: var(--warning);">🏫</div>
+            <div>
+              <div class="stat-value" id="statRuangCount">0 Ruang</div>
+              <div class="stat-label">Ruang Ujian Aktif (2 Guru/Ruang)</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: var(--success-soft); color: var(--success);">📅</div>
+            <div>
+              <div class="stat-value" id="statJadwalCount">0 Slot</div>
+              <div class="stat-label">Jadwal Tersimpan di Spreadsheet</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(139, 92, 246, 0.14); color: #8B5CF6;">✅</div>
+            <div>
+              <div class="stat-value" id="statPresensiCount">0 Hadir</div>
+              <div class="stat-label">Rekap Scan QR Presensi Masuk</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====================================================================
+             HALAMAN 1: BUAT JADWAL PENGAWAS (HANYA DATA MASTER & GENERATOR)
+             ==================================================================== -->
+        <section id="tabJadwal">
+          <!-- BARIS ATAS: PENGATURAN SESI CUSTOM, DATA GURU, DATA RUANG -->
+          <div class="grid-3">
+            <!-- 1. Pengaturan Sesi Ujian Harian -->
+            <div class="neu-card">
+              <div class="section-title">
+                <span>⏰ Pengaturan Sesi Ujian Harian</span>
+                <span id="sesiCountBadge" class="badge badge-role">3 Sesi</span>
+              </div>
+
+              <div class="form-row" style="align-items: center; margin-bottom: 12px;">
+                <div style="flex: 1 1 160px;">
+                  <label style="font-size:0.77rem; font-weight:700; display:block; margin-bottom:4px;">Pilihan Jumlah Sesi / Hari</label>
+                  <select id="sesiCountSelect" class="neu-inset" onchange="handleChangeJumlahSesi(this.value)">
+                    <option value="1">1 Sesi per Hari</option>
+                    <option value="2">2 Sesi per Hari</option>
+                    <option value="3" selected>3 Sesi per Hari</option>
+                    <option value="4">4 Sesi per Hari</option>
+                    <option value="5">5 Sesi per Hari</option>
+                    <option value="6">6 Sesi per Hari</option>
+                  </select>
+                </div>
+                <div style="flex: 0 0 auto; align-self: flex-end;">
+                  <button class="neu-btn neu-btn-primary" onclick="saveAllCustomSesi()">
+                    💾 Simpan Jam Sesi
+                  </button>
+                </div>
+              </div>
+
+              <div style="font-size:0.76rem; color:var(--text-muted); margin-bottom:8px;">
+                Atur jam mulai &amp; selesai tiap sesi (contoh: <strong>07:30</strong> - <strong>08:30</strong>). Berlaku untuk semua hari pelaksanaan.
+              </div>
+
+              <div class="table-wrap" style="max-height:285px; overflow-y:auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Sesi</th>
+                      <th>Jam Mulai</th>
+                      <th>Jam Selesai</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sesiTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 2. CRUD Data Guru -->
+            <div class="neu-card">
+              <div class="section-title">
+                <span>👩‍🏫 Data Guru Pengawas</span>
+                <span id="guruCountBadge" class="badge badge-role">0 Guru</span>
+              </div>
+              <div class="form-row">
+                <input id="guruKodeInput" class="neu-inset" type="text" placeholder="Kode (G01)" style="max-width:110px;" />
+                <input id="guruNamaInput" class="neu-inset" type="text" placeholder="Nama Lengkap Guru" />
+              </div>
+              <div class="form-row">
+                <input id="guruNipInput" class="neu-inset" type="text" placeholder="NIP Guru" />
+                <button class="neu-btn neu-btn-primary" onclick="saveGuruItem()">💾 Simpan Guru</button>
+              </div>
+              <div class="table-wrap" style="max-height:260px; overflow-y:auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Kode</th>
+                      <th>Nama Guru</th>
+                      <th>NIP</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="guruTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 3. CRUD Data Ruang -->
+            <div class="neu-card">
+              <div class="section-title">
+                <span>🏫 Data Ruang Ujian</span>
+                <span id="ruangCountBadge" class="badge badge-role">0 Ruang</span>
+              </div>
+              <div class="form-row">
+                <input id="ruangKodeInput" class="neu-inset" type="text" placeholder="No Ruang (01)" style="max-width:120px;" />
+                <input id="ruangNamaInput" class="neu-inset" type="text" placeholder="Nama Ruang" />
+                <button class="neu-btn neu-btn-primary" onclick="saveRuangItem()">💾 Simpan Ruang</button>
+              </div>
+              <div class="table-wrap" style="max-height:305px; overflow-y:auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>No_Ruang</th>
+                      <th>Nama_Ruang</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ruangTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- GENERATOR JADWAL OTOMATIS ANTI BENTROK (5 HARI EFEKTIF SENIN-JUMAT & TAMBAH HARI TANGGAL) -->
+          <div class="neu-card">
+            <div class="section-title">
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span>⚡ Pengaturan Hari Ujian &amp; Generate Jadwal Otomatis (Anti-Bentrok • 5 Hari Efektif Senin - Jumat)</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <button class="neu-btn" onclick="switchTab('lihatJadwal')">
+                  📅 Buka Halaman Lihat Jadwal
+                </button>
+              </div>
+            </div>
+
+            <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:14px; line-height:1.5;">
+              Tambahkan tanggal pelaksanaan ujian satu per satu atau isi cepat hari efektif Senin–Jumat. Jika ada <strong>tanggal merah / libur</strong> di tengah minggu, klik <strong>✕</strong> pada kartu tanggal tersebut. Setelah klik <strong>"🎲 Generate Jadwal Otomatis"</strong>, hasil jadwal akan langsung ditampilkan di menu <strong>"📅 Lihat Jadwal"</strong>.
+            </div>
+
+            <div class="form-row" style="align-items:flex-end;">
+              <div style="flex: 1 1 255px; position: relative;" id="datePickerWrapper">
+                <label style="font-size:0.78rem; font-weight:700; display:block; margin-bottom:4px;">Pilih Hari / Tanggal Ujian</label>
+                <div style="position:relative; display:flex; align-items:center; gap:6px;">
+                  <input id="genStartDateIndoDisplay" class="neu-inset" type="text" readonly
+                    style="cursor:pointer; font-weight:700;"
+                    title="Klik untuk membuka Kalender"
+                    onclick="toggleIndoCalendarPopup(event)" />
+                  <button type="button" id="btnCalendarIcon" class="neu-btn" style="padding:10px 12px;"
+                    title="Buka Kalender Pilihan Tanggal"
+                    onclick="toggleIndoCalendarPopup(event)">
+                    📅
+                  </button>
+                  <input id="genStartDate" type="hidden" />
+                </div>
+
+                <!-- POPUP KALENDER BAHASA INDONESIA -->
+                <div id="indoCalendarPopup" class="indo-cal-popup hidden" onclick="event.stopPropagation()">
+                  <div class="indo-cal-header">
+                    <button type="button" class="neu-btn" style="padding:5px 9px;" onclick="shiftCalendarMonth(-1)" title="Bulan Sebelumnya">◀</button>
+                    <div style="display:flex; gap:4px; align-items:center; flex:1; justify-content:center;">
+                      <select id="calMonthSelect" class="neu-inset" style="padding:5px 7px; font-size:0.78rem; font-weight:700; width:auto;" onchange="onCalMonthYearSelectChange()"></select>
+                      <select id="calYearSelect" class="neu-inset" style="padding:5px 7px; font-size:0.78rem; font-weight:700; width:auto;" onchange="onCalMonthYearSelectChange()"></select>
+                    </div>
+                    <button type="button" class="neu-btn" style="padding:5px 9px;" onclick="shiftCalendarMonth(1)" title="Bulan Berikutnya">▶</button>
+                  </div>
+
+                  <div class="indo-cal-weekdays">
+                    <span>Sen</span>
+                    <span>Sel</span>
+                    <span>Rab</span>
+                    <span>Kam</span>
+                    <span>Jum</span>
+                    <span style="color:var(--danger);">Sab</span>
+                    <span style="color:var(--danger);">Min</span>
+                  </div>
+
+                  <div id="indoCalGrid" class="indo-cal-grid"></div>
+
+                  <div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(148,163,184,0.25); display:flex; flex-direction:column; gap:7px;">
+                    <label style="font-size:0.74rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary);">
+                      <input type="checkbox" id="calAutoAddCheck" checked />
+                      <span>Klik tanggal langsung <strong>+ Tambah ke Daftar Hari Ujian</strong></span>
+                    </label>
+                    <div style="display:flex; justify-content:space-between; gap:6px;">
+                      <button type="button" class="neu-btn" style="padding:5px 10px; font-size:0.75rem; flex:1;" onclick="selectCalendarToday()">Hari Ini</button>
+                      <button type="button" class="neu-btn neu-btn-primary" style="padding:5px 10px; font-size:0.75rem; flex:1;" onclick="closeIndoCalendarPopup()">Selesai / Tutup</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="flex: 0 0 auto;">
+                <button class="neu-btn neu-btn-primary" onclick="addSingleExamDate()">
+                  + Tambah Hari/Tanggal
+                </button>
+              </div>
+
+              <div style="flex: 1 1 170px; max-width: 215px;">
+                <label style="font-size:0.78rem; font-weight:700; display:block; margin-bottom:4px;">Isi Cepat Hari Efektif (Sen-Jum)</label>
+                <div style="display:flex; gap:6px;">
+                  <input id="genDaysCount" class="neu-inset" type="number" value="5" min="1" max="20" style="width:75px;" title="Jumlah Hari Efektif" />
+                  <button class="neu-btn" onclick="addEffectiveWeekdaysBatch()" title="Tambah N hari efektif Senin-Jumat otomatis dari tanggal terpilih">
+                    ⚡ + Hari Efektif
+                  </button>
+                </div>
+              </div>
+
+              <div style="flex: 0 0 auto;">
+                <button class="neu-btn neu-btn-danger" onclick="clearExamDates()">
+                  🗑️ Reset Tanggal
+                </button>
+              </div>
+
+              <div style="flex: 1 1 240px;">
+                <button class="neu-btn neu-btn-success" style="width:100%; padding:11px 16px; font-size:0.9rem;" onclick="generateAntiConflictSchedule()">
+                  🎲 Generate Jadwal Otomatis (<span id="selectedDateCountBtn">0</span> Hari)
+                </button>
+              </div>
+            </div>
+
+            <div id="examDatesChipContainer" class="date-chip-list"></div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             HALAMAN 2: LIHAT JADWAL (HALAMAN TERSENDIRI HASIL GENERATE JADWAL)
+             ==================================================================== -->
+        <section id="tabLihatJadwal" class="hidden">
+          <div class="neu-card">
+            <div class="section-title">
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span>📅 Daftar Jadwal Pengawas Ruang Tersimpan</span>
+                <span id="savedJadwalCountBadge" class="badge badge-role">0 Jadwal Tersimpan</span>
+              </div>
+              <div id="jadwalActionButtons" style="display:flex; flex-wrap:wrap; gap:8px;">
+                <button class="neu-btn" onclick="switchTab('jadwal')">
+                  ⚙️ Kembali ke Pengaturan / Buat Jadwal
+                </button>
+                <button class="neu-btn neu-btn-success" onclick="exportJadwalExcel()">📊 Unduh .XLSX</button>
+                <button class="neu-btn neu-btn-primary" onclick="exportJadwalPDF()">📄 Unduh .PDF</button>
+                <button class="neu-btn neu-btn-danger" onclick="deleteAllSavedJadwal()" title="Hapus seluruh jadwal yang tersimpan agar halaman ringan untuk event berikutnya">
+                  🗑️ Hapus Jadwal Tersimpan
+                </button>
+              </div>
+            </div>
+
+            <!-- TAMPILAN JIKA BELUM ADA JADWAL TERSIMPAN -->
+            <div id="emptyJadwalState" class="empty-schedule-box hidden">
+              <div class="empty-schedule-icon">🗓️</div>
+              <div class="empty-schedule-title">Belum ada jadwal tersimpan</div>
+              <div class="empty-schedule-desc">
+                Silakan atur sesi, data guru, data ruang, serta tanggal pelaksanaan ujian pada menu <strong>"Buat Jadwal Pengawas"</strong>, lalu klik tombol <strong>"Generate Jadwal Otomatis"</strong>.
+              </div>
+              <button class="neu-btn neu-btn-primary" style="margin-top:6px; padding:11px 20px;" onclick="switchTab('jadwal')">
+                🗓️ Buat Jadwal Pengawas Sekarang
+              </button>
+            </div>
+
+            <!-- KONTEN JADWAL JIKA SUDAH ADA JADWAL TERSIMPAN -->
+            <div id="filledJadwalContainer">
+              <!-- PANEL PENUGASAN PENGAWAS PENGGANTI / CADANGAN -->
+              <div class="neu-card-compact" style="margin-bottom: 16px;">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
+                  <div>
+                    <div style="font-size:0.88rem; font-weight:800; color:var(--warning);">
+                      🔄 Penugasan Custom Guru Pengawas Cadangan / Pengganti
+                    </div>
+                    <div style="font-size:0.78rem; color:var(--text-secondary);">
+                      Pilih Hari, Sesi, Ruang &amp; Pengawas yang ingin diganti, lalu pilih Guru Pengawas Cadangan yang tersedia pada sesi tersebut.
+                    </div>
+                  </div>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                    <select id="jadwalFilterDateSelect" class="neu-inset" style="width:auto; font-size:0.79rem; padding:7px 11px; font-weight:700;" onchange="renderJadwalTable()">
+                      <option value="ALL"> Semua Hari / Tanggal</option>
+                    </select>
+                    <select id="dropdownFilterMode" class="neu-inset" style="width:auto; font-size:0.79rem; padding:7px 11px;" onchange="renderJadwalTable(); updateCustomCadanganSelectors();">
+                      <option value="free_only">Dropdown: Hanya Guru Bebas Tugas di Sesi Itu</option>
+                      <option value="all_warn">Dropdown: Semua Guru (Notifikasi Jika Bentrok)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row" style="align-items:flex-end; margin-bottom: 0;">
+                  <div style="flex: 1 1 190px;">
+                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">1. Pilih Hari / Tanggal</label>
+                    <select id="cadanganDateSelect" class="neu-inset" onchange="onCadanganDateOrSesiChange()"></select>
+                  </div>
+                  <div style="flex: 1 1 150px;">
+                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">2. Pilih Sesi</label>
+                    <select id="cadanganSesiSelect" class="neu-inset" onchange="onCadanganDateOrSesiChange()"></select>
+                  </div>
+                  <div style="flex: 1 1 255px;">
+                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">3. Pilih Ruang &amp; Guru Pengawas</label>
+                    <select id="cadanganTargetSlotSelect" class="neu-inset"></select>
+                  </div>
+                  <div style="flex: 1 1 230px;">
+                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">4. Pilih Guru Pengawas Cadangan</label>
+                    <select id="cadanganGuruSelect" class="neu-inset"></select>
+                  </div>
+                  <div style="flex: 0 0 auto;">
+                    <button class="neu-btn neu-btn-warning" style="padding:10px 16px;" onclick="applyCustomCadanganIzin()">
+                      💾 Masukkan Pengawas Cadangan
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TABEL HASIL GENERATE JADWAL (DENGAN STICKY HEADER) -->
+              <div class="table-wrap" style="max-height: calc(100vh - 360px); min-height: 280px; overflow-y: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width:52px; text-align:center;">No</th>
+                      <th>Hari / Tanggal</th>
+                      <th>Sesi &amp; Jam Ujian</th>
+                      <th>Ruang</th>
+                      <th>Pengawas 1</th>
+                      <th>Pengawas 2</th>
+                      <th>Keterangan Pengawas Cadangan / Pengganti</th>
+                    </tr>
+                  </thead>
+                  <tbody id="jadwalTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             HALAMAN 3: BUAT LABEL RUANG & QR-CODE (1 LEMBAR A4 UNTUK 1 RUANG)
+             ==================================================================== -->
+        <section id="tabLabel" class="hidden">
+          <div class="neu-card">
+            <div class="section-title">
+              <div>
+                <span>🏷️ Label Nama Ruang &amp; QR-Code (1 Lembar Kertas A4 = 1 Ruang)</span>
+                <div style="font-size:0.78rem; color:var(--text-secondary); font-weight:500; margin-top:2px;">
+                  Judul Event rata tengah (Font Besar) • Nama Ruang rata tengah (Font 2x Judul Event) • QR-Code standar 1/4 lebar kertas A4 dengan Frame Elegan
+                </div>
+              </div>
+              <button class="neu-btn neu-btn-primary" onclick="downloadRoomLabelsPDF()">
+                🖨️ Unduh Semua Label Ruang (PDF A4 - 1 Halaman / Ruang)
+              </button>
+            </div>
+            <div id="qrRoomGrid" class="qr-a4-grid"></div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             HALAMAN 4: PRESENSI PENGAWAS
+             ==================================================================== -->
+        <section id="tabPresensi" class="hidden">
+          <div class="neu-card">
+            <div class="section-title">
+              <span>✅ Hasil Presensi Pengawas Ruang</span>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <select id="presensiSortSelect" class="neu-inset" style="width:auto;" onchange="renderPresensiTable()">
+                  <option value="tanggal_sesi">Sortir: Urut Tanggal - Sesi</option>
+                  <option value="nama_guru">Sortir: Berdasarkan Nama Guru</option>
+                </select>
+                <button class="neu-btn neu-btn-primary" onclick="exportPresensiPDF()">
+                  📥 Unduh PDF Presensi
+                </button>
+              </div>
+            </div>
+            <div class="table-wrap" style="max-height: calc(100vh - 300px); overflow-y: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:52px; text-align:center;">No</th>
+                    <th>Hari / Tanggal</th>
+                    <th>Sesi</th>
+                    <th>Kode &amp; Nama Guru</th>
+                    <th>NIP</th>
+                    <th>Peran</th>
+                    <th>Nama Ruang &amp; Nama Event</th>
+                    <th>Waktu Scan</th>
+                  </tr>
+                </thead>
+                <tbody id="presensiTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ============================================================================
+    // URL WEB APP GOOGLE SPREADSHEET (Code.gs)
+    // ============================================================================
+    const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwcqInXt3jSLTupTBbKKst1VYMFR58uNb4b3Nt9cFZpYTfyXVTG0FHI0T9ul4yj6d4WgQ/exec";
+
+    const HARI_INDO = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const BULAN_INDO = [
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    const DEFAULT_SESI_TIMES = [
+      { mulai: "07:30", selesai: "08:30" },
+      { mulai: "08:30", selesai: "09:30" },
+      { mulai: "10:00", selesai: "11:00" },
+      { mulai: "11:00", selesai: "12:00" },
+      { mulai: "13:00", selesai: "14:00" },
+      { mulai: "14:00", selesai: "15:00" }
+    ];
+
+    function getLocalTodayIso() {
+      const now = new Date();
+      if (now.getDay() === 6) now.setDate(now.getDate() + 2);
+      if (now.getDay() === 0) now.setDate(now.getDate() + 1);
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    const todayIso = getLocalTodayIso();
+
+    let appState = {
+      eventName: "",
+      gasUrl: GAS_WEBAPP_URL,
+      guruList: [],
+      ruangList: [],
+      sesiList: [
+        { sesiKe: "1", namaSesi: "Sesi 1", jamMulai: "07:30", jamSelesai: "08:30" },
+        { sesiKe: "2", namaSesi: "Sesi 2", jamMulai: "08:30", jamSelesai: "09:30" },
+        { sesiKe: "3", namaSesi: "Sesi 3", jamMulai: "10:00", jamSelesai: "11:00" }
+      ],
+      selectedExamDates: [],
+      daySessionsMap: {},
+      jadwalList: [],
+      presensiList: []
+    };
+
+    function getDefaultSessionsForIsoDate(isoDate) {
+      const allSesiKeys = appState.sesiList.map(s => String(s.sesiKe));
+      if (allSesiKeys.length === 0) return ["1"];
+      const parts = String(isoDate).split("-");
+      if (parts.length === 3) {
+        const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        if (dt.getDay() === 5 && allSesiKeys.length >= 2) {
+          return allSesiKeys.slice(0, 2);
+        }
+      }
+      return [...allSesiKeys];
+    }
+
+    function getActiveSessionsForDate(isoDate) {
+      const allSesiKeys = appState.sesiList.map(s => String(s.sesiKe));
+      const saved = appState.daySessionsMap[isoDate];
+      if (Array.isArray(saved) && saved.length > 0) {
+        const valid = saved.map(String).filter(k => allSesiKeys.includes(k));
+        if (valid.length > 0) {
+          return valid.sort((a, b) => Number(a) - Number(b));
+        }
+      }
+      const def = getDefaultSessionsForIsoDate(isoDate);
+      appState.daySessionsMap[isoDate] = def;
+      return def;
+    }
+
+    function buildDaySessionCombinations() {
+      const allKeys = appState.sesiList.map(s => String(s.sesiKe));
+      const n = allKeys.length;
+      const combos = [];
+      const seen = new Set();
+
+      const addCombo = (arr) => {
+        if (arr.length === 0) return;
+        const sorted = [...arr].sort((a, b) => Number(a) - Number(b));
+        const key = sorted.join("-");
+        if (!seen.has(key)) {
+          seen.add(key);
+          combos.push({
+            key: key,
+            sessions: sorted,
+            label: `${sorted.length} Sesi ujian (${key})`
+          });
+        }
+      };
+
+      addCombo(allKeys);
+
+      for (let len = n - 1; len >= 1; len--) {
+        for (let start = 0; start <= n - len; start++) {
+          addCombo(allKeys.slice(start, start + len));
+        }
+      }
+
+      if (n >= 3) {
+        for (let i = 0; i < n; i++) {
+          for (let j = i + 2; j < n; j++) {
+            addCombo([allKeys[i], allKeys[j]]);
+          }
+        }
+      }
+
+      return combos;
+    }
+
+    function onSelectDaySessionPreset(isoDate, comboKey) {
+      if (!comboKey) return;
+      const chosen = comboKey.split("-").filter(Boolean);
+      if (chosen.length > 0) {
+        appState.daySessionsMap[isoDate] = chosen;
+        renderExamDatesChips();
+      }
+    }
+
+    function toggleDaySessionPill(isoDate, sesiKe) {
+      const current = [...getActiveSessionsForDate(isoDate)];
+      const sStr = String(sesiKe);
+      const idx = current.indexOf(sStr);
+      if (idx >= 0) {
+        if (current.length <= 1) {
+          showToast("Minimal harus ada 1 sesi aktif pada hari ujian ini!", true);
+          return;
+        }
+        current.splice(idx, 1);
+      } else {
+        current.push(sStr);
+      }
+      current.sort((a, b) => Number(a) - Number(b));
+      appState.daySessionsMap[isoDate] = current;
+      renderExamDatesChips();
+    }
+
+    function sanitizeJamValue(rawVal, sesiKeNumber, isStart) {
+      const idx = Math.max(0, (Number(sesiKeNumber) || 1) - 1) % DEFAULT_SESI_TIMES.length;
+      const fallback = isStart ? DEFAULT_SESI_TIMES[idx].mulai : DEFAULT_SESI_TIMES[idx].selesai;
+      if (!rawVal) return fallback;
+      let str = String(rawVal).trim().replace(/^'/, "");
+      const isoTimeMatch = str.match(/T(\d{2}:\d{2})/);
+      if (isoTimeMatch && str.includes("1899")) {
+        return isoTimeMatch[1];
+      }
+      if (str.includes("1899") || /^\d{4}-\d{2}-\d{2}$/.test(str)) {
+        return fallback;
+      }
+      const hmMatch = str.match(/(\d{1,2}[:.]\d{2})/);
+      if (hmMatch) {
+        return hmMatch[1].replace(".", ":");
+      }
+      return fallback;
+    }
+
+    function sanitizeJamSesiRange(rawJamSesi, sesiKe) {
+      const matchedSesi = appState.sesiList.find(s => String(s.sesiKe) === String(sesiKe));
+      const defaultRange = matchedSesi
+        ? `${matchedSesi.jamMulai} - ${matchedSesi.jamSelesai}`
+        : `${sanitizeJamValue("", sesiKe, true)} - ${sanitizeJamValue("", sesiKe, false)}`;
+
+      if (!rawJamSesi) return defaultRange;
+      const str = String(rawJamSesi).trim().replace(/^'/, "");
+      if (str.includes("1899")) return defaultRange;
+      const parts = str.split(/\s*-\s*/);
+      if (parts.length === 2) {
+        const m = sanitizeJamValue(parts[0], sesiKe, true);
+        const s = sanitizeJamValue(parts[1], sesiKe, false);
+        return `${m} - ${s}`;
+      }
+      return defaultRange;
+    }
+
+    function parseIsoFromAnyDate(dateInput) {
+      if (!dateInput) return null;
+      if (dateInput instanceof Date && !isNaN(dateInput.getTime())) {
+        const y = dateInput.getFullYear();
+        const m = String(dateInput.getMonth() + 1).padStart(2, "0");
+        const d = String(dateInput.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+      }
+      const str = String(dateInput).trim();
+      const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (isoMatch) return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+
+      const indoMatch = str.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+      if (indoMatch) {
+        const day = String(indoMatch[1]).padStart(2, "0");
+        const monthName = indoMatch[2].toLowerCase();
+        const year = indoMatch[3];
+        const mIdx = BULAN_INDO.findIndex(b => b.toLowerCase() === monthName);
+        if (mIdx >= 0) {
+          return `${year}-${String(mIdx + 1).padStart(2, "0")}-${day}`;
+        }
+      }
+      return null;
+    }
+
+    function formatTanggalIndo(dateInput) {
+      if (!dateInput) return "-";
+      if (dateInput instanceof Date) {
+        if (isNaN(dateInput.getTime())) return "-";
+        return `${HARI_INDO[dateInput.getDay()]}, ${dateInput.getDate()} ${BULAN_INDO[dateInput.getMonth()]} ${dateInput.getFullYear()}`;
+      }
+      const str = String(dateInput).trim();
+      if (HARI_INDO.some(h => str.toLowerCase().startsWith(h.toLowerCase() + ","))) {
+        return str;
+      }
+
+      let dt = null;
+      const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (isoMatch) {
+        dt = new Date(Number(isoMatch[1]), Number(isoMatch[2]) - 1, Number(isoMatch[3]));
+      } else {
+        const parsed = new Date(str);
+        if (!isNaN(parsed.getTime())) dt = parsed;
+      }
+
+      if (!dt || isNaN(dt.getTime())) return str;
+      return `${HARI_INDO[dt.getDay()]}, ${dt.getDate()} ${BULAN_INDO[dt.getMonth()]} ${dt.getFullYear()}`;
+    }
+
+    function formatWaktuScanIndo(waktuStr, fallbackDateStr) {
+      if (!waktuStr) return "-";
+      const str = String(waktuStr).trim();
+      const match = str.match(/^(\d{4}-\d{2}-\d{2})[T\s]+(\d{2}:\d{2}(?::\d{2})?)/);
+      if (match) {
+        return `${formatTanggalIndo(match[1])} • ${match[2]}`;
+      }
+      if (/^\d{2}:\d{2}(:\d{2})?$/.test(str) && fallbackDateStr) {
+        return `${formatTanggalIndo(fallbackDateStr)} • ${str}`;
+      }
+      return formatTanggalIndo(str);
+    }
+
+    let calViewYear = new Date().getFullYear();
+    let calViewMonth = new Date().getMonth();
+
+    function updateStartDateIndoLabel() {
+      const val = document.getElementById("genStartDate").value || todayIso;
+      const disp = document.getElementById("genStartDateIndoDisplay");
+      if (disp) disp.value = formatTanggalIndo(val);
+      const parts = val.split("-");
+      if (parts.length === 3) {
+        calViewYear = Number(parts[0]);
+        calViewMonth = Number(parts[1]) - 1;
+      }
+      renderIndoCalendarGrid();
+    }
+
+    function toggleIndoCalendarPopup(e) {
+      if (e) e.stopPropagation();
+      const popup = document.getElementById("indoCalendarPopup");
+      if (!popup) return;
+      const isHidden = popup.classList.contains("hidden");
+      if (isHidden) {
+        const val = document.getElementById("genStartDate").value || todayIso;
+        const parts = val.split("-");
+        if (parts.length === 3) {
+          calViewYear = Number(parts[0]);
+          calViewMonth = Number(parts[1]) - 1;
+        }
+        renderIndoCalendarGrid();
+        popup.classList.remove("hidden");
+      } else {
+        popup.classList.add("hidden");
+      }
+    }
+
+    function closeIndoCalendarPopup() {
+      const popup = document.getElementById("indoCalendarPopup");
+      if (popup) popup.classList.add("hidden");
+    }
+
+    document.addEventListener("click", function(e) {
+      const wrap = document.getElementById("datePickerWrapper");
+      if (wrap && !wrap.contains(e.target)) {
+        closeIndoCalendarPopup();
+      }
+    });
+
+    function shiftCalendarMonth(delta) {
+      calViewMonth += delta;
+      if (calViewMonth < 0) {
+        calViewMonth = 11;
+        calViewYear--;
+      } else if (calViewMonth > 11) {
+        calViewMonth = 0;
+        calViewYear++;
+      }
+      renderIndoCalendarGrid();
+    }
+
+    function onCalMonthYearSelectChange() {
+      const mSel = document.getElementById("calMonthSelect");
+      const ySel = document.getElementById("calYearSelect");
+      if (mSel && ySel) {
+        calViewMonth = Number(mSel.value);
+        calViewYear = Number(ySel.value);
+        renderIndoCalendarGrid();
+      }
+    }
+
+    function selectCalendarToday() {
+      document.getElementById("genStartDate").value = todayIso;
+      updateStartDateIndoLabel();
+    }
+
+    function onPickDateFromPopup(isoDate, isWeekend) {
+      if (isWeekend) {
+        showToast("SMKN 1 Mondokan menerapkan 5 hari efektif (Senin - Jumat). Pilih hari Senin s/d Jumat!", true);
+        return;
+      }
+      document.getElementById("genStartDate").value = isoDate;
+      const disp = document.getElementById("genStartDateIndoDisplay");
+      if (disp) disp.value = formatTanggalIndo(isoDate);
+
+      const autoAdd = document.getElementById("calAutoAddCheck")?.checked;
+      if (autoAdd) {
+        if (!appState.selectedExamDates.includes(isoDate)) {
+          appState.selectedExamDates.push(isoDate);
+          appState.daySessionsMap[isoDate] = getDefaultSessionsForIsoDate(isoDate);
+          appState.selectedExamDates.sort();
+          renderExamDatesChips();
+          showToast(`Hari/Tanggal ${formatTanggalIndo(isoDate)} ditambahkan.`);
+        } else {
+          showToast(`Tanggal ${formatTanggalIndo(isoDate)} dipilih (sudah ada di daftar).`);
+        }
+        renderIndoCalendarGrid();
+      } else {
+        renderIndoCalendarGrid();
+        closeIndoCalendarPopup();
+      }
+    }
+
+    function renderIndoCalendarGrid() {
+      const mSel = document.getElementById("calMonthSelect");
+      const ySel = document.getElementById("calYearSelect");
+      const grid = document.getElementById("indoCalGrid");
+      if (!grid || !mSel || !ySel) return;
+
+      mSel.innerHTML = BULAN_INDO.map((b, idx) =>
+        `<option value="${idx}" ${idx === calViewMonth ? "selected" : ""}>${b}</option>`
+      ).join("");
+
+      const years = [];
+      for (let y = calViewYear - 2; y <= calViewYear + 3; y++) {
+        years.push(`<option value="${y}" ${y === calViewYear ? "selected" : ""}>${y}</option>`);
+      }
+      ySel.innerHTML = years.join("");
+
+      const firstDay = new Date(calViewYear, calViewMonth, 1);
+      const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+      const startOffset = (firstDay.getDay() + 6) % 7;
+      const currentVal = document.getElementById("genStartDate").value || todayIso;
+
+      let cellsHtml = "";
+      for (let i = 0; i < startOffset; i++) {
+        cellsHtml += `<div class="indo-cal-day empty"></div>`;
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dt = new Date(calViewYear, calViewMonth, d);
+        const dow = dt.getDay();
+        const isWeekend = (dow === 0 || dow === 6);
+        const iso = `${calViewYear}-${String(calViewMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        const isSelected = (iso === currentVal);
+        const isInSchedule = appState.selectedExamDates.includes(iso);
+
+        const classes = [
+          "indo-cal-day",
+          isSelected ? "selected" : "",
+          isInSchedule ? "in-schedule" : "",
+          isWeekend ? "weekend" : ""
+        ].filter(Boolean).join(" ");
+
+        cellsHtml += `
+          <button type="button" class="${classes}"
+            onclick="onPickDateFromPopup('${iso}', ${isWeekend})"
+            title="${formatTanggalIndo(iso)}${isInSchedule ? ' (Sudah masuk daftar ujian)' : ''}">
+            ${d}
+          </button>
+        `;
+      }
+
+      grid.innerHTML = cellsHtml;
+    }
+
+    function initDefaultExamDates() {
+      if (appState.selectedExamDates.length === 0) {
+        addEffectiveWeekdaysFrom(todayIso, 5, false);
+      }
+    }
+
+    function addEffectiveWeekdaysFrom(startIsoStr, count, notify = true) {
+      const parts = startIsoStr.split("-");
+      let dt = parts.length === 3
+        ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+        : new Date();
+
+      let added = 0;
+      let safety = 0;
+      while (added < count && safety < 60) {
+        safety++;
+        const dayOfWeek = dt.getDay();
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+          const y = dt.getFullYear();
+          const m = String(dt.getMonth() + 1).padStart(2, "0");
+          const d = String(dt.getDate()).padStart(2, "0");
+          const iso = `${y}-${m}-${d}`;
+          if (!appState.selectedExamDates.includes(iso)) {
+            appState.selectedExamDates.push(iso);
+            appState.daySessionsMap[iso] = getDefaultSessionsForIsoDate(iso);
+            added++;
+          }
+        }
+        dt.setDate(dt.getDate() + 1);
+      }
+      appState.selectedExamDates.sort();
+      renderExamDatesChips();
+      if (notify) {
+        showToast(`${added} Hari Efektif (Senin–Jumat) ditambahkan!`);
+      }
+    }
+
+    function addSingleExamDate() {
+      const val = document.getElementById("genStartDate").value || todayIso;
+      const parts = val.split("-");
+      const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      const dayOfWeek = dt.getDay();
+
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        showToast("SMKN 1 Mondokan menerapkan 5 hari efektif (Senin - Jumat). Pilih hari Senin s/d Jumat!", true);
+        return;
+      }
+      if (appState.selectedExamDates.includes(val)) {
+        showToast(`Tanggal ${formatTanggalIndo(val)} sudah ada dalam daftar!`, true);
+        return;
+      }
+      appState.selectedExamDates.push(val);
+      appState.daySessionsMap[val] = getDefaultSessionsForIsoDate(val);
+      appState.selectedExamDates.sort();
+      renderExamDatesChips();
+      showToast(`Hari/Tanggal ${formatTanggalIndo(val)} ditambahkan.`);
+
+      const nextDt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + 1);
+      if (nextDt.getDay() === 6) nextDt.setDate(nextDt.getDate() + 2);
+      if (nextDt.getDay() === 0) nextDt.setDate(nextDt.getDate() + 1);
+      const ny = nextDt.getFullYear();
+      const nm = String(nextDt.getMonth() + 1).padStart(2, "0");
+      const nd = String(nextDt.getDate()).padStart(2, "0");
+      document.getElementById("genStartDate").value = `${ny}-${nm}-${nd}`;
+      updateStartDateIndoLabel();
+    }
+
+    function addEffectiveWeekdaysBatch() {
+      const startVal = document.getElementById("genStartDate").value || todayIso;
+      const count = Math.max(1, parseInt(document.getElementById("genDaysCount").value || "5", 10));
+      addEffectiveWeekdaysFrom(startVal, count, true);
+    }
+
+    function removeExamDate(isoDate) {
+      appState.selectedExamDates = appState.selectedExamDates.filter(d => d !== isoDate);
+      delete appState.daySessionsMap[isoDate];
+      renderExamDatesChips();
+    }
+
+    function clearExamDates() {
+      appState.selectedExamDates = [];
+      appState.daySessionsMap = {};
+      renderExamDatesChips();
+      showToast("Daftar tanggal ujian dikosongkan.");
+    }
+
+    function renderExamDatesChips() {
+      const container = document.getElementById("examDatesChipContainer");
+      const countSpan = document.getElementById("selectedDateCountBtn");
+      if (countSpan) countSpan.innerText = appState.selectedExamDates.length;
+      renderIndoCalendarGrid();
+      if (!container) return;
+
+      if (appState.selectedExamDates.length === 0) {
+        container.innerHTML = `<span style="font-size:0.82rem; color:var(--danger); font-weight:700;">Belum ada tanggal ujian dipilih. Klik "+ Tambah Hari/Tanggal" atau "⚡ + Hari Efektif".</span>`;
+        return;
+      }
+
+      const combos = buildDaySessionCombinations();
+      const allSesiKeys = appState.sesiList.map(s => String(s.sesiKe));
+
+      container.innerHTML = appState.selectedExamDates.map((iso, idx) => {
+        const activeSesi = getActiveSessionsForDate(iso);
+        const activeKey = activeSesi.join("-");
+        const summaryLabel = `${activeSesi.length} Sesi ujian (${activeKey})`;
+
+        const presetOptionsHtml = combos.map(c =>
+          `<option value="${c.key}" ${c.key === activeKey ? "selected" : ""}>${c.label}</option>`
+        ).join("");
+        const hasExactCombo = combos.some(c => c.key === activeKey);
+        const customOptionHtml = !hasExactCombo
+          ? `<option value="${activeKey}" selected>${summaryLabel}</option>`
+          : "";
+
+        const pillsHtml = allSesiKeys.map(sKe => {
+          const isOn = activeSesi.includes(sKe);
+          return `
+            <button type="button" class="day-sesi-pill ${isOn ? 'active' : ''}"
+              onclick="toggleDaySessionPill('${iso}', '${sKe}')"
+              title="Klik untuk mengaktifkan/menonaktifkan Sesi ${sKe} pada ${formatTanggalIndo(iso)}">
+              Sesi ${sKe}
+            </button>
+          `;
+        }).join("");
+
+        return `
+          <div class="date-chip">
+            <div class="date-chip-header">
+              <div>
+                <span style="color:var(--accent); font-weight:800;">Hari ${idx + 1} :</span>
+                <span style="font-weight:700;">${formatTanggalIndo(iso)}</span>
+              </div>
+              <button type="button" class="date-chip-remove" onclick="removeExamDate('${iso}')" title="Hapus tanggal ini (misal Tanggal Merah)">✕</button>
+            </div>
+
+            <div class="date-chip-summary">${summaryLabel}</div>
+
+            <div style="display:flex; flex-direction:column; gap:5px; margin-top:2px;">
+              <select class="neu-inset" style="padding:5px 8px; font-size:0.76rem; font-weight:600;"
+                onchange="onSelectDaySessionPreset('${iso}', this.value)">
+                ${customOptionHtml}
+                ${presetOptionsHtml}
+              </select>
+              <div class="day-sesi-pills">
+                ${pillsHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("genStartDate").value = todayIso;
+    updateStartDateIndoLabel();
+    initDefaultExamDates();
+
+    let activeLoadingCount = 0;
+
+    function showLoading(title = "Memproses Data...", subtitle = "Mohon tunggu sebentar, sedang memproses data") {
+      activeLoadingCount++;
+      const overlay = document.getElementById("loadingOverlay");
+      const titleEl = document.getElementById("loadingTitleText");
+      const subEl = document.getElementById("loadingSubText");
+      if (titleEl) titleEl.innerText = title;
+      if (subEl) subEl.innerText = subtitle;
+      if (overlay) overlay.classList.add("active");
+    }
+
+    function hideLoading(force = false) {
+      if (force) {
+        activeLoadingCount = 0;
+      } else {
+        activeLoadingCount = Math.max(0, activeLoadingCount - 1);
+      }
+      if (activeLoadingCount === 0) {
+        const overlay = document.getElementById("loadingOverlay");
+        if (overlay) overlay.classList.remove("active");
+      }
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById("toast");
+      t.style.display = "block";
+      t.style.background = isError ? "#DC2626" : "#0284C7";
+      t.style.color = "#FFFFFF";
+      t.innerText = msg;
+      setTimeout(() => { t.style.display = "none"; }, 3400);
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.contains("dark-mode");
+      const label = isDark ? "☀️" : "🌙";
+      document.getElementById("themeBtnLogin").innerText = label;
+      document.getElementById("themeBtnDash").innerText = label;
+    }
+
+    function togglePassVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (inp.type === "password") {
+        inp.type = "text";
+        btn.innerText = "🙈";
+      } else {
+        inp.type = "password";
+        btn.innerText = "👁️";
+      }
+    }
+
+    function handleAdminLogin() {
+      const u = document.getElementById("adminUser").value.trim();
+      const p = document.getElementById("adminPass").value.trim();
+      if (!u || !p) {
+        showToast("Masukkan username dan password Admin!", true);
+        return;
+      }
+      document.getElementById("loginView").classList.add("hidden");
+      document.getElementById("dashboardView").classList.remove("hidden");
+      syncFromSpreadsheet();
+    }
+
+    function logoutAdmin() {
+      document.getElementById("dashboardView").classList.add("hidden");
+      document.getElementById("loginView").classList.remove("hidden");
+    }
+
+    function switchTab(tab) {
+      const tabs = ["jadwal", "lihatJadwal", "label", "presensi"];
+      tabs.forEach(t => {
+        const sectionId = "tab" + t.charAt(0).toUpperCase() + t.slice(1);
+        const btnId = "tabBtn" + t.charAt(0).toUpperCase() + t.slice(1);
+        const secEl = document.getElementById(sectionId);
+        const btnEl = document.getElementById(btnId);
+        if (secEl) secEl.classList.toggle("hidden", t !== tab);
+        if (btnEl) btnEl.classList.toggle("active", t === tab);
+      });
+
+      const scrollArea = document.getElementById("mainScrollWorkspace");
+      if (scrollArea) scrollArea.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (tab === "lihatJadwal") {
+        renderJadwalTable();
+        updateCustomCadanganSelectors();
+      }
+      if (tab === "label") renderRoomQrLabels();
+      if (tab === "presensi") renderPresensiTable();
+    }
+
+    async function syncFromSpreadsheet() {
+      if (!appState.gasUrl) return;
+      showLoading("Memuat Data Spreadsheet...", "Mengambil data guru, ruang, sesi, jadwal & presensi");
+      try {
+        const res = await fetch(appState.gasUrl + "?action=getAllData");
+        const json = await res.json();
+        if (json.status === "success" && json.data) {
+          appState.eventName = json.data.eventName || "";
+          appState.guruList = json.data.guruList || [];
+          appState.ruangList = (json.data.ruangList || []).map(r => ({
+            noRuang: r.noRuang || r.kodeRuang || "",
+            namaRuang: r.namaRuang || ""
+          }));
+
+          let hadCorruptedTime = false;
+          const rawSesi = json.data.sesiList || [];
+          if (rawSesi.length > 0) {
+            appState.sesiList = rawSesi.map(s => {
+              const rawM = String(s.jamMulai || "");
+              const rawS = String(s.jamSelesai || "");
+              if (rawM.includes("1899") || rawS.includes("1899")) {
+                hadCorruptedTime = true;
+              }
+              return {
+                sesiKe: String(s.sesiKe),
+                namaSesi: "Sesi " + s.sesiKe,
+                jamMulai: sanitizeJamValue(s.jamMulai, s.sesiKe, true),
+                jamSelesai: sanitizeJamValue(s.jamSelesai, s.sesiKe, false)
+              };
+            }).sort((a, b) => Number(a.sesiKe) - Number(b.sesiKe));
+          }
+
+          appState.jadwalList = (json.data.jadwalList || []).map(j => ({
+            ...j,
+            noRuang: j.noRuang || j.kodeRuang || "",
+            jamSesi: sanitizeJamSesiRange(j.jamSesi, j.sesiKe)
+          }));
+
+          const jadwalDates = [];
+          const syncedDaySessions = {};
+          appState.jadwalList.forEach(j => {
+            const iso = parseIsoFromAnyDate(j.hariTanggal);
+            if (iso) {
+              if (!jadwalDates.includes(iso)) jadwalDates.push(iso);
+              if (!syncedDaySessions[iso]) syncedDaySessions[iso] = [];
+              const sKeStr = String(j.sesiKe);
+              if (!syncedDaySessions[iso].includes(sKeStr)) {
+                syncedDaySessions[iso].push(sKeStr);
+              }
+            }
+          });
+          if (jadwalDates.length > 0) {
+            appState.selectedExamDates = jadwalDates.sort();
+            Object.keys(syncedDaySessions).forEach(iso => {
+              appState.daySessionsMap[iso] = syncedDaySessions[iso].sort((a, b) => Number(a) - Number(b));
+            });
+          }
+
+          appState.presensiList = (json.data.presensiList || []).map(p => ({
+            ...p,
+            namaRuangDanEvent: p.namaRuangDanEvent || ((p.namaRuang || "") + (p.namaEvent ? " - " + p.namaEvent : ""))
+          }));
+
+          renderAll();
+
+          if (hadCorruptedTime) {
+            await repairSesiTimesInSpreadsheet();
+          }
+          showToast("Data berhasil disinkronkan dari Google Spreadsheet!");
+        }
+      } catch (e) {
+        showToast("Gagal memuat data dari Spreadsheet", true);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    async function repairSesiTimesInSpreadsheet() {
+      for (const s of appState.sesiList) {
+        await postToSpreadsheet({
+          action: "saveSesi",
+          sesiKe: String(s.sesiKe),
+          namaSesi: "Sesi " + s.sesiKe,
+          jamMulai: "'" + s.jamMulai,
+          jamSelesai: "'" + s.jamSelesai
+        }, "", true);
+      }
+    }
+
+    async function postToSpreadsheet(payload, loadingTitle = "", silentLoading = false) {
+      if (!appState.gasUrl) return;
+      if (!silentLoading) {
+        showLoading(loadingTitle || "Menyimpan Data ke Spreadsheet...", "Sedang memproses & menyinkronkan data");
+      }
+      try {
+        await fetch(appState.gasUrl, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+      } finally {
+        if (!silentLoading) {
+          hideLoading();
+        }
+      }
+    }
+
+    async function saveEventName() {
+      const val = document.getElementById("eventNameInput").value.trim();
+      if (!val) return;
+      appState.eventName = val;
+      appState.jadwalList.forEach(j => j.namaEvent = val);
+      document.getElementById("activeEventHeader").innerText = val;
+      renderAll();
+      await postToSpreadsheet({ action: "updateEventName", eventName: val }, "Menyimpan Nama Event...");
+      showToast("Nama Event Jadwal Ujian diperbarui!");
+    }
+
+    // ============================================================================
+    // PENGATURAN SESI UJIAN HARIAN
+    // ============================================================================
+    function handleChangeJumlahSesi(newCountStr) {
+      const targetCount = Math.max(1, Math.min(8, parseInt(newCountStr, 10) || 3));
+      const updated = [];
+      for (let i = 1; i <= targetCount; i++) {
+        const existing = appState.sesiList.find(s => Number(s.sesiKe) === i);
+        if (existing) {
+          updated.push({
+            sesiKe: String(i),
+            namaSesi: "Sesi " + i,
+            jamMulai: sanitizeJamValue(existing.jamMulai, i, true),
+            jamSelesai: sanitizeJamValue(existing.jamSelesai, i, false)
+          });
+        } else {
+          updated.push({
+            sesiKe: String(i),
+            namaSesi: "Sesi " + i,
+            jamMulai: sanitizeJamValue("", i, true),
+            jamSelesai: sanitizeJamValue("", i, false)
+          });
+        }
+      }
+      appState.sesiList = updated;
+      renderSesiTable();
+      renderExamDatesChips();
+    }
+
+    function onInlineSesiTimeInput(sesiKe, field, value) {
+      const target = appState.sesiList.find(s => String(s.sesiKe) === String(sesiKe));
+      if (!target) return;
+      target[field] = value.trim();
+    }
+
+    async function saveSingleSesiRow(sesiKe) {
+      const s = appState.sesiList.find(x => String(x.sesiKe) === String(sesiKe));
+      if (!s) return;
+      s.jamMulai = sanitizeJamValue(s.jamMulai, s.sesiKe, true);
+      s.jamSelesai = sanitizeJamValue(s.jamSelesai, s.sesiKe, false);
+
+      appState.jadwalList.forEach(j => {
+        if (String(j.sesiKe) === String(s.sesiKe)) {
+          j.jamSesi = `${s.jamMulai} - ${s.jamSelesai}`;
+        }
+      });
+
+      renderSesiTable();
+      renderJadwalTable();
+      updateCustomCadanganSelectors();
+
+      await postToSpreadsheet({
+        action: "saveSesi",
+        sesiKe: String(s.sesiKe),
+        namaSesi: "Sesi " + s.sesiKe,
+        jamMulai: "'" + s.jamMulai,
+        jamSelesai: "'" + s.jamSelesai
+      });
+      showToast(`Jam Sesi ${s.sesiKe} (${s.jamMulai} - ${s.jamSelesai}) disimpan!`);
+    }
+
+    async function saveAllCustomSesi() {
+      showLoading("Menyimpan Pengaturan Sesi Ujian...", "Menyinkronkan jumlah sesi & jam ujian ke Spreadsheet");
+      try {
+        appState.sesiList.forEach(s => {
+          const mInp = document.getElementById(`sesiMulai_${s.sesiKe}`);
+          const sInp = document.getElementById(`sesiSelesai_${s.sesiKe}`);
+          if (mInp) s.jamMulai = sanitizeJamValue(mInp.value, s.sesiKe, true);
+          if (sInp) s.jamSelesai = sanitizeJamValue(sInp.value, s.sesiKe, false);
+        });
+
+        appState.jadwalList.forEach(j => {
+          const matched = appState.sesiList.find(s => String(s.sesiKe) === String(j.sesiKe));
+          if (matched) {
+            j.jamSesi = `${matched.jamMulai} - ${matched.jamSelesai}`;
+          }
+        });
+
+        renderSesiTable();
+        renderExamDatesChips();
+        renderJadwalTable();
+        updateCustomCadanganSelectors();
+
+        await postToSpreadsheet({
+          action: "saveAllSesi",
+          sesiList: appState.sesiList.map(s => ({
+            sesiKe: String(s.sesiKe),
+            namaSesi: "Sesi " + s.sesiKe,
+            jamMulai: "'" + s.jamMulai,
+            jamSelesai: "'" + s.jamSelesai
+          }))
+        }, "", true);
+
+        for (const s of appState.sesiList) {
+          await postToSpreadsheet({
+            action: "saveSesi",
+            sesiKe: String(s.sesiKe),
+            namaSesi: "Sesi " + s.sesiKe,
+            jamMulai: "'" + s.jamMulai,
+            jamSelesai: "'" + s.jamSelesai
+          }, "", true);
+        }
+        for (let extra = appState.sesiList.length + 1; extra <= 6; extra++) {
+          await postToSpreadsheet({ action: "deleteSesi", sesiKe: String(extra) }, "", true);
+        }
+
+        if (appState.jadwalList.length > 0) {
+          await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
+        }
+
+        showToast(`Pengaturan ${appState.sesiList.length} Sesi Ujian Harian berhasil disimpan!`);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function deleteSesiItem(sesiKe) {
+      if (appState.sesiList.length <= 1) {
+        showToast("Minimal harus ada 1 Sesi Ujian!", true);
+        return;
+      }
+      appState.sesiList = appState.sesiList
+        .filter(s => String(s.sesiKe) !== String(sesiKe))
+        .map((s, idx) => ({
+          sesiKe: String(idx + 1),
+          namaSesi: "Sesi " + (idx + 1),
+          jamMulai: s.jamMulai,
+          jamSelesai: s.jamSelesai
+        }));
+      renderSesiTable();
+      renderExamDatesChips();
+      postToSpreadsheet({ action: "deleteSesi", sesiKe: sesiKe });
+      showToast("Sesi " + sesiKe + " dihapus.");
+    }
+
+    // ============================================================================
+    // CRUD DATA GURU & DATA RUANG
+    // ============================================================================
+    function saveGuruItem() {
+      const kode = document.getElementById("guruKodeInput").value.trim();
+      const nama = document.getElementById("guruNamaInput").value.trim();
+      const nip = document.getElementById("guruNipInput").value.trim();
+      if (!kode || !nama || !nip) {
+        showToast("Kode Guru, Nama Guru, dan NIP wajib diisi!", true);
+        return;
+      }
+      const idx = appState.guruList.findIndex(g => g.kodeGuru === kode);
+      if (idx >= 0) {
+        appState.guruList[idx] = { kodeGuru: kode, namaGuru: nama, nip: nip };
+      } else {
+        appState.guruList.push({ kodeGuru: kode, namaGuru: nama, nip: nip });
+      }
+      document.getElementById("guruKodeInput").value = "";
+      document.getElementById("guruNamaInput").value = "";
+      document.getElementById("guruNipInput").value = "";
+      renderGuruTable();
+      renderJadwalTable();
+      updateCustomCadanganSelectors();
+      updateDashboardSummaryStats();
+      postToSpreadsheet({ action: "saveGuru", kodeGuru: kode, namaGuru: nama, nip: nip });
+      showToast("Data Guru " + nama + " disimpan.");
+    }
+
+    function editGuruItem(kode) {
+      const g = appState.guruList.find(x => x.kodeGuru === kode);
+      if (!g) return;
+      document.getElementById("guruKodeInput").value = g.kodeGuru;
+      document.getElementById("guruNamaInput").value = g.namaGuru;
+      document.getElementById("guruNipInput").value = g.nip;
+    }
+
+    function deleteGuruItem(kode) {
+      appState.guruList = appState.guruList.filter(g => g.kodeGuru !== kode);
+      renderGuruTable();
+      renderJadwalTable();
+      updateCustomCadanganSelectors();
+      updateDashboardSummaryStats();
+      postToSpreadsheet({ action: "deleteGuru", kodeGuru: kode });
+      showToast("Guru " + kode + " dihapus.");
+    }
+
+    function saveRuangItem() {
+      const noRuang = document.getElementById("ruangKodeInput").value.trim();
+      const namaRuang = document.getElementById("ruangNamaInput").value.trim();
+      if (!noRuang || !namaRuang) {
+        showToast("No Ruang dan Nama Ruang wajib diisi!", true);
+        return;
+      }
+      const idx = appState.ruangList.findIndex(r => r.noRuang === noRuang);
+      if (idx >= 0) {
+        appState.ruangList[idx] = { noRuang: noRuang, namaRuang: namaRuang };
+      } else {
+        appState.ruangList.push({ noRuang: noRuang, namaRuang: namaRuang });
+      }
+      document.getElementById("ruangKodeInput").value = "";
+      document.getElementById("ruangNamaInput").value = "";
+      renderRuangTable();
+      renderRoomQrLabels();
+      updateDashboardSummaryStats();
+      postToSpreadsheet({ action: "saveRuang", noRuang: noRuang, kodeRuang: noRuang, namaRuang: namaRuang });
+      showToast("Data Ruang " + namaRuang + " disimpan.");
+    }
+
+    function editRuangItem(noRuang) {
+      const r = appState.ruangList.find(x => x.noRuang === noRuang);
+      if (!r) return;
+      document.getElementById("ruangKodeInput").value = r.noRuang;
+      document.getElementById("ruangNamaInput").value = r.namaRuang;
+    }
+
+    function deleteRuangItem(noRuang) {
+      appState.ruangList = appState.ruangList.filter(r => r.noRuang !== noRuang);
+      renderRuangTable();
+      renderRoomQrLabels();
+      updateDashboardSummaryStats();
+      postToSpreadsheet({ action: "deleteRuang", noRuang: noRuang, kodeRuang: noRuang });
+      showToast("Ruang " + noRuang + " dihapus.");
+    }
+
+    // ============================================================================
+    // GENERATE JADWAL OTOMATIS ANTI BENTROK -> PINDAH KE HALAMAN "LIHAT JADWAL"
+    // ============================================================================
+    async function generateAntiConflictSchedule() {
+      const neededPerSession = appState.ruangList.length * 2;
+      if (appState.ruangList.length === 0 || appState.guruList.length < neededPerSession) {
+        showToast(`Pastikan Data Ruang telah diisi dan Jumlah Guru (${appState.guruList.length}) minimal ${neededPerSession} (2 guru/ruang)!`, true);
+        return;
+      }
+      if (appState.selectedExamDates.length === 0) {
+        showToast("Tambahkan minimal 1 Hari/Tanggal pelaksanaan ujian terlebih dahulu!", true);
+        return;
+      }
+
+      showLoading("Menyusun Jadwal Pengawas Otomatis...", "Menghitung rotasi anti-bentrok & menyimpan ke Spreadsheet");
+      try {
+        await new Promise(r => setTimeout(r, 150));
+
+        appState.sesiList.forEach(s => {
+          const mInp = document.getElementById(`sesiMulai_${s.sesiKe}`);
+          const sInp = document.getElementById(`sesiSelesai_${s.sesiKe}`);
+          if (mInp) s.jamMulai = sanitizeJamValue(mInp.value, s.sesiKe, true);
+          if (sInp) s.jamSelesai = sanitizeJamValue(sInp.value, s.sesiKe, false);
+        });
+
+        const newJadwal = [];
+        let counter = 1;
+        let globalOffset = 0;
+
+        appState.selectedExamDates.forEach(isoDate => {
+          const tanggalIndo = formatTanggalIndo(isoDate);
+          const activeSesiKeys = getActiveSessionsForDate(isoDate);
+          const daySesiList = appState.sesiList.filter(s => activeSesiKeys.includes(String(s.sesiKe)));
+
+          daySesiList.forEach(sesi => {
+            const rotated = [];
+            for (let i = 0; i < appState.guruList.length; i++) {
+              rotated.push(appState.guruList[(i + globalOffset) % appState.guruList.length]);
+            }
+            globalOffset = (globalOffset + 2) % appState.guruList.length;
+
+            let ptr = 0;
+            const cleanJamSesi = `${sesi.jamMulai} - ${sesi.jamSelesai}`;
+
+            appState.ruangList.forEach(ruang => {
+              const p1 = rotated[ptr++];
+              const p2 = rotated[ptr++];
+              newJadwal.push({
+                idJadwal: "JDW-" + String(counter++).padStart(3, "0"),
+                namaEvent: appState.eventName,
+                hariTanggal: tanggalIndo,
+                sesiKe: String(sesi.sesiKe),
+                jamSesi: cleanJamSesi,
+                noRuang: ruang.noRuang,
+                kodeRuang: ruang.noRuang,
+                namaRuang: ruang.namaRuang,
+                p1Kode: p1.kodeGuru,
+                p1Nama: p1.namaGuru,
+                p1Nip: p1.nip,
+                p2Kode: p2.kodeGuru,
+                p2Nama: p2.namaGuru,
+                p2Nip: p2.nip,
+                cadanganKode: "",
+                cadanganNama: "",
+                p1AsliNama: "",
+                p2AsliNama: "",
+                catatanPengganti: ""
+              });
+            });
+          });
+        });
+
+        appState.jadwalList = newJadwal;
+        updateJadwalFilterDateOptions();
+        renderJadwalTable();
+        updateCustomCadanganSelectors();
+        updateDashboardSummaryStats();
+        await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: newJadwal }, "", true);
+        // Otomatis arahkan ke halaman "Lihat Jadwal" setelah jadwal selesai digenerate
+        switchTab("lihatJadwal");
+        showToast(`Jadwal Otomatis (${appState.selectedExamDates.length} hari, ${newJadwal.length} slot ruang) berhasil dibuat!`);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    async function deleteAllSavedJadwal() {
+      if (appState.jadwalList.length === 0) {
+        showToast("Belum ada jadwal tersimpan untuk dihapus.", true);
+        return;
+      }
+      const total = appState.jadwalList.length;
+      const confirmed = confirm(
+        `Hapus seluruh hasil generate jadwal yang sudah tersimpan (${total} baris jadwal)?\n\n` +
+        `Data jadwal di halaman web dan Google Spreadsheet akan dikosongkan agar ringan untuk pembuatan jadwal event ujian berikutnya.`
+      );
+      if (!confirmed) return;
+
+      showLoading("Menghapus Jadwal Tersimpan...", "Mengosongkan data jadwal di halaman web & Google Spreadsheet");
+      try {
+        appState.jadwalList = [];
+        updateJadwalFilterDateOptions();
+        renderJadwalTable();
+        updateCustomCadanganSelectors();
+        updateDashboardSummaryStats();
+        await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: [] }, "", true);
+        showToast("Seluruh jadwal tersimpan berhasil dihapus!");
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // ============================================================================
+    // PENUGASAN CUSTOM PENGAWAS CADANGAN (TANPA TULISAN "(Izin)" DI DROPDOWN)
+    // ============================================================================
+    function updateJadwalFilterDateOptions() {
+      const filterSel = document.getElementById("jadwalFilterDateSelect");
+      if (!filterSel) return;
+      const prev = filterSel.value || "ALL";
+      const uniqueDates = [];
+      appState.jadwalList.forEach(j => {
+        const d = formatTanggalIndo(j.hariTanggal);
+        if (!uniqueDates.includes(d)) uniqueDates.push(d);
+      });
+      filterSel.innerHTML = `<option value="ALL">📅 Filter: Semua Hari (${appState.jadwalList.length} Slot)</option>` +
+        uniqueDates.map(d => `<option value="${d}">${d}</option>`).join("");
+      if (prev === "ALL" || uniqueDates.includes(prev)) {
+        filterSel.value = prev;
+      }
+    }
+
+    function updateCustomCadanganSelectors() {
+      const dateSel = document.getElementById("cadanganDateSelect");
+      const sesiSel = document.getElementById("cadanganSesiSelect");
+      if (!dateSel || !sesiSel) return;
+
+      const uniqueDates = [];
+      appState.jadwalList.forEach(j => {
+        const d = formatTanggalIndo(j.hariTanggal);
+        if (!uniqueDates.includes(d)) uniqueDates.push(d);
+      });
+
+      const prevDate = dateSel.value;
+      dateSel.innerHTML = uniqueDates.length > 0
+        ? uniqueDates.map(d => `<option value="${d}">${d}</option>`).join("")
+        : `<option value="">-- Belum Ada Jadwal --</option>`;
+      if (uniqueDates.includes(prevDate)) dateSel.value = prevDate;
+
+      const prevSesi = sesiSel.value;
+      sesiSel.innerHTML = appState.sesiList.map(s =>
+        `<option value="${s.sesiKe}">Sesi ${s.sesiKe} (${s.jamMulai} - ${s.jamSelesai})</option>`
+      ).join("");
+      if (appState.sesiList.some(s => String(s.sesiKe) === String(prevSesi))) {
+        sesiSel.value = prevSesi;
+      }
+
+      onCadanganDateOrSesiChange();
+    }
+
+    function onCadanganDateOrSesiChange() {
+      const dateVal = document.getElementById("cadanganDateSelect")?.value || "";
+      const sesiVal = document.getElementById("cadanganSesiSelect")?.value || "";
+      const slotSel = document.getElementById("cadanganTargetSlotSelect");
+      const guruSel = document.getElementById("cadanganGuruSelect");
+      if (!slotSel || !guruSel) return;
+
+      const sessionRows = appState.jadwalList.filter(j =>
+        formatTanggalIndo(j.hariTanggal) === dateVal && String(j.sesiKe) === String(sesiVal)
+      );
+
+      if (sessionRows.length === 0) {
+        slotSel.innerHTML = `<option value="">-- Tidak ada jadwal pada Hari & Sesi ini --</option>`;
+        guruSel.innerHTML = `<option value="">-- Pilih Guru Cadangan --</option>`;
+        return;
+      }
+
+      // Tanpa embel-embel "(Izin)" di belakang nama guru agar tidak membingungkan
+      const slotOptions = [];
+      sessionRows.forEach(r => {
+        slotOptions.push(`<option value="${r.idJadwal}|1">Ruang ${r.noRuang} (${r.namaRuang}) - Pengawas 1: ${r.p1Nama}</option>`);
+        slotOptions.push(`<option value="${r.idJadwal}|2">Ruang ${r.noRuang} (${r.namaRuang}) - Pengawas 2: ${r.p2Nama}</option>`);
+      });
+      slotSel.innerHTML = slotOptions.join("");
+
+      const filterMode = document.getElementById("dropdownFilterMode")?.value || "free_only";
+      const candidateGurus = appState.guruList.filter(g => {
+        if (filterMode === "free_only") {
+          const busy = sessionRows.some(r => r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru);
+          return !busy;
+        }
+        return true;
+      });
+
+      if (candidateGurus.length === 0) {
+        guruSel.innerHTML = `<option value="">-- Semua guru sudah mengawasi di sesi ini --</option>`;
+      } else {
+        guruSel.innerHTML = candidateGurus.map(g => {
+          const busyRow = sessionRows.find(r => r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru);
+          const info = busyRow ? ` (Mengawasi: ${busyRow.namaRuang})` : " (Bebas Tugas / Tersedia)";
+          return `<option value="${g.kodeGuru}">${g.kodeGuru} - ${g.namaGuru}${info}</option>`;
+        }).join("");
+      }
+    }
+
+    function applyCustomCadanganIzin() {
+      const slotVal = document.getElementById("cadanganTargetSlotSelect")?.value || "";
+      const newKodeGuru = document.getElementById("cadanganGuruSelect")?.value || "";
+      if (!slotVal || !newKodeGuru) {
+        showToast("Pilih Ruang/Guru Pengawas dan Guru Pengawas Cadangan terlebih dahulu!", true);
+        return;
+      }
+      const [idJadwal, roleStr] = slotVal.split("|");
+      handleSupervisorChange(idJadwal, Number(roleStr), newKodeGuru, null);
+    }
+
+    function handleSupervisorChange(idJadwal, roleNumber, newKodeGuru, selectElem) {
+      const targetRow = appState.jadwalList.find(j => j.idJadwal === idJadwal);
+      if (!targetRow) return;
+
+      const selectedGuru = appState.guruList.find(g => g.kodeGuru === newKodeGuru);
+      if (!selectedGuru) return;
+
+      const sameSessionRows = appState.jadwalList.filter(j =>
+        formatTanggalIndo(j.hariTanggal) === formatTanggalIndo(targetRow.hariTanggal) &&
+        String(j.sesiKe) === String(targetRow.sesiKe)
+      );
+
+      for (const row of sameSessionRows) {
+        const isCurrentRole = (row.idJadwal === idJadwal) &&
+          ((roleNumber === 1 && row.p1Kode === newKodeGuru) || (roleNumber === 2 && row.p2Kode === newKodeGuru));
+        if (isCurrentRole) continue;
+
+        if (row.p1Kode === newKodeGuru || row.p2Kode === newKodeGuru) {
+          const conflictMsg = `${selectedGuru.namaGuru} telah mengawasi di ruang ${row.namaRuang}, pilih yang lain`;
+          alert(conflictMsg);
+          showToast(conflictMsg, true);
+          if (selectElem) {
+            selectElem.value = roleNumber === 1 ? targetRow.p1Kode : targetRow.p2Kode;
+          }
+          return;
+        }
+      }
+
+      if (roleNumber === 1) {
+        const originalName = targetRow.p1AsliNama || targetRow.p1Nama;
+        targetRow.p1AsliNama = originalName;
+        targetRow.p1Kode = selectedGuru.kodeGuru;
+        targetRow.p1Nama = selectedGuru.namaGuru;
+        targetRow.p1Nip = selectedGuru.nip;
+        targetRow.cadanganKode = selectedGuru.kodeGuru;
+        targetRow.cadanganNama = selectedGuru.namaGuru;
+        targetRow.catatanPengganti = `Pengawas 1 seharusnya ${originalName} diganti ${selectedGuru.namaGuru}`;
+      } else {
+        const originalName = targetRow.p2AsliNama || targetRow.p2Nama;
+        targetRow.p2AsliNama = originalName;
+        targetRow.p2Kode = selectedGuru.kodeGuru;
+        targetRow.p2Nama = selectedGuru.namaGuru;
+        targetRow.p2Nip = selectedGuru.nip;
+        targetRow.cadanganKode = selectedGuru.kodeGuru;
+        targetRow.cadanganNama = selectedGuru.namaGuru;
+        targetRow.catatanPengganti = `Pengawas 2 seharusnya ${originalName} diganti ${selectedGuru.namaGuru}`;
+      }
+
+      renderJadwalTable();
+      updateCustomCadanganSelectors();
+      postToSpreadsheet({
+        action: "replacePengawas",
+        idJadwal: idJadwal,
+        peran: String(roleNumber),
+        kodeGuruBaru: selectedGuru.kodeGuru,
+        namaGuruBaru: selectedGuru.namaGuru,
+        nipGuruBaru: selectedGuru.nip,
+        catatanPengganti: targetRow.catatanPengganti
+      });
+      showToast(targetRow.catatanPengganti);
+    }
+
+    function resetIzinPengawas(idJadwal) {
+      const row = appState.jadwalList.find(j => j.idJadwal === idJadwal);
+      if (!row) return;
+
+      if (row.p1AsliNama) {
+        const origGuru = appState.guruList.find(g => g.namaGuru === row.p1AsliNama);
+        if (origGuru) {
+          row.p1Kode = origGuru.kodeGuru;
+          row.p1Nama = origGuru.namaGuru;
+          row.p1Nip = origGuru.nip;
+        }
+        row.p1AsliNama = "";
+      }
+      if (row.p2AsliNama) {
+        const origGuru = appState.guruList.find(g => g.namaGuru === row.p2AsliNama);
+        if (origGuru) {
+          row.p2Kode = origGuru.kodeGuru;
+          row.p2Nama = origGuru.namaGuru;
+          row.p2Nip = origGuru.nip;
+        }
+        row.p2AsliNama = "";
+      }
+      row.cadanganKode = "";
+      row.cadanganNama = "";
+      row.catatanPengganti = "";
+
+      renderJadwalTable();
+      updateCustomCadanganSelectors();
+      postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList });
+      showToast("Pengawas dikembalikan sesuai jadwal semula.");
+    }
+
+    // ============================================================================
+    // RENDER UI TABLES & DASHBOARD SUMMARY STATS
+    // ============================================================================
+    function updateDashboardSummaryStats() {
+      const gCount = appState.guruList.length;
+      const rCount = appState.ruangList.length;
+      const jCount = appState.jadwalList.length;
+      const pCount = appState.presensiList.length;
+
+      const statG = document.getElementById("statGuruCount");
+      const statR = document.getElementById("statRuangCount");
+      const statJ = document.getElementById("statJadwalCount");
+      const statP = document.getElementById("statPresensiCount");
+
+      if (statG) statG.innerText = `${gCount} Guru`;
+      if (statR) statR.innerText = `${rCount} Ruang`;
+      if (statJ) statJ.innerText = jCount > 0 ? `${jCount} Slot` : "Belum Ada";
+      if (statP) statP.innerText = `${pCount} Hadir`;
+
+      const navJ = document.getElementById("navJadwalCountBadge");
+      const navR = document.getElementById("navRuangCountBadge");
+      const navP = document.getElementById("navPresensiCountBadge");
+
+      if (navJ) navJ.innerText = jCount;
+      if (navR) navR.innerText = rCount;
+      if (navP) navP.innerText = pCount;
+    }
+
+    function renderAll() {
+      document.getElementById("eventNameInput").value = appState.eventName;
+      document.getElementById("activeEventHeader").innerText = appState.eventName || "Belum Diatur";
+      updateDashboardSummaryStats();
+      renderExamDatesChips();
+      renderSesiTable();
+      renderGuruTable();
+      renderRuangTable();
+      updateJadwalFilterDateOptions();
+      renderJadwalTable();
+      updateCustomCadanganSelectors();
+      renderRoomQrLabels();
+      renderPresensiTable();
+    }
+
+    function renderSesiTable() {
+      const countBadge = document.getElementById("sesiCountBadge");
+      if (countBadge) countBadge.innerText = appState.sesiList.length + " Sesi";
+      const sel = document.getElementById("sesiCountSelect");
+      if (sel && appState.sesiList.length >= 1 && appState.sesiList.length <= 6) {
+        sel.value = String(appState.sesiList.length);
+      }
+
+      const tb = document.getElementById("sesiTableBody");
+      tb.innerHTML = appState.sesiList.map(s => {
+        const cleanM = sanitizeJamValue(s.jamMulai, s.sesiKe, true);
+        const cleanS = sanitizeJamValue(s.jamSelesai, s.sesiKe, false);
+        return `
+          <tr>
+            <td><strong>Sesi ${s.sesiKe}</strong></td>
+            <td>
+              <input id="sesiMulai_${s.sesiKe}" class="neu-inset" type="text" value="${cleanM}"
+                placeholder="07:30" style="padding:6px 9px; font-size:0.82rem; max-width:95px;"
+                onchange="onInlineSesiTimeInput('${s.sesiKe}', 'jamMulai', this.value)" />
+            </td>
+            <td>
+              <input id="sesiSelesai_${s.sesiKe}" class="neu-inset" type="text" value="${cleanS}"
+                placeholder="08:30" style="padding:6px 9px; font-size:0.82rem; max-width:95px;"
+                onchange="onInlineSesiTimeInput('${s.sesiKe}', 'jamSelesai', this.value)" />
+            </td>
+            <td style="white-space:nowrap;">
+              <button class="neu-btn neu-btn-primary" style="padding:5px 9px; font-size:0.74rem;" onclick="saveSingleSesiRow('${s.sesiKe}')" title="Simpan Jam Sesi ${s.sesiKe}">💾</button>
+              <button class="neu-btn neu-btn-danger" style="padding:5px 9px; font-size:0.74rem;" onclick="deleteSesiItem('${s.sesiKe}')" title="Hapus Sesi ${s.sesiKe}">✕</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderGuruTable() {
+      document.getElementById("guruCountBadge").innerText = appState.guruList.length + " Guru";
+      const tb = document.getElementById("guruTableBody");
+      if (appState.guruList.length === 0) {
+        tb.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:16px; color:var(--text-muted);">Belum ada data guru pengawas.</td></tr>`;
+        return;
+      }
+      tb.innerHTML = appState.guruList.map(g => `
+        <tr>
+          <td><strong>${g.kodeGuru}</strong></td>
+          <td>${g.namaGuru}</td>
+          <td><code>${g.nip}</code></td>
+          <td style="white-space:nowrap;">
+            <button class="neu-btn" style="padding:4px 8px; font-size:0.75rem;" onclick="editGuruItem('${g.kodeGuru}')">Edit</button>
+            <button class="neu-btn neu-btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteGuruItem('${g.kodeGuru}')">Hapus</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderRuangTable() {
+      document.getElementById("ruangCountBadge").innerText = appState.ruangList.length + " Ruang";
+      const tb = document.getElementById("ruangTableBody");
+      if (appState.ruangList.length === 0) {
+        tb.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:16px; color:var(--text-muted);">Belum ada data ruang ujian.</td></tr>`;
+        return;
+      }
+      tb.innerHTML = appState.ruangList.map(r => `
+        <tr>
+          <td><strong>${r.noRuang}</strong></td>
+          <td>${r.namaRuang}</td>
+          <td style="white-space:nowrap;">
+            <button class="neu-btn" style="padding:4px 8px; font-size:0.75rem;" onclick="editRuangItem('${r.noRuang}')">Edit</button>
+            <button class="neu-btn neu-btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteRuangItem('${r.noRuang}')">Hapus</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderJadwalTable() {
+      const badge = document.getElementById("savedJadwalCountBadge");
+      const emptyBox = document.getElementById("emptyJadwalState");
+      const filledBox = document.getElementById("filledJadwalContainer");
+      const tb = document.getElementById("jadwalTableBody");
+
+      const totalJadwal = appState.jadwalList.length;
+      if (badge) {
+        badge.innerText = totalJadwal > 0 ? `${totalJadwal} Jadwal Tersimpan` : "Belum ada jadwal tersimpan";
+      }
+
+      // Jika belum ada jadwal tersimpan, tampilkan label "Belum ada jadwal tersimpan"
+      if (totalJadwal === 0) {
+        if (emptyBox) emptyBox.classList.remove("hidden");
+        if (filledBox) filledBox.classList.add("hidden");
+        if (tb) tb.innerHTML = "";
+        return;
+      }
+
+      if (emptyBox) emptyBox.classList.add("hidden");
+      if (filledBox) filledBox.classList.remove("hidden");
+
+      const filterMode = document.getElementById("dropdownFilterMode")?.value || "free_only";
+      const selectedDateFilter = document.getElementById("jadwalFilterDateSelect")?.value || "ALL";
+
+      const filteredRows = appState.jadwalList.filter(j => {
+        if (selectedDateFilter === "ALL") return true;
+        return formatTanggalIndo(j.hariTanggal) === selectedDateFilter;
+      });
+
+      tb.innerHTML = filteredRows.map((j, idx) => {
+        const sameSessionRows = appState.jadwalList.filter(x =>
+          formatTanggalIndo(x.hariTanggal) === formatTanggalIndo(j.hariTanggal) &&
+          String(x.sesiKe) === String(j.sesiKe)
+        );
+
+        const buildOptions = (currentKode) => {
+          return appState.guruList.filter(g => {
+            if (g.kodeGuru === currentKode) return true;
+            if (filterMode === "free_only") {
+              const busy = sameSessionRows.some(r => r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru);
+              return !busy;
+            }
+            return true;
+          }).map(g => {
+            const busyRow = sameSessionRows.find(r =>
+              (r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru) && g.kodeGuru !== currentKode
+            );
+            const suffix = busyRow ? ` (Mengawasi: ${busyRow.namaRuang})` : "";
+            const selected = g.kodeGuru === currentKode ? "selected" : "";
+            return `<option value="${g.kodeGuru}" ${selected}>${g.kodeGuru} - ${g.namaGuru}${suffix}</option>`;
+          }).join("");
+        };
+
+        const cleanJam = sanitizeJamSesiRange(j.jamSesi, j.sesiKe);
+
+        return `
+          <tr>
+            <td style="text-align:center; font-weight:700; color:var(--text-muted);">${idx + 1}</td>
+            <td><strong>${formatTanggalIndo(j.hariTanggal)}</strong></td>
+            <td>
+              <span class="badge badge-role">Sesi ${j.sesiKe}</span>
+              <div style="font-size:0.77rem; color:var(--text-secondary); font-weight:700; margin-top:3px;">${cleanJam}</div>
+            </td>
+            <td>
+              <strong>Ruang ${j.noRuang}</strong>
+              <div style="font-size:0.78rem; color:var(--text-secondary);">${j.namaRuang}</div>
+            </td>
+            <td>
+              <select class="neu-inset" style="padding:6px 9px; font-size:0.8rem;" onchange="handleSupervisorChange('${j.idJadwal}', 1, this.value, this)">
+                ${buildOptions(j.p1Kode)}
+              </select>
+            </td>
+            <td>
+              <select class="neu-inset" style="padding:6px 9px; font-size:0.8rem;" onchange="handleSupervisorChange('${j.idJadwal}', 2, this.value, this)">
+                ${buildOptions(j.p2Kode)}
+              </select>
+            </td>
+            <td>
+              ${j.catatanPengganti
+                ? `<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                     <span class="badge badge-substitute">🔄 ${j.catatanPengganti}</span>
+                     <button class="neu-btn neu-btn-danger" style="padding:4px 9px; font-size:0.72rem;" onclick="resetIzinPengawas('${j.idJadwal}')" title="Kembalikan Pengawas Semula">↺ Kembalikan Semula</button>
+                   </div>`
+                : `<span class="badge badge-success">✔ Sesuai Jadwal</span>`}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // ============================================================================
+    // HALAMAN 3: LABEL RUANG & QR-CODE (1 LEMBAR KERTAS A4 = 1 RUANG)
+    // ============================================================================
+    function renderRoomQrLabels() {
+      const container = document.getElementById("qrRoomGrid");
+      if (!container) return;
+      container.innerHTML = "";
+      const eventTitle = appState.eventName || "ASESMEN SUMATIF AKHIR TAHUN";
+
+      if (appState.ruangList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-schedule-box" style="grid-column: 1 / -1;">
+            <div class="empty-schedule-icon">🏫</div>
+            <div class="empty-schedule-title">Belum Ada Data Ruang Ujian</div>
+            <div class="empty-schedule-desc">Tambahkan daftar ruang ujian terlebih dahulu pada menu <strong>"Buat Jadwal Pengawas"</strong> untuk membuat QR-Code Label Ruang A4.</div>
+          </div>
+        `;
+        return;
+      }
+
+      appState.ruangList.forEach((r, idx) => {
+        const wrap = document.createElement("div");
+        wrap.className = "neu-card";
+        wrap.style.display = "flex";
+        wrap.style.flexDirection = "column";
+        wrap.style.gap = "12px";
+
+        const qrId = "qr_item_" + idx;
+        wrap.innerHTML = `
+          <div class="a4-sheet-preview">
+            <div class="a4-outer-frame">
+              <div class="a4-inner-frame" style="justify-content: space-evenly;">
+                <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                  <div style="font-size:0.74rem; font-weight:800; letter-spacing:2px; color:#64748B;">
+                    SMKN 1 MONDOKAN • PRESENSI PENGAWAS RUANG
+                  </div>
+                </div>
+
+                <div class="a4-event-title">${eventTitle}</div>
+
+                <div style="width:100%; display:flex; flex-direction:column; align-items:center; padding: 0 8px; box-sizing: border-box;">
+                  <div style="font-size:0.82rem; font-weight:800; color:#D97706; letter-spacing:1.5px;">
+                    RUANG UJIAN NO. ${r.noRuang}
+                  </div>
+                  <div class="a4-room-name">${r.namaRuang}</div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:100%;">
+                  <div class="a4-qr-wrapper">
+                    <div id="${qrId}" class="a4-qr-box"></div>
+                  </div>
+                  <div style="font-size:0.68rem; font-weight:700; color:#1E3A8A; letter-spacing:1px;">
+                    SCAN QR-CODE UNTUK PRESENSI PENGAWAS
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="neu-btn neu-btn-primary" style="width:100%;" onclick="downloadSingleRoomLabelPDF(${idx})">
+            🖨️ Unduh PDF A4 (${r.namaRuang})
+          </button>
+        `;
+        container.appendChild(wrap);
+
+        const qrPayload = JSON.stringify({
+          namaRuang: r.namaRuang,
+          namaEvent: appState.eventName,
+          namaRuangDanEvent: `${r.namaRuang} - ${appState.eventName}`
+        });
+
+        new QRCode(document.getElementById(qrId), {
+          text: qrPayload,
+          width: 240,
+          height: 240,
+          colorDark: "#0F172A",
+          colorLight: "#FFFFFF",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      });
+    }
+
+    function drawRoomPageOnPdf(doc, r, idx) {
+      const pageW = 210;
+      const pageH = 297;
+      const centerX = pageW / 2;
+      const eventTitle = (appState.eventName || "ASESMEN SUMATIF AKHIR TAHUN").toUpperCase();
+
+      doc.setDrawColor(30, 58, 138);
+      doc.setLineWidth(1.6);
+      doc.roundedRect(12, 12, pageW - 24, pageH - 24, 4, 4, "S");
+
+      doc.setDrawColor(217, 119, 6);
+      doc.setLineWidth(0.7);
+      doc.roundedRect(15.5, 15.5, pageW - 31, pageH - 31, 3, 3, "S");
+
+      doc.setDrawColor(30, 58, 138);
+      doc.setLineWidth(0.35);
+      doc.roundedRect(18, 18, pageW - 36, pageH - 36, 2, 2, "S");
+
+      const corners = [
+        { x: 22, y: 22, dx: 1, dy: 1 },
+        { x: pageW - 22, y: 22, dx: -1, dy: 1 },
+        { x: 22, y: pageH - 22, dx: 1, dy: -1 },
+        { x: pageW - 22, y: pageH - 22, dx: -1, dy: -1 }
+      ];
+      corners.forEach(c => {
+        doc.setDrawColor(217, 119, 6);
+        doc.setLineWidth(0.9);
+        doc.line(c.x, c.y, c.x + c.dx * 18, c.y);
+        doc.line(c.x, c.y, c.x, c.y + c.dy * 18);
+        doc.setDrawColor(30, 58, 138);
+        doc.setLineWidth(0.5);
+        doc.line(c.x + c.dx * 4, c.y + c.dy * 4, c.x + c.dx * 14, c.y + c.dy * 4);
+        doc.line(c.x + c.dx * 4, c.y + c.dy * 4, c.x + c.dx * 4, c.y + c.dy * 14);
+        doc.setFillColor(217, 119, 6);
+        doc.circle(c.x + c.dx * 6, c.y + c.dy * 6, 1.4, "F");
+      });
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text("SMKN 1 MONDOKAN • LABEL PRESENSI PENGAWAS RUANG", centerX, 40, { align: "center" });
+
+      const eventFontSize = 20;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(eventFontSize);
+      doc.setTextColor(30, 58, 138);
+      const wrappedEvent = doc.splitTextToSize(eventTitle, 148);
+      doc.text(wrappedEvent, centerX, 58, { align: "center" });
+
+      const dividerY = 58 + (wrappedEvent.length * 8.8) + 4;
+      doc.setDrawColor(217, 119, 6);
+      doc.setLineWidth(0.7);
+      doc.line(centerX - 45, dividerY, centerX + 45, dividerY);
+      doc.setFillColor(217, 119, 6);
+      doc.circle(centerX, dividerY, 2, "F");
+
+      const roomBannerX = 28;
+      const roomBannerW = pageW - (roomBannerX * 2);
+      const roomBannerY = dividerY + 12;
+
+      const roomFontSize = 44;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(roomFontSize);
+      const roomTextUpper = String(r.namaRuang || "").toUpperCase();
+      const wrappedRoom = doc.splitTextToSize(roomTextUpper, roomBannerW - 16);
+      const roomLineCount = Math.max(1, wrappedRoom.length);
+      const roomLineHeightMm = 17;
+      const roomBannerH = 30 + (roomLineCount * roomLineHeightMm);
+
+      doc.setFillColor(254, 249, 238);
+      doc.setDrawColor(217, 119, 6);
+      doc.setLineWidth(1.3);
+      doc.roundedRect(roomBannerX, roomBannerY, roomBannerW, roomBannerH, 4, 4, "FD");
+
+      doc.setDrawColor(30, 58, 138);
+      doc.setLineWidth(0.45);
+      doc.roundedRect(roomBannerX + 2.2, roomBannerY + 2.2, roomBannerW - 4.4, roomBannerH - 4.4, 3, 3, "S");
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(217, 119, 6);
+      doc.text(`RUANG UJIAN NO. ${r.noRuang}`, centerX, roomBannerY + 12, { align: "center" });
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(roomFontSize);
+      doc.setTextColor(15, 23, 42);
+      doc.text(wrappedRoom, centerX, roomBannerY + 32, { align: "center" });
+
+      const qrSizeMm = pageW / 4;
+      const qrFramePad = 7;
+      const qrBoxSize = qrSizeMm + qrFramePad * 2;
+      const qrBoxX = (pageW - qrBoxSize) / 2;
+      const qrBoxY = roomBannerY + roomBannerH + 15;
+
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(30, 58, 138);
+      doc.setLineWidth(1.2);
+      doc.roundedRect(qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 5, 5, "FD");
+
+      doc.setDrawColor(217, 119, 6);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(qrBoxX + 2.5, qrBoxY + 2.5, qrBoxSize - 5, qrBoxSize - 5, 3, 3, "S");
+
+      const qrContainer = document.getElementById("qr_item_" + idx);
+      const canvas = qrContainer ? qrContainer.querySelector("canvas") : null;
+      if (canvas) {
+        const imgData = canvas.toDataURL("image/png");
+        doc.addImage(imgData, "PNG", (pageW - qrSizeMm) / 2, qrBoxY + qrFramePad, qrSizeMm, qrSizeMm);
+      }
+
+      const captionY = qrBoxY + qrBoxSize + 12;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(30, 58, 138);
+      doc.text("SCAN QR-CODE INI UNTUK PRESENSI PENGAWAS RUANG", centerX, captionY, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`${r.namaRuang} • ${appState.eventName || ""}`, centerX, captionY + 6, { align: "center" });
+    }
+
+    function downloadSingleRoomLabelPDF(idx) {
+      showLoading("Menyiapkan PDF Label Ruang...", "Merender QR-Code & menyusun halaman A4");
+      renderRoomQrLabels();
+      setTimeout(() => {
+        try {
+          const r = appState.ruangList[idx];
+          if (!r) return;
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+          drawRoomPageOnPdf(doc, r, idx);
+          doc.save(`Label_QR_${r.namaRuang.replace(/\s+/g, "_")}_A4.pdf`);
+          showToast(`PDF A4 untuk ${r.namaRuang} berhasil diunduh!`);
+        } finally {
+          hideLoading();
+        }
+      }, 220);
+    }
+
+    function downloadRoomLabelsPDF() {
+      if (appState.ruangList.length === 0) {
+        showToast("Data Ruang masih kosong!", true);
+        return;
+      }
+      showLoading("Menyiapkan PDF Semua Label Ruang...", `Merender ${appState.ruangList.length} halaman A4 (1 ruang/lembar)`);
+      renderRoomQrLabels();
+      setTimeout(() => {
+        try {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+          appState.ruangList.forEach((r, idx) => {
+            if (idx > 0) doc.addPage();
+            drawRoomPageOnPdf(doc, r, idx);
+          });
+
+          doc.save("Label_QR_Ruang_A4_1_Lembar_1_Ruang.pdf");
+          showToast(`PDF Label Ruang A4 (${appState.ruangList.length} halaman, 1 ruang/lembar) berhasil diunduh!`);
+        } finally {
+          hideLoading();
+        }
+      }, 280);
+    }
+
+    // ============================================================================
+    // UNDUH EXCEL & PDF JADWAL PENGAWAS
+    // ============================================================================
+    function exportJadwalExcel() {
+      if (appState.jadwalList.length === 0) {
+        showToast("Belum ada jadwal tersimpan untuk diunduh!", true);
+        return;
+      }
+      showLoading("Menyiapkan File Excel (.xlsx)...", "Menyusun tabel jadwal pengawas asesmen");
+      setTimeout(() => {
+        try {
+          const rows = appState.jadwalList.map((j, index) => ({
+            "No": index + 1,
+            "Nama Event": j.namaEvent,
+            "Hari / Tanggal": formatTanggalIndo(j.hariTanggal),
+            "Sesi Ke": j.sesiKe,
+            "Jam Sesi": sanitizeJamSesiRange(j.jamSesi, j.sesiKe),
+            "No Ruang": j.noRuang,
+            "Nama Ruang": j.namaRuang,
+            "Kode Pengawas 1": j.p1Kode,
+            "Nama Pengawas 1": j.p1Nama,
+            "NIP Pengawas 1": j.p1Nip,
+            "Kode Pengawas 2": j.p2Kode,
+            "Nama Pengawas 2": j.p2Nama,
+            "NIP Pengawas 2": j.p2Nip,
+            "Keterangan Pengawas Cadangan / Pengganti": j.catatanPengganti || "Sesuai Jadwal"
+          }));
+          const ws = XLSX.utils.json_to_sheet(rows);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Jadwal_Pengawas");
+          XLSX.writeFile(wb, "Jadwal_Pengawas_Asesmen.xlsx");
+          showToast("File Excel (.xlsx) berhasil diunduh!");
+        } finally {
+          hideLoading();
+        }
+      }, 150);
+    }
+
+    function exportJadwalPDF() {
+      if (appState.jadwalList.length === 0) {
+        showToast("Belum ada jadwal tersimpan untuk diunduh!", true);
+        return;
+      }
+      showLoading("Menyiapkan File PDF Jadwal...", "Menyusun dokumen jadwal pengawas asesmen");
+      setTimeout(() => {
+        try {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(14);
+          doc.text("JADWAL PENGAWAS RUANG - " + (appState.eventName || "").toUpperCase(), 14, 15);
+
+          const tableRows = appState.jadwalList.map((j, i) => [
+            i + 1,
+            formatTanggalIndo(j.hariTanggal),
+            `Sesi ${j.sesiKe} (${sanitizeJamSesiRange(j.jamSesi, j.sesiKe)})`,
+            `${j.noRuang} - ${j.namaRuang}`,
+            `${j.p1Kode} - ${j.p1Nama}\nNIP: ${j.p1Nip}`,
+            `${j.p2Kode} - ${j.p2Nama}\nNIP: ${j.p2Nip}`,
+            j.catatanPengganti || "Sesuai Jadwal"
+          ]);
+
+          doc.autoTable({
+            startY: 22,
+            head: [["No", "Hari / Tanggal", "Sesi & Jam", "Ruang", "Pengawas 1", "Pengawas 2", "Keterangan Pengawas Cadangan / Pengganti"]],
+            body: tableRows,
+            styles: { fontSize: 8.5, cellPadding: 2.5 },
+            headStyles: { fillColor: [2, 132, 199] }
+          });
+
+          doc.save("Jadwal_Pengawas_Asesmen.pdf");
+          showToast("File PDF Jadwal berhasil diunduh!");
+        } finally {
+          hideLoading();
+        }
+      }, 150);
+    }
+
+    function getSortedPresensi() {
+      const mode = document.getElementById("presensiSortSelect").value;
+      const copy = [...appState.presensiList];
+      if (mode === "nama_guru") {
+        copy.sort((a, b) => a.namaGuru.localeCompare(b.namaGuru) || a.hariTanggal.localeCompare(b.hariTanggal) || Number(a.sesiKe) - Number(b.sesiKe));
+      } else {
+        copy.sort((a, b) => a.hariTanggal.localeCompare(b.hariTanggal) || Number(a.sesiKe) - Number(b.sesiKe) || a.namaGuru.localeCompare(b.namaGuru));
+      }
+      return copy;
+    }
+
+    function renderPresensiTable() {
+      const sorted = getSortedPresensi();
+      const tb = document.getElementById("presensiTableBody");
+      if (sorted.length === 0) {
+        tb.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted); font-weight:600;">Belum ada data presensi scan QR pengawas yang masuk.</td></tr>`;
+        return;
+      }
+      tb.innerHTML = sorted.map((p, idx) => `
+        <tr>
+          <td style="text-align:center; font-weight:700; color:var(--text-muted);">${idx + 1}</td>
+          <td><strong>${formatTanggalIndo(p.hariTanggal)}</strong></td>
+          <td><span class="badge badge-role">Sesi ${p.sesiKe}</span></td>
+          <td><strong>${p.kodeGuru}</strong> - ${p.namaGuru}</td>
+          <td><code>${p.nip}</code></td>
+          <td><strong>${p.peranPengawas}</strong></td>
+          <td>${p.namaRuangDanEvent}</td>
+          <td>${formatWaktuScanIndo(p.waktuScan, p.hariTanggal)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function exportPresensiPDF() {
+      if (appState.presensiList.length === 0) {
+        showToast("Belum ada data presensi untuk diunduh!", true);
+        return;
+      }
+      showLoading("Menyiapkan PDF Rekap Presensi...", "Menyusun dokumen rekapitulasi presensi pengawas");
+      setTimeout(() => {
+        try {
+          const sorted = getSortedPresensi();
+          const sortMode = document.getElementById("presensiSortSelect").value;
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13.5);
+          doc.text("REKAPITULASI PRESENSI PENGAWAS - " + (appState.eventName || "").toUpperCase(), 14, 15);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9.5);
+          doc.text("Urutan Sortir: " + (sortMode === "nama_guru" ? "Berdasarkan Nama Guru (A-Z)" : "Berdasarkan Urut Tanggal & Sesi"), 14, 21);
+
+          const rows = sorted.map((p, i) => [
+            i + 1,
+            formatTanggalIndo(p.hariTanggal),
+            "Sesi " + p.sesiKe,
+            `${p.kodeGuru} - ${p.namaGuru}`,
+            p.nip,
+            p.peranPengawas,
+            p.namaRuangDanEvent,
+            formatWaktuScanIndo(p.waktuScan, p.hariTanggal)
+          ]);
+
+          doc.autoTable({
+            startY: 26,
+            head: [["No", "Hari / Tanggal", "Sesi", "Nama Guru", "NIP", "Pengawas Ke", "Nama Ruang & Nama Event", "Waktu Scan"]],
+            body: rows,
+            styles: { fontSize: 8, cellPadding: 2.5 },
+            headStyles: { fillColor: [5, 150, 105] }
+          });
+
+          doc.save("Rekap_Presensi_Pengawas.pdf");
+          showToast("PDF Rekap Presensi berhasil diunduh!");
+        } finally {
+          hideLoading();
+        }
+      }, 150);
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
