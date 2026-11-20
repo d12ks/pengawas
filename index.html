@@ -567,6 +567,91 @@
       margin-top: 14px;
     }
 
+    /* Kelompok Jadwal Per Hari di Halaman Lihat Jadwal */
+    .day-group-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 14px;
+    }
+
+    .day-group-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: 5px 5px 12px var(--shadow-dark), -5px -5px 12px var(--shadow-light);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .day-group-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 13px 18px;
+      background: var(--table-header-bg);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+    }
+
+    .day-group-title-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .day-group-number-badge {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 0.78rem;
+      padding: 5px 11px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+    }
+
+    .day-group-date-text {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .day-nav-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .day-nav-pill {
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 0.79rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+      transition: all 0.14s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .day-nav-pill:hover {
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .day-nav-pill.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #FFFFFF;
+      border-color: transparent;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.28);
+    }
+
     .date-chip {
       display: flex;
       flex-direction: column;
@@ -1364,17 +1449,17 @@
           <div class="neu-card">
             <div class="section-title">
               <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <span>📅 Daftar Jadwal Pengawas Ruang Tersimpan</span>
+                <span>📅 Daftar Jadwal Pengawas Ruang Tersimpan (Dikelompokkan Per Hari)</span>
                 <span id="savedJadwalCountBadge" class="badge badge-role">0 Jadwal Tersimpan</span>
               </div>
               <div id="jadwalActionButtons" style="display:flex; flex-wrap:wrap; gap:8px;">
                 <button class="neu-btn" onclick="switchTab('jadwal')">
-                  ⚙️ Kembali ke Pengaturan / Buat Jadwal
+                  ⚙️ Pengaturan &amp; Buat Jadwal Baru
                 </button>
                 <button class="neu-btn neu-btn-success" onclick="exportJadwalExcel()">📊 Unduh .XLSX</button>
                 <button class="neu-btn neu-btn-primary" onclick="exportJadwalPDF()">📄 Unduh .PDF</button>
                 <button class="neu-btn neu-btn-danger" onclick="deleteAllSavedJadwal()" title="Hapus seluruh jadwal yang tersimpan agar halaman ringan untuk event berikutnya">
-                  🗑️ Hapus Jadwal Tersimpan
+                  🗑️ Hapus Semua Jadwal
                 </button>
               </div>
             </div>
@@ -1384,7 +1469,7 @@
               <div class="empty-schedule-icon">🗓️</div>
               <div class="empty-schedule-title">Belum ada jadwal tersimpan</div>
               <div class="empty-schedule-desc">
-                Silakan atur sesi, data guru, data ruang, serta tanggal pelaksanaan ujian pada menu <strong>"Buat Jadwal Pengawas"</strong>, lalu klik tombol <strong>"Generate Jadwal Otomatis"</strong>.
+                Silakan atur sesi, data guru, data ruang, serta tanggal pelaksanaan ujian pada menu <strong>"Buat Jadwal Pengawas"</strong>, lalu klik tombol <strong>"Generate Jadwal Otomatis"</strong>, atau tambahkan hari baru di bawah ini.
               </div>
               <button class="neu-btn neu-btn-primary" style="margin-top:6px; padding:11px 20px;" onclick="switchTab('jadwal')">
                 🗓️ Buat Jadwal Pengawas Sekarang
@@ -1393,20 +1478,54 @@
 
             <!-- KONTEN JADWAL JIKA SUDAH ADA JADWAL TERSIMPAN -->
             <div id="filledJadwalContainer">
-              <!-- PANEL PENUGASAN PENGAWAS PENGGANTI / CADANGAN -->
+              <!-- 1. PANEL TAMBAH HARI BARU KE JADWAL YANG SUDAH TERSIMPAN -->
+              <div class="neu-card-compact" style="margin-bottom: 14px;">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
+                  <div>
+                    <div style="font-size:0.88rem; font-weight:800; color:var(--accent);">
+                      ➕ Tambah Hari / Tanggal Baru ke Jadwal Tersimpan
+                    </div>
+                    <div style="font-size:0.78rem; color:var(--text-secondary);">
+                      Tambahkan hari pelaksanaan baru (anti-bentrok) tanpa mengubah atau mereset jadwal hari lain yang sudah tersimpan.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row" style="align-items:flex-end; margin-bottom: 0;">
+                  <div style="flex: 1 1 220px;">
+                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Pilih Tanggal Hari Baru (Senin - Jumat)</label>
+                    <input id="appendJadwalDateInput" class="neu-inset" type="date" onchange="onAppendDateInputChange()" />
+                  </div>
+                  <div style="flex: 1 1 230px;">
+                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Format Hari / Tanggal Indonesia</label>
+                    <input id="appendJadwalDateIndoPreview" class="neu-inset" type="text" readonly style="font-weight:700; color:var(--accent);" />
+                  </div>
+                  <div style="flex: 1 1 210px;">
+                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Pilihan Sesi Ujian Hari Tersebut</label>
+                    <select id="appendJadwalSesiComboSelect" class="neu-inset"></select>
+                  </div>
+                  <div style="flex: 0 0 auto;">
+                    <button class="neu-btn neu-btn-success" style="padding:10px 18px;" onclick="appendSingleDayToSavedSchedule()">
+                      ➕ Tambah Hari ke Jadwal Tersimpan
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. PANEL PENUGASAN PENGAWAS PENGGANTI / CADANGAN -->
               <div class="neu-card-compact" style="margin-bottom: 16px;">
                 <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
                   <div>
                     <div style="font-size:0.88rem; font-weight:800; color:var(--warning);">
-                      🔄 Penugasan Custom Guru Pengawas Cadangan / Pengganti
+                      🔄 Penugasan Custom Guru Pengawas Cadangan / Pengganti (Jika Ada Guru Tidak Hadir)
                     </div>
                     <div style="font-size:0.78rem; color:var(--text-secondary);">
-                      Pilih Hari, Sesi, Ruang &amp; Pengawas yang ingin diganti, lalu pilih Guru Pengawas Cadangan yang tersedia pada sesi tersebut.
+                      Pilih Hari, Sesi, Ruang &amp; Pengawas yang berhalangan hadir, lalu pilih Guru Pengawas Cadangan yang tersedia pada sesi tersebut.
                     </div>
                   </div>
                   <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-                    <select id="jadwalFilterDateSelect" class="neu-inset" style="width:auto; font-size:0.79rem; padding:7px 11px; font-weight:700;" onchange="renderJadwalTable()">
-                      <option value="ALL"> Semua Hari / Tanggal</option>
+                    <select id="jadwalFilterDateSelect" class="neu-inset" style="width:auto; font-size:0.79rem; padding:7px 11px; font-weight:700;" onchange="onSelectDayFilterDropdown(this.value)">
+                      <option value="ALL">📅 Semua Hari / Tanggal</option>
                     </select>
                     <select id="dropdownFilterMode" class="neu-inset" style="width:auto; font-size:0.79rem; padding:7px 11px;" onchange="renderJadwalTable(); updateCustomCadanganSelectors();">
                       <option value="free_only">Dropdown: Hanya Guru Bebas Tugas di Sesi Itu</option>
@@ -1440,23 +1559,11 @@
                 </div>
               </div>
 
-              <!-- TABEL HASIL GENERATE JADWAL (DENGAN STICKY HEADER) -->
-              <div class="table-wrap" style="max-height: calc(100vh - 360px); min-height: 280px; overflow-y: auto;">
-                <table>
-                  <thead>
-                    <tr>
-                      <th style="width:52px; text-align:center;">No</th>
-                      <th>Hari / Tanggal</th>
-                      <th>Sesi &amp; Jam Ujian</th>
-                      <th>Ruang</th>
-                      <th>Pengawas 1</th>
-                      <th>Pengawas 2</th>
-                      <th>Keterangan Pengawas Cadangan / Pengganti</th>
-                    </tr>
-                  </thead>
-                  <tbody id="jadwalTableBody"></tbody>
-                </table>
-              </div>
+              <!-- 3. TOMBOL NAVIGASI CEPAT FILTER HARI -->
+              <div id="jadwalDayNavPills" class="day-nav-pills"></div>
+
+              <!-- 4. DAFTAR KELOMPOK JADWAL PER HARI (DENGAN TOMBOL HAPUS HARI DI TIAP KELOMPOK HARI) -->
+              <div id="jadwalGroupedByDayContainer" class="day-group-list"></div>
             </div>
           </div>
         </section>
@@ -2613,21 +2720,285 @@
     }
 
     // ============================================================================
+    // KELOLA TAMBAH HARI BARU & HAPUS HARI TERTENTU PADA JADWAL TERSIMPAN
+    // ============================================================================
+    function getUniqueScheduleDatesSorted() {
+      const dateMap = new Map();
+      appState.jadwalList.forEach(j => {
+        const indo = formatTanggalIndo(j.hariTanggal);
+        if (!dateMap.has(indo)) {
+          const iso = parseIsoFromAnyDate(j.hariTanggal) || indo;
+          dateMap.set(indo, iso);
+        }
+      });
+      return Array.from(dateMap.entries())
+        .sort((a, b) => a[1].localeCompare(b[1]))
+        .map(entry => ({ indo: entry[0], iso: entry[1] }));
+    }
+
+    function getNextSuggestedAppendIsoDate() {
+      const uniqueDates = getUniqueScheduleDatesSorted();
+      let baseIso = todayIso;
+      if (uniqueDates.length > 0) {
+        const lastIso = uniqueDates[uniqueDates.length - 1].iso;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(lastIso)) {
+          baseIso = lastIso;
+        }
+      }
+      const parts = baseIso.split("-");
+      const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      // Majukan minimal 1 hari kerja (Senin-Jumat) yang belum ada di jadwal
+      const existingIndos = new Set(uniqueDates.map(u => u.indo));
+      for (let step = 0; step < 30; step++) {
+        if (uniqueDates.length > 0 || step > 0) {
+          dt.setDate(dt.getDate() + 1);
+        }
+        if (dt.getDay() === 6) dt.setDate(dt.getDate() + 2);
+        if (dt.getDay() === 0) dt.setDate(dt.getDate() + 1);
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth() + 1).padStart(2, "0");
+        const d = String(dt.getDate()).padStart(2, "0");
+        const candidateIso = `${y}-${m}-${d}`;
+        const candidateIndo = formatTanggalIndo(candidateIso);
+        if (!existingIndos.has(candidateIndo)) {
+          return candidateIso;
+        }
+      }
+      return todayIso;
+    }
+
+    function initAppendDayControls() {
+      const dateInp = document.getElementById("appendJadwalDateInput");
+      const previewInp = document.getElementById("appendJadwalDateIndoPreview");
+      const comboSel = document.getElementById("appendJadwalSesiComboSelect");
+      if (!dateInp || !comboSel) return;
+
+      const suggestedIso = getNextSuggestedAppendIsoDate();
+      dateInp.value = suggestedIso;
+      if (previewInp) {
+        previewInp.value = formatTanggalIndo(suggestedIso);
+      }
+
+      const combos = buildDaySessionCombinations();
+      const defaultSessions = getDefaultSessionsForIsoDate(suggestedIso).join("-");
+      comboSel.innerHTML = combos.map(c =>
+        `<option value="${c.key}" ${c.key === defaultSessions ? "selected" : ""}>${c.label}</option>`
+      ).join("");
+    }
+
+    function onAppendDateInputChange() {
+      const dateInp = document.getElementById("appendJadwalDateInput");
+      const previewInp = document.getElementById("appendJadwalDateIndoPreview");
+      const comboSel = document.getElementById("appendJadwalSesiComboSelect");
+      if (!dateInp) return;
+
+      const iso = dateInp.value || todayIso;
+      if (previewInp) {
+        previewInp.value = formatTanggalIndo(iso);
+      }
+      if (comboSel) {
+        const defaultKey = getDefaultSessionsForIsoDate(iso).join("-");
+        const hasOption = Array.from(comboSel.options).some(opt => opt.value === defaultKey);
+        if (hasOption) comboSel.value = defaultKey;
+      }
+    }
+
+    async function appendSingleDayToSavedSchedule() {
+      const neededPerSession = appState.ruangList.length * 2;
+      if (appState.ruangList.length === 0 || appState.guruList.length < neededPerSession) {
+        showToast(`Pastikan Data Ruang telah diisi dan Jumlah Guru (${appState.guruList.length}) minimal ${neededPerSession} (2 guru/ruang)!`, true);
+        return;
+      }
+
+      const dateInp = document.getElementById("appendJadwalDateInput");
+      const comboSel = document.getElementById("appendJadwalSesiComboSelect");
+      const isoDate = dateInp?.value || "";
+      if (!isoDate) {
+        showToast("Pilih tanggal hari baru terlebih dahulu!", true);
+        return;
+      }
+
+      const parts = isoDate.split("-");
+      const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      if (dt.getDay() === 0 || dt.getDay() === 6) {
+        showToast("SMKN 1 Mondokan menerapkan 5 hari efektif (Senin - Jumat). Pilih hari Senin s/d Jumat!", true);
+        return;
+      }
+
+      const tanggalIndo = formatTanggalIndo(isoDate);
+      const alreadyExists = appState.jadwalList.some(j => formatTanggalIndo(j.hariTanggal) === tanggalIndo);
+      if (alreadyExists) {
+        showToast(`Jadwal untuk ${tanggalIndo} sudah ada di daftar jadwal tersimpan!`, true);
+        return;
+      }
+
+      const chosenCombo = comboSel?.value || appState.sesiList.map(s => String(s.sesiKe)).join("-");
+      const activeSesiKeys = chosenCombo.split("-").filter(Boolean);
+      const daySesiList = appState.sesiList.filter(s => activeSesiKeys.includes(String(s.sesiKe)));
+      if (daySesiList.length === 0) {
+        showToast("Pilih minimal 1 sesi untuk hari baru tersebut!", true);
+        return;
+      }
+
+      showLoading("Menambahkan Hari Baru ke Jadwal...", `Menyusun jadwal anti-bentrok untuk ${tanggalIndo}`);
+      try {
+        await new Promise(r => setTimeout(r, 120));
+
+        // Hitung nomor urut ID berikutnya & offset rotasi guru agar merata dengan hari-hari yang sudah ada
+        let maxIdNum = 0;
+        appState.jadwalList.forEach(j => {
+          const m = String(j.idJadwal || "").match(/(\d+)/);
+          if (m) {
+            const num = parseInt(m[1], 10);
+            if (num > maxIdNum) maxIdNum = num;
+          }
+        });
+        let nextCounter = maxIdNum + 1;
+
+        const existingSessionCount = new Set(
+          appState.jadwalList.map(j => `${formatTanggalIndo(j.hariTanggal)}__${j.sesiKe}`)
+        ).size;
+        let globalOffset = (existingSessionCount * 2) % Math.max(1, appState.guruList.length);
+
+        const appendedRows = [];
+        daySesiList.forEach(sesi => {
+          const rotated = [];
+          for (let i = 0; i < appState.guruList.length; i++) {
+            rotated.push(appState.guruList[(i + globalOffset) % appState.guruList.length]);
+          }
+          globalOffset = (globalOffset + 2) % appState.guruList.length;
+
+          let ptr = 0;
+          const cleanJamSesi = `${sesi.jamMulai} - ${sesi.jamSelesai}`;
+
+          appState.ruangList.forEach(ruang => {
+            const p1 = rotated[ptr++];
+            const p2 = rotated[ptr++];
+            appendedRows.push({
+              idJadwal: "JDW-" + String(nextCounter++).padStart(3, "0"),
+              namaEvent: appState.eventName,
+              hariTanggal: tanggalIndo,
+              sesiKe: String(sesi.sesiKe),
+              jamSesi: cleanJamSesi,
+              noRuang: ruang.noRuang,
+              kodeRuang: ruang.noRuang,
+              namaRuang: ruang.namaRuang,
+              p1Kode: p1.kodeGuru,
+              p1Nama: p1.namaGuru,
+              p1Nip: p1.nip,
+              p2Kode: p2.kodeGuru,
+              p2Nama: p2.namaGuru,
+              p2Nip: p2.nip,
+              cadanganKode: "",
+              cadanganNama: "",
+              p1AsliNama: "",
+              p2AsliNama: "",
+              catatanPengganti: ""
+            });
+          });
+        });
+
+        // Gabungkan dan urutkan berdasarkan tanggal ISO lalu sesi lalu ruang
+        const combined = [...appState.jadwalList, ...appendedRows];
+        combined.sort((a, b) => {
+          const isoA = parseIsoFromAnyDate(a.hariTanggal) || String(a.hariTanggal);
+          const isoB = parseIsoFromAnyDate(b.hariTanggal) || String(b.hariTanggal);
+          if (isoA !== isoB) return isoA.localeCompare(isoB);
+          const sDiff = Number(a.sesiKe) - Number(b.sesiKe);
+          if (sDiff !== 0) return sDiff;
+          return String(a.noRuang).localeCompare(String(b.noRuang), undefined, { numeric: true });
+        });
+
+        appState.jadwalList = combined;
+        if (!appState.selectedExamDates.includes(isoDate)) {
+          appState.selectedExamDates.push(isoDate);
+          appState.selectedExamDates.sort();
+        }
+        appState.daySessionsMap[isoDate] = activeSesiKeys;
+
+        renderExamDatesChips();
+        updateJadwalFilterDateOptions();
+        initAppendDayControls();
+        renderJadwalTable();
+        updateCustomCadanganSelectors();
+        updateDashboardSummaryStats();
+
+        await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
+        showToast(`Hari baru (${tanggalIndo} • ${appendedRows.length} slot ruang) berhasil ditambahkan ke jadwal tersimpan!`);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    async function deleteSingleSavedDayJadwal(tanggalIndoTarget) {
+      const targetRows = appState.jadwalList.filter(j => formatTanggalIndo(j.hariTanggal) === tanggalIndoTarget);
+      if (targetRows.length === 0) return;
+
+      const confirmed = confirm(
+        `Hapus seluruh jadwal pada hari:\n"${tanggalIndoTarget}" (${targetRows.length} slot ruang)?\n\n` +
+        `Jadwal hari lain akan tetap tersimpan.`
+      );
+      if (!confirmed) return;
+
+      showLoading("Menghapus Jadwal Hari Terpilih...", `Menghapus jadwal ${tanggalIndoTarget} dari Spreadsheet`);
+      try {
+        const isoRemoved = parseIsoFromAnyDate(tanggalIndoTarget);
+        appState.jadwalList = appState.jadwalList.filter(
+          j => formatTanggalIndo(j.hariTanggal) !== tanggalIndoTarget
+        );
+        if (isoRemoved) {
+          appState.selectedExamDates = appState.selectedExamDates.filter(d => d !== isoRemoved);
+          delete appState.daySessionsMap[isoRemoved];
+        }
+
+        // Jika filter sedang memilih hari yang dihapus, kembalikan ke ALL
+        const filterSel = document.getElementById("jadwalFilterDateSelect");
+        if (filterSel && filterSel.value === tanggalIndoTarget) {
+          filterSel.value = "ALL";
+        }
+
+        renderExamDatesChips();
+        updateJadwalFilterDateOptions();
+        initAppendDayControls();
+        renderJadwalTable();
+        updateCustomCadanganSelectors();
+        updateDashboardSummaryStats();
+
+        await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
+        showToast(`Jadwal hari ${tanggalIndoTarget} berhasil dihapus!`);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function onSelectDayFilterDropdown(val) {
+      const filterSel = document.getElementById("jadwalFilterDateSelect");
+      if (filterSel) filterSel.value = val;
+      // Sinkronkan juga dropdown nomor 1 pada panel Pengawas Cadangan jika memilih hari spesifik
+      if (val && val !== "ALL") {
+        const cadDateSel = document.getElementById("cadanganDateSelect");
+        if (cadDateSel) {
+          cadDateSel.value = val;
+          onCadanganDateOrSesiChange();
+        }
+      }
+      renderJadwalTable();
+    }
+
+    // ============================================================================
     // PENUGASAN CUSTOM PENGAWAS CADANGAN (TANPA TULISAN "(Izin)" DI DROPDOWN)
     // ============================================================================
     function updateJadwalFilterDateOptions() {
       const filterSel = document.getElementById("jadwalFilterDateSelect");
       if (!filterSel) return;
       const prev = filterSel.value || "ALL";
-      const uniqueDates = [];
-      appState.jadwalList.forEach(j => {
-        const d = formatTanggalIndo(j.hariTanggal);
-        if (!uniqueDates.includes(d)) uniqueDates.push(d);
-      });
-      filterSel.innerHTML = `<option value="ALL">📅 Filter: Semua Hari (${appState.jadwalList.length} Slot)</option>` +
-        uniqueDates.map(d => `<option value="${d}">${d}</option>`).join("");
+      const uniqueDates = getUniqueScheduleDatesSorted().map(u => u.indo);
+      filterSel.innerHTML = `<option value="ALL">📅 Tampilkan Semua Hari (${uniqueDates.length} Hari • ${appState.jadwalList.length} Slot)</option>` +
+        uniqueDates.map((d, idx) => `<option value="${d}">Hari ${idx + 1}: ${d}</option>`).join("");
       if (prev === "ALL" || uniqueDates.includes(prev)) {
         filterSel.value = prev;
+      } else {
+        filterSel.value = "ALL";
       }
     }
 
@@ -2636,15 +3007,11 @@
       const sesiSel = document.getElementById("cadanganSesiSelect");
       if (!dateSel || !sesiSel) return;
 
-      const uniqueDates = [];
-      appState.jadwalList.forEach(j => {
-        const d = formatTanggalIndo(j.hariTanggal);
-        if (!uniqueDates.includes(d)) uniqueDates.push(d);
-      });
+      const uniqueDates = getUniqueScheduleDatesSorted().map(u => u.indo);
 
       const prevDate = dateSel.value;
       dateSel.innerHTML = uniqueDates.length > 0
-        ? uniqueDates.map(d => `<option value="${d}">${d}</option>`).join("")
+        ? uniqueDates.map((d, idx) => `<option value="${d}">Hari ${idx + 1} - ${d}</option>`).join("")
         : `<option value="">-- Belum Ada Jadwal --</option>`;
       if (uniqueDates.includes(prevDate)) dateSel.value = prevDate;
 
@@ -2846,6 +3213,7 @@
       renderGuruTable();
       renderRuangTable();
       updateJadwalFilterDateOptions();
+      initAppendDayControls();
       renderJadwalTable();
       updateCustomCadanganSelectors();
       renderRoomQrLabels();
@@ -2929,18 +3297,24 @@
       const badge = document.getElementById("savedJadwalCountBadge");
       const emptyBox = document.getElementById("emptyJadwalState");
       const filledBox = document.getElementById("filledJadwalContainer");
-      const tb = document.getElementById("jadwalTableBody");
+      const pillsContainer = document.getElementById("jadwalDayNavPills");
+      const groupedContainer = document.getElementById("jadwalGroupedByDayContainer");
 
       const totalJadwal = appState.jadwalList.length;
+      const uniqueDates = getUniqueScheduleDatesSorted();
+
       if (badge) {
-        badge.innerText = totalJadwal > 0 ? `${totalJadwal} Jadwal Tersimpan` : "Belum ada jadwal tersimpan";
+        badge.innerText = totalJadwal > 0
+          ? `${uniqueDates.length} Hari • ${totalJadwal} Slot Tersimpan`
+          : "Belum ada jadwal tersimpan";
       }
 
       // Jika belum ada jadwal tersimpan, tampilkan label "Belum ada jadwal tersimpan"
       if (totalJadwal === 0) {
         if (emptyBox) emptyBox.classList.remove("hidden");
         if (filledBox) filledBox.classList.add("hidden");
-        if (tb) tb.innerHTML = "";
+        if (pillsContainer) pillsContainer.innerHTML = "";
+        if (groupedContainer) groupedContainer.innerHTML = "";
         return;
       }
 
@@ -2950,68 +3324,130 @@
       const filterMode = document.getElementById("dropdownFilterMode")?.value || "free_only";
       const selectedDateFilter = document.getElementById("jadwalFilterDateSelect")?.value || "ALL";
 
-      const filteredRows = appState.jadwalList.filter(j => {
-        if (selectedDateFilter === "ALL") return true;
-        return formatTanggalIndo(j.hariTanggal) === selectedDateFilter;
-      });
+      // Render tombol pil navigasi cepat per hari
+      if (pillsContainer) {
+        const allActive = selectedDateFilter === "ALL" ? "active" : "";
+        let pillsHtml = `
+          <button type="button" class="day-nav-pill ${allActive}" onclick="onSelectDayFilterDropdown('ALL')">
+            <span>📅 Semua Hari (${uniqueDates.length} Hari)</span>
+          </button>
+        `;
+        uniqueDates.forEach((dObj, idx) => {
+          const isAct = selectedDateFilter === dObj.indo ? "active" : "";
+          const escapedIndo = dObj.indo.replace(/'/g, "\\'");
+          pillsHtml += `
+            <button type="button" class="day-nav-pill ${isAct}" onclick="onSelectDayFilterDropdown('${escapedIndo}')">
+              <span>Hari ${idx + 1}: ${dObj.indo}</span>
+            </button>
+          `;
+        });
+        pillsContainer.innerHTML = pillsHtml;
+      }
 
-      tb.innerHTML = filteredRows.map((j, idx) => {
-        const sameSessionRows = appState.jadwalList.filter(x =>
-          formatTanggalIndo(x.hariTanggal) === formatTanggalIndo(j.hariTanggal) &&
-          String(x.sesiKe) === String(j.sesiKe)
-        );
+      // Kelompokkan jadwal berdasarkan Hari / Tanggal
+      const visibleDates = uniqueDates.filter(dObj =>
+        selectedDateFilter === "ALL" || dObj.indo === selectedDateFilter
+      );
 
-        const buildOptions = (currentKode) => {
-          return appState.guruList.filter(g => {
-            if (g.kodeGuru === currentKode) return true;
-            if (filterMode === "free_only") {
-              const busy = sameSessionRows.some(r => r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru);
-              return !busy;
-            }
-            return true;
-          }).map(g => {
-            const busyRow = sameSessionRows.find(r =>
-              (r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru) && g.kodeGuru !== currentKode
-            );
-            const suffix = busyRow ? ` (Mengawasi: ${busyRow.namaRuang})` : "";
-            const selected = g.kodeGuru === currentKode ? "selected" : "";
-            return `<option value="${g.kodeGuru}" ${selected}>${g.kodeGuru} - ${g.namaGuru}${suffix}</option>`;
-          }).join("");
-        };
+      if (!groupedContainer) return;
 
-        const cleanJam = sanitizeJamSesiRange(j.jamSesi, j.sesiKe);
+      groupedContainer.innerHTML = visibleDates.map(dObj => {
+        const dayIndex = uniqueDates.findIndex(u => u.indo === dObj.indo) + 1;
+        const dayRows = appState.jadwalList.filter(j => formatTanggalIndo(j.hariTanggal) === dObj.indo);
+        const sesiSet = new Set(dayRows.map(r => String(r.sesiKe)));
+        const sesiSummary = Array.from(sesiSet).sort((a, b) => Number(a) - Number(b)).join(", ");
+        const escapedIndo = dObj.indo.replace(/'/g, "\\'");
+
+        const rowsHtml = dayRows.map((j, idx) => {
+          const sameSessionRows = dayRows.filter(x => String(x.sesiKe) === String(j.sesiKe));
+
+          const buildOptions = (currentKode) => {
+            return appState.guruList.filter(g => {
+              if (g.kodeGuru === currentKode) return true;
+              if (filterMode === "free_only") {
+                const busy = sameSessionRows.some(r => r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru);
+                return !busy;
+              }
+              return true;
+            }).map(g => {
+              const busyRow = sameSessionRows.find(r =>
+                (r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru) && g.kodeGuru !== currentKode
+              );
+              const suffix = busyRow ? ` (Mengawasi: ${busyRow.namaRuang})` : "";
+              const selected = g.kodeGuru === currentKode ? "selected" : "";
+              return `<option value="${g.kodeGuru}" ${selected}>${g.kodeGuru} - ${g.namaGuru}${suffix}</option>`;
+            }).join("");
+          };
+
+          const cleanJam = sanitizeJamSesiRange(j.jamSesi, j.sesiKe);
+
+          return `
+            <tr>
+              <td style="text-align:center; font-weight:700; color:var(--text-muted);">${idx + 1}</td>
+              <td>
+                <span class="badge badge-role">Sesi ${j.sesiKe}</span>
+                <div style="font-size:0.77rem; color:var(--text-secondary); font-weight:700; margin-top:3px;">${cleanJam}</div>
+              </td>
+              <td>
+                <strong>Ruang ${j.noRuang}</strong>
+                <div style="font-size:0.78rem; color:var(--text-secondary);">${j.namaRuang}</div>
+              </td>
+              <td>
+                <select class="neu-inset" style="padding:6px 9px; font-size:0.8rem;" onchange="handleSupervisorChange('${j.idJadwal}', 1, this.value, this)">
+                  ${buildOptions(j.p1Kode)}
+                </select>
+              </td>
+              <td>
+                <select class="neu-inset" style="padding:6px 9px; font-size:0.8rem;" onchange="handleSupervisorChange('${j.idJadwal}', 2, this.value, this)">
+                  ${buildOptions(j.p2Kode)}
+                </select>
+              </td>
+              <td>
+                ${j.catatanPengganti
+                  ? `<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                       <span class="badge badge-substitute">🔄 ${j.catatanPengganti}</span>
+                       <button class="neu-btn neu-btn-danger" style="padding:4px 9px; font-size:0.72rem;" onclick="resetIzinPengawas('${j.idJadwal}')" title="Kembalikan Pengawas Semula">↺ Kembalikan Semula</button>
+                     </div>`
+                  : `<span class="badge badge-success">✔ Sesuai Jadwal</span>`}
+              </td>
+            </tr>
+          `;
+        }).join("");
 
         return `
-          <tr>
-            <td style="text-align:center; font-weight:700; color:var(--text-muted);">${idx + 1}</td>
-            <td><strong>${formatTanggalIndo(j.hariTanggal)}</strong></td>
-            <td>
-              <span class="badge badge-role">Sesi ${j.sesiKe}</span>
-              <div style="font-size:0.77rem; color:var(--text-secondary); font-weight:700; margin-top:3px;">${cleanJam}</div>
-            </td>
-            <td>
-              <strong>Ruang ${j.noRuang}</strong>
-              <div style="font-size:0.78rem; color:var(--text-secondary);">${j.namaRuang}</div>
-            </td>
-            <td>
-              <select class="neu-inset" style="padding:6px 9px; font-size:0.8rem;" onchange="handleSupervisorChange('${j.idJadwal}', 1, this.value, this)">
-                ${buildOptions(j.p1Kode)}
-              </select>
-            </td>
-            <td>
-              <select class="neu-inset" style="padding:6px 9px; font-size:0.8rem;" onchange="handleSupervisorChange('${j.idJadwal}', 2, this.value, this)">
-                ${buildOptions(j.p2Kode)}
-              </select>
-            </td>
-            <td>
-              ${j.catatanPengganti
-                ? `<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                     <span class="badge badge-substitute">🔄 ${j.catatanPengganti}</span>
-                     <button class="neu-btn neu-btn-danger" style="padding:4px 9px; font-size:0.72rem;" onclick="resetIzinPengawas('${j.idJadwal}')" title="Kembalikan Pengawas Semula">↺ Kembalikan Semula</button>
-                   </div>`
-                : `<span class="badge badge-success">✔ Sesuai Jadwal</span>`}
-            </td>
-          </tr>
+          <div class="day-group-card">
+            <div class="day-group-header">
+              <div class="day-group-title-wrap">
+                <span class="day-group-number-badge">HARI KE-${dayIndex}</span>
+                <span class="day-group-date-text">📅 ${dObj.indo}</span>
+                <span class="badge badge-role">${sesiSet.size} Sesi (Sesi ${sesiSummary}) • ${dayRows.length} Slot Ruang</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="neu-btn neu-btn-danger" style="padding:7px 12px; font-size:0.78rem;"
+                  onclick="deleteSingleSavedDayJadwal('${escapedIndo}')"
+                  title="Hapus jadwal hari ${dObj.indo} saja">
+                  🗑️ Hapus Hari Ini
+                </button>
+              </div>
+            </div>
+            <div class="table-wrap" style="margin-top:0; border:none; border-radius:0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:52px; text-align:center;">No</th>
+                    <th style="width:155px;">Sesi &amp; Jam Ujian</th>
+                    <th style="width:155px;">Ruang</th>
+                    <th>Pengawas 1</th>
+                    <th>Pengawas 2</th>
+                    <th>Keterangan Pengawas Cadangan / Pengganti</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
         `;
       }).join("");
     }
