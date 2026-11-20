@@ -3516,11 +3516,8 @@
         `;
         container.appendChild(wrap);
 
-        const qrPayload = JSON.stringify({
-          namaRuang: r.namaRuang,
-          namaEvent: appState.eventName,
-          namaRuangDanEvent: `${r.namaRuang} - ${appState.eventName}`
-        });
+        // Isi QR-Code langsung berisi Nama Ruang dari tab Data_Ruang kolom "Nama Ruang"
+        const qrPayload = String(r.namaRuang || "").trim();
 
         new QRCode(document.getElementById(qrId), {
           text: qrPayload,
