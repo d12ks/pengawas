@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Pengawas - Manajemen Asesmen SMKN 1 Mondokan</title>
+  <title>Manajemen Jadwal Pengawas Asesmen - SMKN 1 Mondokan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -13,52 +13,52 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
-      --bg-main: #E4E9F2;
-      --bg-card: #E4E9F2;
-      --bg-header-glass: rgba(228, 233, 242, 0.92);
-      --text-primary: #0F172A;
-      --text-secondary: #334155;
-      --text-muted: #64748B;
+      --bg-main: #E6E6E6;
+      --bg-card: #E6E6E6;
+      --bg-header-glass: rgba(230, 230, 230, 0.94);
+      --text-primary: #262626;
+      --text-secondary: #525252;
+      --text-muted: #737373;
       --accent: #0284C7;
       --accent-strong: #0369A1;
-      --accent-soft: rgba(2, 132, 199, 0.12);
-      --success: #059669;
-      --success-soft: rgba(5, 150, 105, 0.14);
-      --warning: #D97706;
-      --warning-soft: rgba(217, 119, 6, 0.15);
-      --danger: #DC2626;
-      --danger-soft: rgba(220, 38, 38, 0.14);
+      --accent-soft: rgba(82, 82, 82, 0.12);
+      --success: #404040;
+      --success-soft: rgba(64, 64, 64, 0.12);
+      --warning: #525252;
+      --warning-soft: rgba(82, 82, 82, 0.14);
+      --danger: #525252;
+      --danger-soft: rgba(82, 82, 82, 0.14);
       --shadow-light: #FFFFFF;
-      --shadow-dark: #B5C1D4;
-      --border-subtle: rgba(255, 255, 255, 0.65);
-      --table-header-bg: #DCE4F0;
-      --table-row-hover: rgba(2, 132, 199, 0.06);
+      --shadow-dark: #BDBDBD;
+      --border-subtle: rgba(255, 255, 255, 0.72);
+      --table-header-bg: #D6D6D6;
+      --table-row-hover: rgba(0, 0, 0, 0.04);
       --radius-xl: 20px;
       --radius-lg: 16px;
       --radius-md: 11px;
     }
 
     body.dark-mode {
-      --bg-main: #1E222A;
-      --bg-card: #1E222A;
-      --bg-header-glass: rgba(30, 34, 42, 0.94);
-      --text-primary: #F8FAFC;
-      --text-secondary: #CBD5E1;
-      --text-muted: #94A3B8;
-      --accent: #38BDF8;
-      --accent-strong: #0284C7;
-      --accent-soft: rgba(56, 189, 248, 0.15);
-      --success: #34D399;
-      --success-soft: rgba(52, 211, 153, 0.15);
-      --warning: #FBBF24;
-      --warning-soft: rgba(251, 191, 36, 0.16);
-      --danger: #F87171;
-      --danger-soft: rgba(248, 113, 113, 0.15);
-      --shadow-light: #282E38;
-      --shadow-dark: #14171C;
-      --border-subtle: rgba(255, 255, 255, 0.07);
-      --table-header-bg: #252A34;
-      --table-row-hover: rgba(56, 189, 248, 0.08);
+      --bg-main: #262626;
+      --bg-card: #262626;
+      --bg-header-glass: rgba(38, 38, 38, 0.94);
+      --text-primary: #F5F5F5;
+      --text-secondary: #D4D4D4;
+      --text-muted: #A3A3A3;
+      --accent: #0284C7;
+      --accent-strong: #0369A1;
+      --accent-soft: rgba(212, 212, 212, 0.12);
+      --success: #D4D4D4;
+      --success-soft: rgba(212, 212, 212, 0.12);
+      --warning: #BDBDBD;
+      --warning-soft: rgba(189, 189, 189, 0.14);
+      --danger: #D4D4D4;
+      --danger-soft: rgba(212, 212, 212, 0.14);
+      --shadow-light: #333333;
+      --shadow-dark: #171717;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --table-header-bg: #303030;
+      --table-row-hover: rgba(255, 255, 255, 0.05);
     }
 
     * {
@@ -168,21 +168,21 @@
     }
 
     .neu-btn-success {
-      background: linear-gradient(135deg, #10B981, #059669);
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
       color: #FFFFFF !important;
       border: none;
-      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.26);
     }
 
     .neu-btn-warning {
-      background: linear-gradient(135deg, #F59E0B, #D97706);
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
       color: #FFFFFF !important;
       border: none;
-      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.26);
     }
 
     .neu-btn-danger {
-      color: var(--danger) !important;
+      color: var(--text-secondary) !important;
     }
 
     /* ==========================================================================
@@ -478,11 +478,11 @@
       z-index: 10;
       background: var(--table-header-bg);
       font-weight: 800;
-      color: var(--accent);
+      color: var(--text-primary);
       text-transform: uppercase;
       font-size: 0.73rem;
       letter-spacing: 0.4px;
-      box-shadow: 0 1px 0 rgba(148, 163, 184, 0.3);
+      box-shadow: 0 1px 0 rgba(115, 115, 115, 0.3);
     }
 
     tbody tr:hover {
@@ -1205,31 +1205,31 @@
     <main class="workspace-scroll-area" id="mainScrollWorkspace">
       <div class="workspace-container">
 
-        <!-- BARIS RINGKASAN STATISTIK PROFESIONAL -->
+        <!-- BARIS RINGKASAN STATISTIK PROFESIONAL (VARIASI ABU-ABU NEUROMORPHIC) -->
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-icon" style="background: var(--accent-soft); color: var(--accent);">👩‍🏫</div>
+            <div class="stat-icon" style="background: var(--accent-soft); color: var(--text-primary);">👩‍🏫</div>
             <div>
               <div class="stat-value" id="statGuruCount">0 Guru</div>
               <div class="stat-label">Total Guru Pengawas Terdaftar</div>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon" style="background: var(--warning-soft); color: var(--warning);">🏫</div>
+            <div class="stat-icon" style="background: var(--accent-soft); color: var(--text-primary);">🏫</div>
             <div>
               <div class="stat-value" id="statRuangCount">0 Ruang</div>
               <div class="stat-label">Ruang Ujian Aktif (2 Guru/Ruang)</div>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon" style="background: var(--success-soft); color: var(--success);">📅</div>
+            <div class="stat-icon" style="background: var(--accent-soft); color: var(--text-primary);">📅</div>
             <div>
               <div class="stat-value" id="statJadwalCount">0 Slot</div>
               <div class="stat-label">Jadwal Tersimpan di Spreadsheet</div>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(139, 92, 246, 0.14); color: #8B5CF6;">✅</div>
+            <div class="stat-icon" style="background: var(--accent-soft); color: var(--text-primary);">✅</div>
             <div>
               <div class="stat-value" id="statPresensiCount">0 Hadir</div>
               <div class="stat-label">Rekap Scan QR Presensi Masuk</div>
@@ -1578,27 +1578,58 @@
           <div class="neu-card">
             <div class="section-title">
               <div>
-                <span>🏷️ Label Nama Ruang &amp; QR-Code (1 Lembar Kertas A4 = 1 Ruang)</span>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                  <span>🏷️ Label Nama &amp; QR-Code Ruang</span>
+                  <span id="savedLabelCountBadge" class="badge badge-role">0 Label Ruang</span>
+                </div>
                 <div style="font-size:0.78rem; color:var(--text-secondary); font-weight:500; margin-top:2px;">
-                  Judul Event rata tengah (Font Besar) • Nama Ruang rata tengah (Font 2x Judul Event) • QR-Code standar 1/4 lebar kertas A4 dengan Frame Elegan
+                  Gunakan kertas ukuran A4 untuk mencetak label ruang.
                 </div>
               </div>
-              <button class="neu-btn neu-btn-primary" onclick="downloadRoomLabelsPDF()">
-                🖨️ Unduh Semua Label Ruang (PDF A4 - 1 Halaman / Ruang)
-              </button>
+              <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <button class="neu-btn neu-btn-primary" onclick="generateAllRoomLabels()" title="Buat / Perbarui Semua Label Ruang & QR-Code sesuai Event & Data Ruang">
+                  🏷️ Buat Label Ruang
+                </button>
+                <button id="btnDownloadAllLabelsPdf" class="neu-btn neu-btn-primary" onclick="downloadRoomLabelsPDF()">
+                  🖨️ Unduh Semua Label Ruang
+                </button>
+                <button id="btnDeleteAllLabels" class="neu-btn neu-btn-danger" onclick="deleteAllRoomLabels()" title="Hapus semua label ruang">
+                  🗑️ Hapus Semua Label
+                </button>
+              </div>
             </div>
             <div id="qrRoomGrid" class="qr-a4-grid"></div>
           </div>
         </section>
 
         <!-- ====================================================================
-             HALAMAN 4: PRESENSI PENGAWAS
+             HALAMAN 4: PRESENSI PENGAWAS (DENGAN AUTO-REFRESH IDEAL TIAP 15 DETIK)
              ==================================================================== -->
         <section id="tabPresensi" class="hidden">
           <div class="neu-card">
             <div class="section-title">
-              <span>✅ Hasil Presensi Pengawas Ruang</span>
-              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                  <span>✅ Hasil Presensi Pengawas Ruang</span>
+                  <span id="presensiAutoRefreshBadge" class="badge badge-role">
+                    🔄 Auto-Refresh Aktif (15 dtk)
+                  </span>
+                </div>
+                <div id="presensiLastSyncSubtext" style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">
+                  Sinkronisasi otomatis setiap 15 detik dari tab Presensi_Pengawas Spreadsheet
+                </div>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <select id="presensiAutoRefreshSelect" class="neu-inset" style="width:auto; font-size:0.8rem; padding:8px 11px; font-weight:700;" onchange="onChangePresensiAutoRefreshInterval(this.value)">
+                  <option value="15" selected>⏱️ Auto-Refresh: 15 Detik (Ideal)</option>
+                  <option value="10">⏱️ Auto-Refresh: 10 Detik</option>
+                  <option value="30">⏱️ Auto-Refresh: 30 Detik</option>
+                  <option value="60">⏱️ Auto-Refresh: 60 Detik</option>
+                  <option value="0">⏸️ Auto-Refresh: Nonaktif</option>
+                </select>
+                <button class="neu-btn" onclick="triggerManualPresensiRefresh()">
+                  🔄 Refresh Sekarang
+                </button>
                 <select id="presensiSortSelect" class="neu-inset" style="width:auto;" onchange="renderPresensiTable()">
                   <option value="tanggal_sesi">Sortir: Urut Tanggal - Sesi</option>
                   <option value="nama_guru">Sortir: Berdasarkan Nama Guru</option>
@@ -1669,6 +1700,14 @@
       eventName: "",
       gasUrl: GAS_WEBAPP_URL,
       isConnectedToSheet: false,
+      labelsCleared: localStorage.getItem("mondokan_labels_cleared") === "true",
+      excludedLabelRoomNos: (() => {
+        try {
+          return JSON.parse(localStorage.getItem("mondokan_excluded_label_rooms") || "[]");
+        } catch (_) {
+          return [];
+        }
+      })(),
       adminList: [],
       guruList: [],
       ruangList: [],
@@ -1682,6 +1721,12 @@
       jadwalList: [],
       presensiList: []
     };
+
+    function getActiveLabelRooms() {
+      if (appState.labelsCleared) return [];
+      const excluded = Array.isArray(appState.excludedLabelRoomNos) ? appState.excludedLabelRoomNos : [];
+      return appState.ruangList.filter(r => !excluded.includes(String(r.noRuang)));
+    }
 
     function getDefaultSessionsForIsoDate(isoDate) {
       const allSesiKeys = appState.sesiList.map(s => String(s.sesiKe));
@@ -2298,7 +2343,15 @@
       document.getElementById("loginView").classList.remove("hidden");
     }
 
+    let currentActiveTab = "jadwal";
+    let presensiAutoRefreshIntervalSec = 15; // Ideal: 15 detik untuk Google Apps Script Web App
+    let presensiCountdownRemaining = 15;
+    let presensiTickerId = null;
+    let isSilentSyncInProgress = false;
+    let lastPresensiSyncTimeStr = "-";
+
     function switchTab(tab) {
+      currentActiveTab = tab;
       const tabs = ["jadwal", "lihatJadwal", "label", "presensi"];
       tabs.forEach(t => {
         const sectionId = "tab" + t.charAt(0).toUpperCase() + t.slice(1);
@@ -2317,7 +2370,75 @@
         updateCustomCadanganSelectors();
       }
       if (tab === "label") renderRoomQrLabels();
-      if (tab === "presensi") renderPresensiTable();
+      if (tab === "presensi") {
+        renderPresensiTable();
+        presensiCountdownRemaining = presensiAutoRefreshIntervalSec;
+        updatePresensiAutoRefreshUI();
+        // Langsung muat data presensi terbaru di latar belakang saat tab Presensi dibuka
+        syncFromSpreadsheet(true);
+      }
+    }
+
+    function onChangePresensiAutoRefreshInterval(valStr) {
+      const sec = parseInt(valStr, 10) || 0;
+      presensiAutoRefreshIntervalSec = sec;
+      presensiCountdownRemaining = sec;
+      updatePresensiAutoRefreshUI();
+      if (sec > 0) {
+        showToast(`Auto-Refresh halaman Presensi diatur setiap ${sec} detik.`);
+      } else {
+        showToast("Auto-Refresh halaman Presensi dinonaktifkan.");
+      }
+    }
+
+    async function triggerManualPresensiRefresh() {
+      presensiCountdownRemaining = presensiAutoRefreshIntervalSec;
+      updatePresensiAutoRefreshUI(true);
+      await syncFromSpreadsheet(false);
+    }
+
+    function updatePresensiAutoRefreshUI(isSyncingNow = false) {
+      const badge = document.getElementById("presensiAutoRefreshBadge");
+      const subtext = document.getElementById("presensiLastSyncSubtext");
+      if (!badge || !subtext) return;
+
+      if (presensiAutoRefreshIntervalSec <= 0) {
+        badge.innerText = "⏸️ Auto-Refresh Nonaktif";
+        subtext.innerText = `Pembaruan otomatis dimatikan • Terakhir disinkronkan: ${lastPresensiSyncTimeStr}`;
+        return;
+      }
+
+      if (isSyncingNow || isSilentSyncInProgress) {
+        badge.innerText = "🔄 Memperbarui Data Presensi...";
+      } else {
+        badge.innerText = `🔄 Auto-Refresh (${presensiAutoRefreshIntervalSec} dtk) • ${presensiCountdownRemaining}s`;
+      }
+      subtext.innerText = `Sinkronisasi otomatis setiap ${presensiAutoRefreshIntervalSec} detik dari Spreadsheet • Update terakhir: ${lastPresensiSyncTimeStr}`;
+    }
+
+    function startPresensiAutoRefreshTimer() {
+      if (presensiTickerId) clearInterval(presensiTickerId);
+      presensiTickerId = setInterval(async () => {
+        const dashView = document.getElementById("dashboardView");
+        const isDashVisible = dashView && !dashView.classList.contains("hidden");
+        if (!isDashVisible || currentActiveTab !== "presensi" || presensiAutoRefreshIntervalSec <= 0) {
+          return;
+        }
+        if (isSilentSyncInProgress) {
+          updatePresensiAutoRefreshUI(true);
+          return;
+        }
+        presensiCountdownRemaining--;
+        if (presensiCountdownRemaining <= 0) {
+          presensiCountdownRemaining = presensiAutoRefreshIntervalSec;
+          updatePresensiAutoRefreshUI(true);
+          await syncFromSpreadsheet(true);
+          presensiCountdownRemaining = presensiAutoRefreshIntervalSec;
+          updatePresensiAutoRefreshUI(false);
+        } else {
+          updatePresensiAutoRefreshUI(false);
+        }
+      }, 1000);
     }
 
     function applyRemoteDataToState(remoteData) {
@@ -2393,6 +2514,8 @@
 
     async function syncFromSpreadsheet(silent = false) {
       if (!appState.gasUrl) return false;
+      if (silent && isSilentSyncInProgress) return false;
+      if (silent) isSilentSyncInProgress = true;
       updateSpreadsheetBadge("connecting", "☁️ Sinkronisasi Spreadsheet...");
       if (!silent) {
         showLoading("Memuat Data Spreadsheet...", "Mengambil data guru, ruang, sesi, jadwal & presensi dari Google Sheets");
@@ -2412,8 +2535,10 @@
         if (json.status === "success" && json.data) {
           const hadCorruptedTime = applyRemoteDataToState(json.data);
           appState.isConnectedToSheet = true;
-          const timeNow = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+          const timeNow = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+          lastPresensiSyncTimeStr = timeNow;
           updateSpreadsheetBadge("connected", `🟢 Terhubung Spreadsheet (${timeNow})`);
+          updatePresensiAutoRefreshUI(false);
           renderAll();
 
           if (hadCorruptedTime) {
@@ -2435,6 +2560,8 @@
         }
         return false;
       } finally {
+        if (silent) isSilentSyncInProgress = false;
+        updatePresensiAutoRefreshUI(false);
         if (!silent) {
           hideLoading();
         }
@@ -3320,8 +3447,9 @@
       const navR = document.getElementById("navRuangCountBadge");
       const navP = document.getElementById("navPresensiCountBadge");
 
+      const activeLabelsCount = getActiveLabelRooms().length;
       if (navJ) navJ.innerText = jCount;
-      if (navR) navR.innerText = rCount;
+      if (navR) navR.innerText = activeLabelsCount;
       if (navP) navP.innerText = pCount;
     }
 
@@ -3576,11 +3704,97 @@
     // ============================================================================
     // HALAMAN 3: LABEL RUANG & QR-CODE (1 LEMBAR KERTAS A4 = 1 RUANG)
     // ============================================================================
+    function generateAllRoomLabels() {
+      if (appState.ruangList.length === 0) {
+        showToast("Data Ruang masih kosong! Silakan isi Data Ruang Ujian pada menu Buat Jadwal Pengawas.", true);
+        return;
+      }
+      showLoading("Membuat Label Ruang & QR-Code...", `Menyusun ${appState.ruangList.length} label ruang A4 untuk ${appState.eventName || "Asesmen"}`);
+      setTimeout(() => {
+        try {
+          appState.labelsCleared = false;
+          appState.excludedLabelRoomNos = [];
+          localStorage.setItem("mondokan_labels_cleared", "false");
+          localStorage.setItem("mondokan_excluded_label_rooms", "[]");
+          renderRoomQrLabels();
+          updateDashboardSummaryStats();
+          showToast(`${appState.ruangList.length} Label Ruang & QR-Code berhasil dibuat!`);
+        } finally {
+          hideLoading();
+        }
+      }, 180);
+    }
+
+    function deleteAllRoomLabels() {
+      const activeRooms = getActiveLabelRooms();
+      if (activeRooms.length === 0) {
+        showToast("Belum ada label ruang yang tersimpan untuk dihapus.", true);
+        return;
+      }
+      const confirmed = confirm(
+        `Hapus seluruh label ruang & QR-Code yang tersimpan (${activeRooms.length} label ruang)?\n\n` +
+        `Daftar label ruang di halaman ini akan dikosongkan agar ringan dan mudah dikelola untuk event berikutnya. Anda dapat klik tombol "Buat Label Ruang" kapan saja untuk men-generate ulang label.`
+      );
+      if (!confirmed) return;
+
+      showLoading("Menghapus Semua Label Ruang...", "Mengosongkan daftar label ruang untuk persiapan event berikutnya");
+      setTimeout(() => {
+        try {
+          appState.labelsCleared = true;
+          appState.excludedLabelRoomNos = [];
+          localStorage.setItem("mondokan_labels_cleared", "true");
+          localStorage.setItem("mondokan_excluded_label_rooms", "[]");
+          renderRoomQrLabels();
+          updateDashboardSummaryStats();
+          showToast("Seluruh label ruang berhasil dihapus!");
+        } finally {
+          hideLoading();
+        }
+      }, 150);
+    }
+
+    function deleteSingleRoomLabel(noRuang) {
+      const target = appState.ruangList.find(r => String(r.noRuang) === String(noRuang));
+      const roomLabel = target ? `${target.namaRuang} (Ruang ${target.noRuang})` : `Ruang ${noRuang}`;
+      if (!confirm(`Hapus label ruang untuk ${roomLabel} dari daftar label?`)) return;
+
+      if (!Array.isArray(appState.excludedLabelRoomNos)) {
+        appState.excludedLabelRoomNos = [];
+      }
+      if (!appState.excludedLabelRoomNos.includes(String(noRuang))) {
+        appState.excludedLabelRoomNos.push(String(noRuang));
+      }
+      if (getActiveLabelRooms().length === 0) {
+        appState.labelsCleared = true;
+        localStorage.setItem("mondokan_labels_cleared", "true");
+      }
+      localStorage.setItem("mondokan_excluded_label_rooms", JSON.stringify(appState.excludedLabelRoomNos));
+      renderRoomQrLabels();
+      updateDashboardSummaryStats();
+      showToast(`Label ${roomLabel} dihapus dari daftar label.`);
+    }
+
     function renderRoomQrLabels() {
       const container = document.getElementById("qrRoomGrid");
+      const badge = document.getElementById("savedLabelCountBadge");
+      const btnDownloadAll = document.getElementById("btnDownloadAllLabelsPdf");
+      const btnDeleteAll = document.getElementById("btnDeleteAllLabels");
       if (!container) return;
       container.innerHTML = "";
       const eventTitle = appState.eventName || "ASESMEN SUMATIF AKHIR TAHUN";
+      const activeRooms = getActiveLabelRooms();
+
+      if (badge) {
+        badge.innerText = activeRooms.length > 0
+          ? `${activeRooms.length} Label Ruang`
+          : "Belum ada label tersimpan";
+      }
+      if (btnDownloadAll) {
+        btnDownloadAll.style.display = activeRooms.length > 0 ? "inline-flex" : "none";
+      }
+      if (btnDeleteAll) {
+        btnDeleteAll.style.display = activeRooms.length > 0 ? "inline-flex" : "none";
+      }
 
       if (appState.ruangList.length === 0) {
         container.innerHTML = `
@@ -3588,12 +3802,31 @@
             <div class="empty-schedule-icon">🏫</div>
             <div class="empty-schedule-title">Belum Ada Data Ruang Ujian</div>
             <div class="empty-schedule-desc">Tambahkan daftar ruang ujian terlebih dahulu pada menu <strong>"Buat Jadwal Pengawas"</strong> untuk membuat QR-Code Label Ruang A4.</div>
+            <button class="neu-btn neu-btn-primary" style="margin-top:6px; padding:11px 20px;" onclick="switchTab('jadwal')">
+              🏫 Kelola Data Ruang Ujian
+            </button>
           </div>
         `;
         return;
       }
 
-      appState.ruangList.forEach((r, idx) => {
+      if (activeRooms.length === 0) {
+        container.innerHTML = `
+          <div class="empty-schedule-box" style="grid-column: 1 / -1;">
+            <div class="empty-schedule-icon">🏷️</div>
+            <div class="empty-schedule-title">Belum ada label ruang tersimpan</div>
+            <div class="empty-schedule-desc">
+              Label ruang telah dikosongkan. Pastikan <strong>Nama Event</strong> dan <strong>Data Ruang (${appState.ruangList.length} ruang)</strong> sudah sesuai untuk event berikutnya, lalu klik tombol di bawah untuk men-generate label ruang &amp; QR-Code A4.
+            </div>
+            <button class="neu-btn neu-btn-primary" style="margin-top:6px; padding:11px 20px;" onclick="generateAllRoomLabels()">
+              🏷️ Buat Label Ruang Sekarang (${appState.ruangList.length} Ruang)
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      activeRooms.forEach((r, idx) => {
         const wrap = document.createElement("div");
         wrap.className = "neu-card";
         wrap.style.display = "flex";
@@ -3631,9 +3864,14 @@
               </div>
             </div>
           </div>
-          <button class="neu-btn neu-btn-primary" style="width:100%;" onclick="downloadSingleRoomLabelPDF(${idx})">
-            🖨️ Unduh PDF A4 (${r.namaRuang})
-          </button>
+          <div style="display:flex; gap:8px; width:100%;">
+            <button class="neu-btn neu-btn-primary" style="flex:1;" onclick="downloadSingleRoomLabelPDF(${idx})">
+              🖨️ Unduh PDF A4 (${r.namaRuang})
+            </button>
+            <button class="neu-btn neu-btn-danger" style="padding:9px 12px;" onclick="deleteSingleRoomLabel('${r.noRuang}')" title="Hapus label ${r.namaRuang}">
+              🗑️ Hapus
+            </button>
+          </div>
         `;
         container.appendChild(wrap);
 
@@ -3774,11 +4012,13 @@
     }
 
     function downloadSingleRoomLabelPDF(idx) {
+      const activeRooms = getActiveLabelRooms();
+      if (activeRooms.length === 0) return;
       showLoading("Menyiapkan PDF Label Ruang...", "Merender QR-Code & menyusun halaman A4");
       renderRoomQrLabels();
       setTimeout(() => {
         try {
-          const r = appState.ruangList[idx];
+          const r = activeRooms[idx];
           if (!r) return;
           const { jsPDF } = window.jspdf;
           const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -3792,24 +4032,25 @@
     }
 
     function downloadRoomLabelsPDF() {
-      if (appState.ruangList.length === 0) {
-        showToast("Data Ruang masih kosong!", true);
+      const activeRooms = getActiveLabelRooms();
+      if (activeRooms.length === 0) {
+        showToast("Belum ada label ruang aktif! Klik 'Buat Label Ruang' terlebih dahulu.", true);
         return;
       }
-      showLoading("Menyiapkan PDF Semua Label Ruang...", `Merender ${appState.ruangList.length} halaman A4 (1 ruang/lembar)`);
+      showLoading("Menyiapkan PDF Semua Label Ruang...", `Merender ${activeRooms.length} halaman A4 (1 ruang/lembar)`);
       renderRoomQrLabels();
       setTimeout(() => {
         try {
           const { jsPDF } = window.jspdf;
           const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-          appState.ruangList.forEach((r, idx) => {
+          activeRooms.forEach((r, idx) => {
             if (idx > 0) doc.addPage();
             drawRoomPageOnPdf(doc, r, idx);
           });
 
           doc.save("Label_QR_Ruang_A4_1_Lembar_1_Ruang.pdf");
-          showToast(`PDF Label Ruang A4 (${appState.ruangList.length} halaman, 1 ruang/lembar) berhasil diunduh!`);
+          showToast(`PDF Label Ruang A4 (${activeRooms.length} halaman, 1 ruang/lembar) berhasil diunduh!`);
         } finally {
           hideLoading();
         }
@@ -3973,6 +4214,7 @@
     }
 
     renderAll();
+    startPresensiAutoRefreshTimer();
     syncFromSpreadsheet(true);
   </script>
 </body>
