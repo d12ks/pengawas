@@ -652,6 +652,108 @@
       box-shadow: 0 4px 10px rgba(2, 132, 199, 0.28);
     }
 
+    /* Baris Nama Pengawas + Tombol Dropdown "Ganti" di Sisi Kanan */
+    .supervisor-cell-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .supervisor-name-box {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 140px;
+      flex: 1 1 auto;
+    }
+
+    .supervisor-name-main {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .supervisor-orig-note {
+      font-size: 0.72rem;
+      color: var(--warning);
+      font-weight: 700;
+    }
+
+    .ganti-dropdown-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+
+    .ganti-btn-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .ganti-dropdown-wrap:hover .ganti-btn-label {
+      transform: translateY(-1px);
+    }
+
+    .ganti-select-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+
+    /* Panel Ringkasan Pengawas Cadangan per Sesi di setiap Hari */
+    .day-cadangan-panel {
+      padding: 12px 18px;
+      background: var(--bg-main);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .day-cadangan-sesi-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 0.77rem;
+    }
+
+    .cadangan-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 7px;
+      font-size: 0.73rem;
+      font-weight: 700;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 1px 1px 3px var(--shadow-dark), -1px -1px 3px var(--shadow-light);
+    }
+
     .date-chip {
       display: flex;
       flex-direction: column;
@@ -1534,57 +1636,17 @@
                 </div>
               </div>
 
-              <!-- 2. PANEL PENUGASAN PENGAWAS PENGGANTI / CADANGAN -->
-              <div class="neu-card-compact" style="margin-bottom: 16px;">
-                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
-                  <div>
-                    <div style="font-size:0.88rem; font-weight:800; color:var(--warning);">
-                      🔄 Penugasan Custom Guru Pengawas Cadangan / Pengganti (Jika Ada Guru Tidak Hadir)
-                    </div>
-                    <div style="font-size:0.78rem; color:var(--text-secondary);">
-                      Pilih Hari, Sesi, Ruang &amp; Pengawas yang berhalangan hadir, lalu pilih Guru Pengawas Cadangan yang tersedia pada sesi tersebut.
-                    </div>
-                  </div>
-                  <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-                    <select id="jadwalFilterDateSelect" class="neu-inset" style="width:auto; font-size:0.79rem; padding:7px 11px; font-weight:700;" onchange="onSelectDayFilterDropdown(this.value)">
-                      <option value="ALL">📅 Semua Hari / Tanggal</option>
-                    </select>
-                    <select id="dropdownFilterMode" class="neu-inset" style="width:auto; font-size:0.79rem; padding:7px 11px;" onchange="renderJadwalTable(); updateCustomCadanganSelectors();">
-                      <option value="free_only">Dropdown: Hanya Guru Bebas Tugas di Sesi Itu</option>
-                      <option value="all_warn">Dropdown: Semua Guru (Notifikasi Jika Bentrok)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="form-row" style="align-items:flex-end; margin-bottom: 0;">
-                  <div style="flex: 1 1 190px;">
-                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">1. Pilih Hari / Tanggal</label>
-                    <select id="cadanganDateSelect" class="neu-inset" onchange="onCadanganDateOrSesiChange()"></select>
-                  </div>
-                  <div style="flex: 1 1 150px;">
-                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">2. Pilih Sesi</label>
-                    <select id="cadanganSesiSelect" class="neu-inset" onchange="onCadanganDateOrSesiChange()"></select>
-                  </div>
-                  <div style="flex: 1 1 255px;">
-                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">3. Pilih Ruang &amp; Guru Pengawas</label>
-                    <select id="cadanganTargetSlotSelect" class="neu-inset"></select>
-                  </div>
-                  <div style="flex: 1 1 230px;">
-                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">4. Pilih Guru Pengawas Cadangan</label>
-                    <select id="cadanganGuruSelect" class="neu-inset"></select>
-                  </div>
-                  <div style="flex: 0 0 auto;">
-                    <button class="neu-btn neu-btn-warning" style="padding:10px 16px;" onclick="applyCustomCadanganIzin()">
-                      💾 Masukkan Pengawas Cadangan
-                    </button>
-                  </div>
+              <!-- 2. BARIS FILTER HARI & TOMBOL NAVIGASI CEPAT FILTER HARI -->
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
+                <div id="jadwalDayNavPills" class="day-nav-pills" style="margin-bottom:0;"></div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                  <select id="jadwalFilterDateSelect" class="neu-inset" style="width:auto; font-size:0.79rem; padding:7px 11px; font-weight:700;" onchange="onSelectDayFilterDropdown(this.value)">
+                    <option value="ALL">📅 Semua Hari / Tanggal</option>
+                  </select>
                 </div>
               </div>
 
-              <!-- 3. TOMBOL NAVIGASI CEPAT FILTER HARI -->
-              <div id="jadwalDayNavPills" class="day-nav-pills"></div>
-
-              <!-- 4. DAFTAR KELOMPOK JADWAL PER HARI (DENGAN TOMBOL HAPUS HARI DI TIAP KELOMPOK HARI) -->
+              <!-- 3. DAFTAR KELOMPOK JADWAL PER HARI (DENGAN TOMBOL "GANTI" DI KANAN NAMA PENGAWAS 1 & 2) -->
               <div id="jadwalGroupedByDayContainer" class="day-group-list"></div>
             </div>
           </div>
@@ -3318,19 +3380,11 @@
     function onSelectDayFilterDropdown(val) {
       const filterSel = document.getElementById("jadwalFilterDateSelect");
       if (filterSel) filterSel.value = val;
-      // Sinkronkan juga dropdown nomor 1 pada panel Pengawas Cadangan jika memilih hari spesifik
-      if (val && val !== "ALL") {
-        const cadDateSel = document.getElementById("cadanganDateSelect");
-        if (cadDateSel) {
-          cadDateSel.value = val;
-          onCadanganDateOrSesiChange();
-        }
-      }
       renderJadwalTable();
     }
 
     // ============================================================================
-    // PENUGASAN CUSTOM PENGAWAS CADANGAN (TANPA TULISAN "(Izin)" DI DROPDOWN)
+    // MEKANISME PENGAWAS CADANGAN PER SESI & TOMBOL "GANTI" DI KANAN PENGAWAS 1 & 2
     // ============================================================================
     function updateJadwalFilterDateOptions() {
       const filterSel = document.getElementById("jadwalFilterDateSelect");
@@ -3346,87 +3400,43 @@
       }
     }
 
-    function updateCustomCadanganSelectors() {
-      const dateSel = document.getElementById("cadanganDateSelect");
-      const sesiSel = document.getElementById("cadanganSesiSelect");
-      if (!dateSel || !sesiSel) return;
-
-      const uniqueDates = getUniqueScheduleDatesSorted().map(u => u.indo);
-
-      const prevDate = dateSel.value;
-      dateSel.innerHTML = uniqueDates.length > 0
-        ? uniqueDates.map((d, idx) => `<option value="${d}">Hari ${idx + 1} - ${d}</option>`).join("")
-        : `<option value="">-- Belum Ada Jadwal --</option>`;
-      if (uniqueDates.includes(prevDate)) dateSel.value = prevDate;
-
-      const prevSesi = sesiSel.value;
-      sesiSel.innerHTML = appState.sesiList.map(s =>
-        `<option value="${s.sesiKe}">Sesi ${s.sesiKe} (${s.jamMulai} - ${s.jamSelesai})</option>`
-      ).join("");
-      if (appState.sesiList.some(s => String(s.sesiKe) === String(prevSesi))) {
-        sesiSel.value = prevSesi;
-      }
-
-      onCadanganDateOrSesiChange();
-    }
-
-    function onCadanganDateOrSesiChange() {
-      const dateVal = document.getElementById("cadanganDateSelect")?.value || "";
-      const sesiVal = document.getElementById("cadanganSesiSelect")?.value || "";
-      const slotSel = document.getElementById("cadanganTargetSlotSelect");
-      const guruSel = document.getElementById("cadanganGuruSelect");
-      if (!slotSel || !guruSel) return;
-
+    /**
+     * Menghasilkan daftar Guru Pengawas Cadangan pada suatu Hari & Sesi tertentu,
+     * yaitu seluruh guru di Data_Guru yang TIDAK sedang bertugas mengawasi (baik sebagai Pengawas 1 maupun Pengawas 2)
+     * pada sesi tersebut.
+     */
+    function getCadanganGurusForSession(tanggalIndo, sesiKe) {
+      const cleanDate = formatTanggalIndo(tanggalIndo);
       const sessionRows = appState.jadwalList.filter(j =>
-        formatTanggalIndo(j.hariTanggal) === dateVal && String(j.sesiKe) === String(sesiVal)
+        formatTanggalIndo(j.hariTanggal) === cleanDate &&
+        String(j.sesiKe) === String(sesiKe)
       );
-
-      if (sessionRows.length === 0) {
-        slotSel.innerHTML = `<option value="">-- Tidak ada jadwal pada Hari & Sesi ini --</option>`;
-        guruSel.innerHTML = `<option value="">-- Pilih Guru Cadangan --</option>`;
-        return;
-      }
-
-      // Tanpa embel-embel "(Izin)" di belakang nama guru agar tidak membingungkan
-      const slotOptions = [];
+      const busyKodes = new Set();
       sessionRows.forEach(r => {
-        slotOptions.push(`<option value="${r.idJadwal}|1">Ruang ${r.noRuang} (${r.namaRuang}) - Pengawas 1: ${r.p1Nama}</option>`);
-        slotOptions.push(`<option value="${r.idJadwal}|2">Ruang ${r.noRuang} (${r.namaRuang}) - Pengawas 2: ${r.p2Nama}</option>`);
+        if (r.p1Kode) busyKodes.add(String(r.p1Kode).trim().toUpperCase());
+        if (r.p2Kode) busyKodes.add(String(r.p2Kode).trim().toUpperCase());
       });
-      slotSel.innerHTML = slotOptions.join("");
-
-      const filterMode = document.getElementById("dropdownFilterMode")?.value || "free_only";
-      const candidateGurus = appState.guruList.filter(g => {
-        if (filterMode === "free_only") {
-          const busy = sessionRows.some(r => r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru);
-          return !busy;
-        }
-        return true;
-      });
-
-      if (candidateGurus.length === 0) {
-        guruSel.innerHTML = `<option value="">-- Semua guru sudah mengawasi di sesi ini --</option>`;
-      } else {
-        guruSel.innerHTML = candidateGurus.map(g => {
-          const busyRow = sessionRows.find(r => r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru);
-          const info = busyRow ? ` (Mengawasi: ${busyRow.namaRuang})` : " (Bebas Tugas / Tersedia)";
-          return `<option value="${g.kodeGuru}">${g.kodeGuru} - ${g.namaGuru}${info}</option>`;
-        }).join("");
-      }
+      return appState.guruList.filter(g => !busyKodes.has(String(g.kodeGuru).trim().toUpperCase()));
     }
 
-    function applyCustomCadanganIzin() {
-      const slotVal = document.getElementById("cadanganTargetSlotSelect")?.value || "";
-      const newKodeGuru = document.getElementById("cadanganGuruSelect")?.value || "";
-      if (!slotVal || !newKodeGuru) {
-        showToast("Pilih Ruang/Guru Pengawas dan Guru Pengawas Cadangan terlebih dahulu!", true);
-        return;
+    function updateCustomCadanganSelectors() {
+      // Dipertahankan sebagai no-op kompatibilitas karena kartu form lama telah diganti
+      // dengan tombol dropdown "Ganti" langsung di kanan Nama Pengawas 1 & Pengawas 2.
+    }
+
+    function buildCatatanPenggantiForRow(row) {
+      const notes = [];
+      if (row.p1AsliNama && row.p1AsliNama !== row.p1Nama) {
+        notes.push(`Pengawas 1: ${row.p1AsliNama} diganti ${row.p1Nama}`);
       }
-      const [idJadwal, roleStr] = slotVal.split("|");
-      handleSupervisorChange(idJadwal, Number(roleStr), newKodeGuru, null);
+      if (row.p2AsliNama && row.p2AsliNama !== row.p2Nama) {
+        notes.push(`Pengawas 2: ${row.p2AsliNama} diganti ${row.p2Nama}`);
+      }
+      return notes.join(" • ");
     }
 
     function handleSupervisorChange(idJadwal, roleNumber, newKodeGuru, selectElem) {
+      if (!newKodeGuru) return;
       const targetRow = appState.jadwalList.find(j => j.idJadwal === idJadwal);
       if (!targetRow) return;
 
@@ -3444,11 +3454,11 @@
         if (isCurrentRole) continue;
 
         if (row.p1Kode === newKodeGuru || row.p2Kode === newKodeGuru) {
-          const conflictMsg = `${selectedGuru.namaGuru} telah mengawasi di ruang ${row.namaRuang}, pilih yang lain`;
+          const conflictMsg = `${selectedGuru.namaGuru} telah mengawasi di ruang ${row.namaRuang} pada Sesi ${targetRow.sesiKe}, silakan pilih Pengawas Cadangan yang lain!`;
           alert(conflictMsg);
           showToast(conflictMsg, true);
           if (selectElem) {
-            selectElem.value = roleNumber === 1 ? targetRow.p1Kode : targetRow.p2Kode;
+            selectElem.value = "";
           }
           return;
         }
@@ -3456,26 +3466,31 @@
 
       if (roleNumber === 1) {
         const originalName = targetRow.p1AsliNama || targetRow.p1Nama;
-        targetRow.p1AsliNama = originalName;
         targetRow.p1Kode = selectedGuru.kodeGuru;
         targetRow.p1Nama = selectedGuru.namaGuru;
         targetRow.p1Nip = selectedGuru.nip;
-        targetRow.cadanganKode = selectedGuru.kodeGuru;
-        targetRow.cadanganNama = selectedGuru.namaGuru;
-        targetRow.catatanPengganti = `Pengawas 1 seharusnya ${originalName} diganti ${selectedGuru.namaGuru}`;
+        if (selectedGuru.namaGuru === originalName) {
+          targetRow.p1AsliNama = "";
+        } else {
+          targetRow.p1AsliNama = originalName;
+        }
       } else {
         const originalName = targetRow.p2AsliNama || targetRow.p2Nama;
-        targetRow.p2AsliNama = originalName;
         targetRow.p2Kode = selectedGuru.kodeGuru;
         targetRow.p2Nama = selectedGuru.namaGuru;
         targetRow.p2Nip = selectedGuru.nip;
-        targetRow.cadanganKode = selectedGuru.kodeGuru;
-        targetRow.cadanganNama = selectedGuru.namaGuru;
-        targetRow.catatanPengganti = `Pengawas 2 seharusnya ${originalName} diganti ${selectedGuru.namaGuru}`;
+        if (selectedGuru.namaGuru === originalName) {
+          targetRow.p2AsliNama = "";
+        } else {
+          targetRow.p2AsliNama = originalName;
+        }
       }
 
+      targetRow.cadanganKode = selectedGuru.kodeGuru;
+      targetRow.cadanganNama = selectedGuru.namaGuru;
+      targetRow.catatanPengganti = buildCatatanPenggantiForRow(targetRow);
+
       renderJadwalTable();
-      updateCustomCadanganSelectors();
       postToSpreadsheet({
         action: "replacePengawas",
         idJadwal: idJadwal,
@@ -3485,7 +3500,7 @@
         nipGuruBaru: selectedGuru.nip,
         catatanPengganti: targetRow.catatanPengganti
       });
-      showToast(targetRow.catatanPengganti);
+      showToast(targetRow.catatanPengganti || "Pengawas dikembalikan sesuai jadwal semula");
     }
 
     function resetIzinPengawas(idJadwal) {
@@ -3515,7 +3530,6 @@
       row.catatanPengganti = "";
 
       renderJadwalTable();
-      updateCustomCadanganSelectors();
       postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList });
       showToast("Pengawas dikembalikan sesuai jadwal semula.");
     }
@@ -3666,7 +3680,6 @@
       if (emptyBox) emptyBox.classList.add("hidden");
       if (filledBox) filledBox.classList.remove("hidden");
 
-      const filterMode = document.getElementById("dropdownFilterMode")?.value || "free_only";
       const selectedDateFilter = document.getElementById("jadwalFilterDateSelect")?.value || "ALL";
 
       // Render tombol pil navigasi cepat per hari
@@ -3699,32 +3712,42 @@
       groupedContainer.innerHTML = visibleDates.map(dObj => {
         const dayIndex = uniqueDates.findIndex(u => u.indo === dObj.indo) + 1;
         const dayRows = appState.jadwalList.filter(j => formatTanggalIndo(j.hariTanggal) === dObj.indo);
-        const sesiSet = new Set(dayRows.map(r => String(r.sesiKe)));
-        const sesiSummary = Array.from(sesiSet).sort((a, b) => Number(a) - Number(b)).join(", ");
+        const sesiSorted = Array.from(new Set(dayRows.map(r => String(r.sesiKe)))).sort((a, b) => Number(a) - Number(b));
+        const sesiSummary = sesiSorted.join(", ");
         const escapedIndo = dObj.indo.replace(/'/g, "\\'");
 
-        const rowsHtml = dayRows.map((j, idx) => {
-          const sameSessionRows = dayRows.filter(x => String(x.sesiKe) === String(j.sesiKe));
+        // Ringkasan Daftar Pengawas Cadangan (Guru yang tidak mengawasi) di setiap Sesi pada hari tersebut
+        const cadanganPerSesiHtml = sesiSorted.map(sKe => {
+          const cadanganGurus = getCadanganGurusForSession(dObj.indo, sKe);
+          const chips = cadanganGurus.length > 0
+            ? cadanganGurus.map(g => `<span class="cadangan-chip">${g.kodeGuru} - ${g.namaGuru}</span>`).join("")
+            : `<span style="color:var(--text-muted); font-style:italic;">Semua guru bertugas mengawasi di Sesi ${sKe}</span>`;
+          return `
+            <div class="day-cadangan-sesi-row">
+              <span class="badge badge-role" style="flex:0 0 auto;">Pengawas Cadangan Sesi ${sKe} (${cadanganGurus.length} Guru):</span>
+              <div style="display:flex; flex-wrap:wrap; gap:5px; flex:1 1 260px;">${chips}</div>
+            </div>
+          `;
+        }).join("");
 
-          const buildOptions = (currentKode) => {
-            return appState.guruList.filter(g => {
-              if (g.kodeGuru === currentKode) return true;
-              if (filterMode === "free_only") {
-                const busy = sameSessionRows.some(r => r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru);
-                return !busy;
-              }
-              return true;
-            }).map(g => {
-              const busyRow = sameSessionRows.find(r =>
-                (r.p1Kode === g.kodeGuru || r.p2Kode === g.kodeGuru) && g.kodeGuru !== currentKode
-              );
-              const suffix = busyRow ? ` (Mengawasi: ${busyRow.namaRuang})` : "";
-              const selected = g.kodeGuru === currentKode ? "selected" : "";
-              return `<option value="${g.kodeGuru}" ${selected}>${g.kodeGuru} - ${g.namaGuru}${suffix}</option>`;
-            }).join("");
+        const rowsHtml = dayRows.map((j, idx) => {
+          // Daftar Pengawas Cadangan khusus untuk sesi baris ini (guru yang tidak mengawasi di sesi tersebut)
+          const cadanganGurusInSesi = getCadanganGurusForSession(dObj.indo, j.sesiKe);
+
+          const buildCadanganOptions = (roleLabel, currentNama) => {
+            if (cadanganGurusInSesi.length === 0) {
+              return `<option value="">-- Tidak ada Pengawas Cadangan di Sesi ${j.sesiKe} --</option>`;
+            }
+            const headerOpt = `<option value="">🔄 Pilih Pengawas Cadangan Sesi ${j.sesiKe} (Pengganti ${roleLabel}: ${currentNama})</option>`;
+            const listOpts = cadanganGurusInSesi.map(g =>
+              `<option value="${g.kodeGuru}">${g.kodeGuru} - ${g.namaGuru} (Cadangan Sesi ${j.sesiKe})</option>`
+            ).join("");
+            return headerOpt + listOpts;
           };
 
           const cleanJam = sanitizeJamSesiRange(j.jamSesi, j.sesiKe);
+          const isP1Replaced = Boolean(j.p1AsliNama && j.p1AsliNama !== j.p1Nama);
+          const isP2Replaced = Boolean(j.p2AsliNama && j.p2AsliNama !== j.p2Nama);
 
           return `
             <tr>
@@ -3738,14 +3761,38 @@
                 <div style="font-size:0.78rem; color:var(--text-secondary);">${j.namaRuang}</div>
               </td>
               <td>
-                <select class="neu-inset" style="padding:6px 9px; font-size:0.8rem;" onchange="handleSupervisorChange('${j.idJadwal}', 1, this.value, this)">
-                  ${buildOptions(j.p1Kode)}
-                </select>
+                <div class="supervisor-cell-wrap">
+                  <div class="supervisor-name-box">
+                    <div class="supervisor-name-main">
+                      <span><strong>${j.p1Kode}</strong> - ${j.p1Nama}</span>
+                      ${isP1Replaced ? `<span class="badge badge-substitute" style="font-size:0.68rem; padding:2px 7px;">Pengganti</span>` : ""}
+                    </div>
+                    ${isP1Replaced ? `<div class="supervisor-orig-note">Semula: ${j.p1AsliNama}</div>` : ""}
+                  </div>
+                  <div class="ganti-dropdown-wrap" title="Ganti Pengawas 1 dengan Pengawas Cadangan Sesi ${j.sesiKe}">
+                    <span class="ganti-btn-label">🔄 Ganti ▾</span>
+                    <select class="ganti-select-overlay" onchange="handleSupervisorChange('${j.idJadwal}', 1, this.value, this)">
+                      ${buildCadanganOptions("Pengawas 1", j.p1Nama)}
+                    </select>
+                  </div>
+                </div>
               </td>
               <td>
-                <select class="neu-inset" style="padding:6px 9px; font-size:0.8rem;" onchange="handleSupervisorChange('${j.idJadwal}', 2, this.value, this)">
-                  ${buildOptions(j.p2Kode)}
-                </select>
+                <div class="supervisor-cell-wrap">
+                  <div class="supervisor-name-box">
+                    <div class="supervisor-name-main">
+                      <span><strong>${j.p2Kode}</strong> - ${j.p2Nama}</span>
+                      ${isP2Replaced ? `<span class="badge badge-substitute" style="font-size:0.68rem; padding:2px 7px;">Pengganti</span>` : ""}
+                    </div>
+                    ${isP2Replaced ? `<div class="supervisor-orig-note">Semula: ${j.p2AsliNama}</div>` : ""}
+                  </div>
+                  <div class="ganti-dropdown-wrap" title="Ganti Pengawas 2 dengan Pengawas Cadangan Sesi ${j.sesiKe}">
+                    <span class="ganti-btn-label">🔄 Ganti ▾</span>
+                    <select class="ganti-select-overlay" onchange="handleSupervisorChange('${j.idJadwal}', 2, this.value, this)">
+                      ${buildCadanganOptions("Pengawas 2", j.p2Nama)}
+                    </select>
+                  </div>
+                </div>
               </td>
               <td>
                 ${j.catatanPengganti
@@ -3765,7 +3812,7 @@
               <div class="day-group-title-wrap">
                 <span class="day-group-number-badge">HARI KE-${dayIndex}</span>
                 <span class="day-group-date-text">📅 ${dObj.indo}</span>
-                <span class="badge badge-role">${sesiSet.size} Sesi (Sesi ${sesiSummary}) • ${dayRows.length} Slot Ruang</span>
+                <span class="badge badge-role">${sesiSorted.length} Sesi (Sesi ${sesiSummary}) • ${dayRows.length} Slot Ruang</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                 <button type="button" class="neu-btn neu-btn-danger" style="padding:7px 12px; font-size:0.78rem;"
@@ -3775,13 +3822,16 @@
                 </button>
               </div>
             </div>
+            <div class="day-cadangan-panel">
+              ${cadanganPerSesiHtml}
+            </div>
             <div class="table-wrap" style="margin-top:0; border:none; border-radius:0;">
               <table>
                 <thead>
                   <tr>
                     <th style="width:52px; text-align:center;">No</th>
-                    <th style="width:155px;">Sesi &amp; Jam Ujian</th>
-                    <th style="width:155px;">Ruang</th>
+                    <th style="width:145px;">Sesi &amp; Jam Ujian</th>
+                    <th style="width:145px;">Ruang</th>
                     <th>Pengawas 1</th>
                     <th>Pengawas 2</th>
                     <th>Keterangan Pengawas Cadangan / Pengganti</th>
