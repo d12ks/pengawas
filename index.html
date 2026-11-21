@@ -1158,7 +1158,10 @@
             </div>
           </div>
 
-          <div style="display:flex; align-items:center; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span id="spreadsheetConnBadge" class="badge badge-role" title="Status Koneksi Google Spreadsheet">
+              ☁️ Menghubungkan Spreadsheet...
+            </span>
             <button class="neu-btn" onclick="syncFromSpreadsheet()" title="Sinkronisasi Data Spreadsheet">
               🔄 <span>Sinkronisasi</span>
             </button>
@@ -1665,6 +1668,8 @@
     let appState = {
       eventName: "",
       gasUrl: GAS_WEBAPP_URL,
+      isConnectedToSheet: false,
+      adminList: [],
       guruList: [],
       ruangList: [],
       sesiList: [
@@ -2241,16 +2246,51 @@
       }
     }
 
-    function handleAdminLogin() {
+    function updateSpreadsheetBadge(status, labelText) {
+      const badge = document.getElementById("spreadsheetConnBadge");
+      if (!badge) return;
+      if (status === "connected") {
+        badge.className = "badge badge-success";
+        badge.innerText = labelText || "🟢 Terhubung Spreadsheet";
+      } else if (status === "error") {
+        badge.className = "badge badge-danger";
+        badge.innerText = labelText || "🔴 Gagal Terhubung Spreadsheet";
+      } else {
+        badge.className = "badge badge-role";
+        badge.innerText = labelText || "☁️ Menghubungkan Spreadsheet...";
+      }
+    }
+
+    async function handleAdminLogin() {
       const u = document.getElementById("adminUser").value.trim();
       const p = document.getElementById("adminPass").value.trim();
       if (!u || !p) {
         showToast("Masukkan username dan password Admin!", true);
         return;
       }
+
+      // Sinkronkan terlebih dahulu jika belum pernah sinkronisasi dari Spreadsheet
+      if (!appState.isConnectedToSheet) {
+        await syncFromSpreadsheet(false);
+      }
+
+      // Validasi dengan daftar Akun_Admin dari Spreadsheet bila tersedia
+      if (Array.isArray(appState.adminList) && appState.adminList.length > 0) {
+        const matched = appState.adminList.find(
+          a => String(a.username || "").trim().toLowerCase() === u.toLowerCase() &&
+               String(a.password || "").trim() === p
+        );
+        if (!matched) {
+          showToast("Username atau Password Admin tidak sesuai dengan tab Akun_Admin di Spreadsheet!", true);
+          return;
+        }
+      }
+
       document.getElementById("loginView").classList.add("hidden");
       document.getElementById("dashboardView").classList.remove("hidden");
-      syncFromSpreadsheet();
+      if (appState.isConnectedToSheet) {
+        showToast("Login Admin berhasil! Terhubung ke Google Spreadsheet.");
+      }
     }
 
     function logoutAdmin() {
@@ -2280,80 +2320,124 @@
       if (tab === "presensi") renderPresensiTable();
     }
 
-    async function syncFromSpreadsheet() {
-      if (!appState.gasUrl) return;
-      showLoading("Memuat Data Spreadsheet...", "Mengambil data guru, ruang, sesi, jadwal & presensi");
+    function applyRemoteDataToState(remoteData) {
+      if (!remoteData) return false;
+      appState.eventName = remoteData.eventName || appState.eventName || "";
+      if (Array.isArray(remoteData.adminList)) {
+        appState.adminList = remoteData.adminList;
+      }
+      if (Array.isArray(remoteData.guruList)) {
+        appState.guruList = remoteData.guruList;
+      }
+      if (Array.isArray(remoteData.ruangList)) {
+        appState.ruangList = remoteData.ruangList.map(r => ({
+          noRuang: r.noRuang || r.kodeRuang || "",
+          namaRuang: r.namaRuang || ""
+        }));
+      }
+
+      let hadCorruptedTime = false;
+      const rawSesi = remoteData.sesiList || [];
+      if (rawSesi.length > 0) {
+        appState.sesiList = rawSesi.map(s => {
+          const rawM = String(s.jamMulai || "");
+          const rawS = String(s.jamSelesai || "");
+          if (rawM.includes("1899") || rawS.includes("1899")) {
+            hadCorruptedTime = true;
+          }
+          return {
+            sesiKe: String(s.sesiKe),
+            namaSesi: "Sesi " + s.sesiKe,
+            jamMulai: sanitizeJamValue(s.jamMulai, s.sesiKe, true),
+            jamSelesai: sanitizeJamValue(s.jamSelesai, s.sesiKe, false)
+          };
+        }).sort((a, b) => Number(a.sesiKe) - Number(b.sesiKe));
+      }
+
+      if (Array.isArray(remoteData.jadwalList)) {
+        appState.jadwalList = remoteData.jadwalList.map(j => ({
+          ...j,
+          noRuang: j.noRuang || j.kodeRuang || "",
+          jamSesi: sanitizeJamSesiRange(j.jamSesi, j.sesiKe)
+        }));
+      }
+
+      const jadwalDates = [];
+      const syncedDaySessions = {};
+      appState.jadwalList.forEach(j => {
+        const iso = parseIsoFromAnyDate(j.hariTanggal);
+        if (iso) {
+          if (!jadwalDates.includes(iso)) jadwalDates.push(iso);
+          if (!syncedDaySessions[iso]) syncedDaySessions[iso] = [];
+          const sKeStr = String(j.sesiKe);
+          if (!syncedDaySessions[iso].includes(sKeStr)) {
+            syncedDaySessions[iso].push(sKeStr);
+          }
+        }
+      });
+      if (jadwalDates.length > 0) {
+        appState.selectedExamDates = jadwalDates.sort();
+        Object.keys(syncedDaySessions).forEach(iso => {
+          appState.daySessionsMap[iso] = syncedDaySessions[iso].sort((a, b) => Number(a) - Number(b));
+        });
+      }
+
+      if (Array.isArray(remoteData.presensiList)) {
+        appState.presensiList = remoteData.presensiList.map(p => ({
+          ...p,
+          namaRuangDanEvent: p.namaRuangDanEvent || ((p.namaRuang || "") + (p.namaEvent ? " - " + p.namaEvent : ""))
+        }));
+      }
+      return hadCorruptedTime;
+    }
+
+    async function syncFromSpreadsheet(silent = false) {
+      if (!appState.gasUrl) return false;
+      updateSpreadsheetBadge("connecting", "☁️ Sinkronisasi Spreadsheet...");
+      if (!silent) {
+        showLoading("Memuat Data Spreadsheet...", "Mengambil data guru, ruang, sesi, jadwal & presensi dari Google Sheets");
+      }
       try {
-        const res = await fetch(appState.gasUrl + "?action=getAllData");
+        const separator = appState.gasUrl.includes("?") ? "&" : "?";
+        const url = `${appState.gasUrl}${separator}action=getAllData&_ts=${Date.now()}`;
+        const res = await fetch(url, {
+          method: "GET",
+          redirect: "follow",
+          cache: "no-store"
+        });
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
         const json = await res.json();
         if (json.status === "success" && json.data) {
-          appState.eventName = json.data.eventName || "";
-          appState.guruList = json.data.guruList || [];
-          appState.ruangList = (json.data.ruangList || []).map(r => ({
-            noRuang: r.noRuang || r.kodeRuang || "",
-            namaRuang: r.namaRuang || ""
-          }));
-
-          let hadCorruptedTime = false;
-          const rawSesi = json.data.sesiList || [];
-          if (rawSesi.length > 0) {
-            appState.sesiList = rawSesi.map(s => {
-              const rawM = String(s.jamMulai || "");
-              const rawS = String(s.jamSelesai || "");
-              if (rawM.includes("1899") || rawS.includes("1899")) {
-                hadCorruptedTime = true;
-              }
-              return {
-                sesiKe: String(s.sesiKe),
-                namaSesi: "Sesi " + s.sesiKe,
-                jamMulai: sanitizeJamValue(s.jamMulai, s.sesiKe, true),
-                jamSelesai: sanitizeJamValue(s.jamSelesai, s.sesiKe, false)
-              };
-            }).sort((a, b) => Number(a.sesiKe) - Number(b.sesiKe));
-          }
-
-          appState.jadwalList = (json.data.jadwalList || []).map(j => ({
-            ...j,
-            noRuang: j.noRuang || j.kodeRuang || "",
-            jamSesi: sanitizeJamSesiRange(j.jamSesi, j.sesiKe)
-          }));
-
-          const jadwalDates = [];
-          const syncedDaySessions = {};
-          appState.jadwalList.forEach(j => {
-            const iso = parseIsoFromAnyDate(j.hariTanggal);
-            if (iso) {
-              if (!jadwalDates.includes(iso)) jadwalDates.push(iso);
-              if (!syncedDaySessions[iso]) syncedDaySessions[iso] = [];
-              const sKeStr = String(j.sesiKe);
-              if (!syncedDaySessions[iso].includes(sKeStr)) {
-                syncedDaySessions[iso].push(sKeStr);
-              }
-            }
-          });
-          if (jadwalDates.length > 0) {
-            appState.selectedExamDates = jadwalDates.sort();
-            Object.keys(syncedDaySessions).forEach(iso => {
-              appState.daySessionsMap[iso] = syncedDaySessions[iso].sort((a, b) => Number(a) - Number(b));
-            });
-          }
-
-          appState.presensiList = (json.data.presensiList || []).map(p => ({
-            ...p,
-            namaRuangDanEvent: p.namaRuangDanEvent || ((p.namaRuang || "") + (p.namaEvent ? " - " + p.namaEvent : ""))
-          }));
-
+          const hadCorruptedTime = applyRemoteDataToState(json.data);
+          appState.isConnectedToSheet = true;
+          const timeNow = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+          updateSpreadsheetBadge("connected", `🟢 Terhubung Spreadsheet (${timeNow})`);
           renderAll();
 
           if (hadCorruptedTime) {
             await repairSesiTimesInSpreadsheet();
           }
-          showToast("Data berhasil disinkronkan dari Google Spreadsheet!");
+          if (!silent) {
+            showToast("Data berhasil disinkronkan dari Google Spreadsheet!");
+          }
+          return true;
+        } else {
+          throw new Error(json.message || "Respons Spreadsheet tidak valid");
         }
       } catch (e) {
-        showToast("Gagal memuat data dari Spreadsheet", true);
+        console.error("Gagal sinkronisasi Spreadsheet:", e);
+        appState.isConnectedToSheet = false;
+        updateSpreadsheetBadge("error", "🔴 Gagal Terhubung Spreadsheet");
+        if (!silent) {
+          showToast("Gagal memuat data dari Spreadsheet: " + (e.message || "Periksa koneksi / URL GAS"), true);
+        }
+        return false;
       } finally {
-        hideLoading();
+        if (!silent) {
+          hideLoading();
+        }
       }
     }
 
@@ -2370,16 +2454,43 @@
     }
 
     async function postToSpreadsheet(payload, loadingTitle = "", silentLoading = false) {
-      if (!appState.gasUrl) return;
+      if (!appState.gasUrl) return false;
       if (!silentLoading) {
-        showLoading(loadingTitle || "Menyimpan Data ke Spreadsheet...", "Sedang memproses & menyinkronkan data");
+        showLoading(loadingTitle || "Menyimpan Data ke Spreadsheet...", "Sedang memproses & menyinkronkan data ke Google Sheets");
       }
+      updateSpreadsheetBadge("connecting", "☁️ Menyimpan ke Spreadsheet...");
       try {
-        await fetch(appState.gasUrl, {
+        const res = await fetch(appState.gasUrl, {
           method: "POST",
+          redirect: "follow",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
           body: JSON.stringify(payload)
         });
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+        const json = await res.json();
+        if (json.status === "success") {
+          appState.isConnectedToSheet = true;
+          const timeNow = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+          updateSpreadsheetBadge("connected", `🟢 Tersimpan di Spreadsheet (${timeNow})`);
+          if (json.data) {
+            applyRemoteDataToState(json.data);
+            renderAll();
+          }
+          return true;
+        } else {
+          throw new Error(json.message || "Gagal menyimpan data ke Spreadsheet");
+        }
       } catch (e) {
+        console.error("Gagal POST ke Spreadsheet:", e);
+        updateSpreadsheetBadge("error", "🔴 Gagal Simpan ke Spreadsheet");
+        if (!silentLoading) {
+          showToast("Gagal menyimpan ke Spreadsheet: " + (e.message || "Cek koneksi internet"), true);
+        }
+        return false;
       } finally {
         if (!silentLoading) {
           hideLoading();
@@ -3862,6 +3973,7 @@
     }
 
     renderAll();
+    syncFromSpreadsheet(true);
   </script>
 </body>
 </html>
