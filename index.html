@@ -1005,8 +1005,8 @@
 
     .loading-spinner-wrap {
       position: relative;
-      width: 56px;
-      height: 56px;
+      width: 78px;
+      height: 78px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1016,20 +1016,33 @@
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      border: 4px solid rgba(2, 132, 199, 0.18);
+      border: 4.5px solid rgba(2, 132, 199, 0.16);
       border-top-color: var(--accent);
       border-right-color: var(--accent);
       animation: spinLoader 0.85s linear infinite;
     }
 
     .loading-ring-inner {
-      width: 34px;
-      height: 34px;
+      position: absolute;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      border: 3.5px solid rgba(217, 119, 6, 0.18);
-      border-bottom-color: var(--warning);
-      border-left-color: var(--warning);
-      animation: spinLoaderReverse 1.1s linear infinite;
+      border: 3.5px solid rgba(100, 116, 139, 0.22);
+      border-bottom-color: var(--text-secondary);
+      border-left-color: var(--text-secondary);
+      animation: spinLoaderReverse 1.15s linear infinite;
+    }
+
+    .loading-percent-text {
+      position: relative;
+      z-index: 2;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.3px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      user-select: none;
     }
 
     @keyframes spinLoader {
@@ -1055,7 +1068,7 @@
 
     .loading-bar-track {
       width: 100%;
-      height: 5px;
+      height: 6px;
       background: rgba(100, 116, 139, 0.2);
       border-radius: 999px;
       overflow: hidden;
@@ -1064,9 +1077,14 @@
     .loading-bar-fill {
       width: 45%;
       height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--warning));
+      background: linear-gradient(90deg, var(--accent), var(--accent-strong));
       border-radius: 999px;
       animation: slideLoadBar 1.15s ease-in-out infinite;
+      transition: width 0.22s ease;
+    }
+
+    .loading-bar-fill.determinate {
+      animation: none;
     }
 
     @keyframes slideLoadBar {
@@ -1098,11 +1116,12 @@
       <div class="loading-spinner-wrap">
         <div class="loading-ring-outer"></div>
         <div class="loading-ring-inner"></div>
+        <span id="loadingPercentText" class="loading-percent-text">0%</span>
       </div>
       <div id="loadingTitleText" class="loading-title">Memproses Data...</div>
       <div id="loadingSubText" class="loading-subtitle">Mohon tunggu sebentar, sedang menyinkronkan data</div>
       <div class="loading-bar-track">
-        <div class="loading-bar-fill"></div>
+        <div id="loadingBarFill" class="loading-bar-fill"></div>
       </div>
     </div>
   </div>
@@ -2240,8 +2259,45 @@
     initDefaultExamDates();
 
     let activeLoadingCount = 0;
+    let loadingProgressTimer = null;
+    let currentLoadingPercent = 0;
 
-    function showLoading(title = "Memproses Data...", subtitle = "Mohon tunggu sebentar, sedang memproses data") {
+    function stopLoadingProgressTimer() {
+      if (loadingProgressTimer) {
+        clearInterval(loadingProgressTimer);
+        loadingProgressTimer = null;
+      }
+    }
+
+    function updateLoadingProgress(percent, subtitle = null, title = null) {
+      const clamped = Math.max(0, Math.min(100, Math.round(Number(percent) || 0)));
+      currentLoadingPercent = clamped;
+      const pctEl = document.getElementById("loadingPercentText");
+      const barEl = document.getElementById("loadingBarFill");
+      const titleEl = document.getElementById("loadingTitleText");
+      const subEl = document.getElementById("loadingSubText");
+      if (pctEl) pctEl.innerText = `${clamped}%`;
+      if (barEl) {
+        barEl.classList.add("determinate");
+        barEl.style.width = `${clamped}%`;
+      }
+      if (title !== null && titleEl) titleEl.innerText = title;
+      if (subtitle !== null && subEl) subEl.innerText = subtitle;
+    }
+
+    function startLoadingProgressApproximation(startPct = 8, targetPct = 92, intervalMs = 140) {
+      stopLoadingProgressTimer();
+      updateLoadingProgress(startPct);
+      loadingProgressTimer = setInterval(() => {
+        if (currentLoadingPercent < targetPct) {
+          const remaining = targetPct - currentLoadingPercent;
+          const step = Math.max(1, Math.ceil(remaining * 0.14));
+          updateLoadingProgress(Math.min(targetPct, currentLoadingPercent + step));
+        }
+      }, intervalMs);
+    }
+
+    function showLoading(title = "Memproses Data...", subtitle = "Mohon tunggu sebentar, sedang memproses data", initialPercent = null) {
       activeLoadingCount++;
       const overlay = document.getElementById("loadingOverlay");
       const titleEl = document.getElementById("loadingTitleText");
@@ -2249,6 +2305,13 @@
       if (titleEl) titleEl.innerText = title;
       if (subEl) subEl.innerText = subtitle;
       if (overlay) overlay.classList.add("active");
+
+      if (initialPercent !== null && initialPercent !== undefined) {
+        stopLoadingProgressTimer();
+        updateLoadingProgress(initialPercent);
+      } else if (activeLoadingCount === 1) {
+        startLoadingProgressApproximation(10, 90, 150);
+      }
     }
 
     function hideLoading(force = false) {
@@ -2258,6 +2321,8 @@
         activeLoadingCount = Math.max(0, activeLoadingCount - 1);
       }
       if (activeLoadingCount === 0) {
+        stopLoadingProgressTimer();
+        updateLoadingProgress(100);
         const overlay = document.getElementById("loadingOverlay");
         if (overlay) overlay.classList.remove("active");
       }
@@ -2869,9 +2934,9 @@
         return;
       }
 
-      showLoading("Menyusun Jadwal Pengawas Otomatis...", "Menghitung rotasi anti-bentrok & menyimpan ke Spreadsheet");
+      showLoading("Menyusun Jadwal Pengawas Otomatis...", "Menyiapkan parameter sesi & ruang ujian (0%)", 4);
       try {
-        await new Promise(r => setTimeout(r, 150));
+        await new Promise(r => setTimeout(r, 80));
 
         appState.sesiList.forEach(s => {
           const mInp = document.getElementById(`sesiMulai_${s.sesiKe}`);
@@ -2880,16 +2945,22 @@
           if (sInp) s.jamSelesai = sanitizeJamValue(sInp.value, s.sesiKe, false);
         });
 
+        updateLoadingProgress(10, "Menghitung total hari, sesi & rotasi pengawas anti-bentrok...");
+        await new Promise(r => setTimeout(r, 60));
+
         const newJadwal = [];
         let counter = 1;
         let globalOffset = 0;
+        const totalDates = Math.max(1, appState.selectedExamDates.length);
 
-        appState.selectedExamDates.forEach(isoDate => {
+        for (let dIdx = 0; dIdx < appState.selectedExamDates.length; dIdx++) {
+          const isoDate = appState.selectedExamDates[dIdx];
           const tanggalIndo = formatTanggalIndo(isoDate);
           const activeSesiKeys = getActiveSessionsForDate(isoDate);
           const daySesiList = appState.sesiList.filter(s => activeSesiKeys.includes(String(s.sesiKe)));
 
-          daySesiList.forEach(sesi => {
+          for (let sIdx = 0; sIdx < daySesiList.length; sIdx++) {
+            const sesi = daySesiList[sIdx];
             const rotated = [];
             for (let i = 0; i < appState.guruList.length; i++) {
               rotated.push(appState.guruList[(i + globalOffset) % appState.guruList.length]);
@@ -2924,15 +2995,32 @@
                 catatanPengganti: ""
               });
             });
-          });
-        });
+          }
+
+          const stepPct = 10 + Math.round(((dIdx + 1) / totalDates) * 45);
+          updateLoadingProgress(
+            stepPct,
+            `Menyusun rotasi Hari ke-${dIdx + 1}/${totalDates} (${tanggalIndo}) • ${newJadwal.length} slot`
+          );
+          await new Promise(r => setTimeout(r, 45));
+        }
+
+        updateLoadingProgress(62, "Merender tabel jadwal & kelompok hari pelaksanaan...");
+        await new Promise(r => setTimeout(r, 50));
 
         appState.jadwalList = newJadwal;
         updateJadwalFilterDateOptions();
         renderJadwalTable();
         updateCustomCadanganSelectors();
         updateDashboardSummaryStats();
+
+        updateLoadingProgress(70, `Menyimpan ${newJadwal.length} baris jadwal ke Google Spreadsheet...`);
+        startLoadingProgressApproximation(70, 96, 130);
         await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: newJadwal }, "", true);
+        stopLoadingProgressTimer();
+        updateLoadingProgress(100, "Jadwal pengawas selesai dibuat & tersimpan!");
+        await new Promise(r => setTimeout(r, 180));
+
         // Otomatis arahkan ke halaman "Lihat Jadwal" setelah jadwal selesai digenerate
         switchTab("lihatJadwal");
         showToast(`Jadwal Otomatis (${appState.selectedExamDates.length} hari, ${newJadwal.length} slot ruang) berhasil dibuat!`);
@@ -3088,9 +3176,9 @@
         return;
       }
 
-      showLoading("Menambahkan Hari Baru ke Jadwal...", `Menyusun jadwal anti-bentrok untuk ${tanggalIndo}`);
+      showLoading("Menambahkan Hari Baru ke Jadwal...", `Menyusun jadwal anti-bentrok untuk ${tanggalIndo}`, 10);
       try {
-        await new Promise(r => setTimeout(r, 120));
+        await new Promise(r => setTimeout(r, 80));
 
         // Hitung nomor urut ID berikutnya & offset rotasi guru agar merata dengan hari-hari yang sudah ada
         let maxIdNum = 0;
@@ -3109,7 +3197,7 @@
         let globalOffset = (existingSessionCount * 2) % Math.max(1, appState.guruList.length);
 
         const appendedRows = [];
-        daySesiList.forEach(sesi => {
+        daySesiList.forEach((sesi, idx) => {
           const rotated = [];
           for (let i = 0; i < appState.guruList.length; i++) {
             rotated.push(appState.guruList[(i + globalOffset) % appState.guruList.length]);
@@ -3144,6 +3232,8 @@
               catatanPengganti: ""
             });
           });
+          const pct = 20 + Math.round(((idx + 1) / daySesiList.length) * 35);
+          updateLoadingProgress(pct, `Menyusun Sesi ${sesi.sesiKe} untuk ${tanggalIndo}...`);
         });
 
         // Gabungkan dan urutkan berdasarkan tanggal ISO lalu sesi lalu ruang
@@ -3164,6 +3254,7 @@
         }
         appState.daySessionsMap[isoDate] = activeSesiKeys;
 
+        updateLoadingProgress(65, "Memperbarui tampilan kelompok jadwal per hari...");
         renderExamDatesChips();
         updateJadwalFilterDateOptions();
         initAppendDayControls();
@@ -3171,7 +3262,12 @@
         updateCustomCadanganSelectors();
         updateDashboardSummaryStats();
 
+        updateLoadingProgress(74, "Menyimpan jadwal hari baru ke Google Spreadsheet...");
+        startLoadingProgressApproximation(74, 96, 130);
         await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
+        stopLoadingProgressTimer();
+        updateLoadingProgress(100, "Hari baru berhasil ditambahkan!");
+        await new Promise(r => setTimeout(r, 150));
         showToast(`Hari baru (${tanggalIndo} • ${appendedRows.length} slot ruang) berhasil ditambahkan ke jadwal tersimpan!`);
       } finally {
         hideLoading();
@@ -3704,25 +3800,29 @@
     // ============================================================================
     // HALAMAN 3: LABEL RUANG & QR-CODE (1 LEMBAR KERTAS A4 = 1 RUANG)
     // ============================================================================
-    function generateAllRoomLabels() {
+    async function generateAllRoomLabels() {
       if (appState.ruangList.length === 0) {
         showToast("Data Ruang masih kosong! Silakan isi Data Ruang Ujian pada menu Buat Jadwal Pengawas.", true);
         return;
       }
-      showLoading("Membuat Label Ruang & QR-Code...", `Menyusun ${appState.ruangList.length} label ruang A4 untuk ${appState.eventName || "Asesmen"}`);
-      setTimeout(() => {
-        try {
-          appState.labelsCleared = false;
-          appState.excludedLabelRoomNos = [];
-          localStorage.setItem("mondokan_labels_cleared", "false");
-          localStorage.setItem("mondokan_excluded_label_rooms", "[]");
-          renderRoomQrLabels();
-          updateDashboardSummaryStats();
-          showToast(`${appState.ruangList.length} Label Ruang & QR-Code berhasil dibuat!`);
-        } finally {
-          hideLoading();
-        }
-      }, 180);
+      showLoading("Membuat Label Ruang & QR-Code...", `Menyusun ${appState.ruangList.length} label ruang A4 untuk ${appState.eventName || "Asesmen"}`, 15);
+      try {
+        await new Promise(r => setTimeout(r, 80));
+        updateLoadingProgress(45, "Menyiapkan daftar ruang & kode QR...");
+        appState.labelsCleared = false;
+        appState.excludedLabelRoomNos = [];
+        localStorage.setItem("mondokan_labels_cleared", "false");
+        localStorage.setItem("mondokan_excluded_label_rooms", "[]");
+        await new Promise(r => setTimeout(r, 80));
+        updateLoadingProgress(80, "Merender kartu pratinjau QR-Code A4...");
+        renderRoomQrLabels();
+        updateDashboardSummaryStats();
+        updateLoadingProgress(100, "Seluruh label ruang & QR-Code siap digunakan!");
+        await new Promise(r => setTimeout(r, 150));
+        showToast(`${appState.ruangList.length} Label Ruang & QR-Code berhasil dibuat!`);
+      } finally {
+        hideLoading();
+      }
     }
 
     function deleteAllRoomLabels() {
