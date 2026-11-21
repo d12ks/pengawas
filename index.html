@@ -3238,9 +3238,10 @@
         return;
       }
 
-      showLoading("Menambahkan Hari Baru ke Jadwal...", `Menyusun jadwal anti-bentrok untuk ${tanggalIndo}`, 10);
+      showLoading("Menambahkan Hari Baru ke Jadwal...", `Menyusun jadwal anti-bentrok untuk ${tanggalIndo}`, 20);
       try {
-        await new Promise(r => setTimeout(r, 80));
+        // Beri jeda singkat hanya untuk merender overlay 20% -> 100% secara instan (< 0.15 detik)
+        await new Promise(r => setTimeout(r, 30));
 
         // Hitung nomor urut ID berikutnya & offset rotasi guru agar merata dengan hari-hari yang sudah ada
         let maxIdNum = 0;
@@ -3294,7 +3295,7 @@
               catatanPengganti: ""
             });
           });
-          const pct = 20 + Math.round(((idx + 1) / daySesiList.length) * 35);
+          const pct = 35 + Math.round(((idx + 1) / daySesiList.length) * 40);
           updateLoadingProgress(pct, `Menyusun Sesi ${sesi.sesiKe} untuk ${tanggalIndo}...`);
         });
 
@@ -3316,7 +3317,7 @@
         }
         appState.daySessionsMap[isoDate] = activeSesiKeys;
 
-        updateLoadingProgress(65, "Memperbarui tampilan kelompok jadwal per hari...");
+        updateLoadingProgress(90, "Memperbarui tampilan kelompok jadwal per hari...");
         renderExamDatesChips();
         updateJadwalFilterDateOptions();
         initAppendDayControls();
@@ -3324,13 +3325,12 @@
         updateCustomCadanganSelectors();
         updateDashboardSummaryStats();
 
-        updateLoadingProgress(74, "Menyimpan jadwal hari baru ke Google Spreadsheet...");
-        startLoadingProgressApproximation(74, 96, 130);
-        await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
-        stopLoadingProgressTimer();
         updateLoadingProgress(100, "Hari baru berhasil ditambahkan!");
-        await new Promise(r => setTimeout(r, 150));
-        showToast(`Hari baru (${tanggalIndo} • ${appendedRows.length} slot ruang) berhasil ditambahkan ke jadwal tersimpan!`);
+        await new Promise(r => setTimeout(r, 60));
+        showToast(`Hari baru (${tanggalIndo} • ${appendedRows.length} slot ruang) berhasil ditambahkan! Menyinkronkan ke Spreadsheet...`);
+
+        // Sinkronkan ke Google Spreadsheet di latar belakang (non-blocking) agar tidak menahan layar loading
+        postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
       } finally {
         hideLoading();
       }
@@ -3346,8 +3346,9 @@
       );
       if (!confirmed) return;
 
-      showLoading("Menghapus Jadwal Hari Terpilih...", `Menghapus jadwal ${tanggalIndoTarget} dari Spreadsheet`);
+      showLoading("Menghapus Jadwal Hari Terpilih...", `Menghapus jadwal ${tanggalIndoTarget}`, 30);
       try {
+        await new Promise(r => setTimeout(r, 30));
         const isoRemoved = parseIsoFromAnyDate(tanggalIndoTarget);
         appState.jadwalList = appState.jadwalList.filter(
           j => formatTanggalIndo(j.hariTanggal) !== tanggalIndoTarget
@@ -3363,6 +3364,7 @@
           filterSel.value = "ALL";
         }
 
+        updateLoadingProgress(85, "Memperbarui tampilan kelompok jadwal...");
         renderExamDatesChips();
         updateJadwalFilterDateOptions();
         initAppendDayControls();
@@ -3370,8 +3372,12 @@
         updateCustomCadanganSelectors();
         updateDashboardSummaryStats();
 
-        await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
+        updateLoadingProgress(100, "Jadwal hari terpilih dihapus!");
+        await new Promise(r => setTimeout(r, 50));
         showToast(`Jadwal hari ${tanggalIndoTarget} berhasil dihapus!`);
+
+        // Sinkronkan ke Google Spreadsheet di latar belakang
+        postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
       } finally {
         hideLoading();
       }
@@ -3716,20 +3722,6 @@
         const sesiSummary = sesiSorted.join(", ");
         const escapedIndo = dObj.indo.replace(/'/g, "\\'");
 
-        // Ringkasan Daftar Pengawas Cadangan (Guru yang tidak mengawasi) di setiap Sesi pada hari tersebut
-        const cadanganPerSesiHtml = sesiSorted.map(sKe => {
-          const cadanganGurus = getCadanganGurusForSession(dObj.indo, sKe);
-          const chips = cadanganGurus.length > 0
-            ? cadanganGurus.map(g => `<span class="cadangan-chip">${g.kodeGuru} - ${g.namaGuru}</span>`).join("")
-            : `<span style="color:var(--text-muted); font-style:italic;">Semua guru bertugas mengawasi di Sesi ${sKe}</span>`;
-          return `
-            <div class="day-cadangan-sesi-row">
-              <span class="badge badge-role" style="flex:0 0 auto;">Pengawas Cadangan Sesi ${sKe} (${cadanganGurus.length} Guru):</span>
-              <div style="display:flex; flex-wrap:wrap; gap:5px; flex:1 1 260px;">${chips}</div>
-            </div>
-          `;
-        }).join("");
-
         const rowsHtml = dayRows.map((j, idx) => {
           // Daftar Pengawas Cadangan khusus untuk sesi baris ini (guru yang tidak mengawasi di sesi tersebut)
           const cadanganGurusInSesi = getCadanganGurusForSession(dObj.indo, j.sesiKe);
@@ -3821,9 +3813,6 @@
                   🗑️ Hapus Hari Ini
                 </button>
               </div>
-            </div>
-            <div class="day-cadangan-panel">
-              ${cadanganPerSesiHtml}
             </div>
             <div class="table-wrap" style="margin-top:0; border:none; border-radius:0;">
               <table>
