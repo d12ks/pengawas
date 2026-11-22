@@ -1223,6 +1223,87 @@
     </div>
   </div>
 
+  <!-- MODAL KONFIGURASI HARI, JUMLAH SESI & PILIHAN RUANG UJIAN PER SESI (SMK MULTI-JURUSAN) -->
+  <div id="daySessionRoomModal" class="loading-overlay" style="z-index: 9850; padding: 14px;" onclick="if(event.target===this) closeDaySessionRoomModal()">
+    <div class="neu-card" style="width: 100%; max-width: 740px; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.28);">
+      <!-- Header Modal -->
+      <div style="padding: 12px 16px; background: var(--excel-header-bg); border-bottom: 1px solid var(--excel-header-border); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+        <div>
+          <div id="dsrModalTitle" style="font-size: 14px; font-weight: 800; color: var(--text-primary);">
+            ➕ Tambah Hari ke Jadwal &amp; Atur Sesi / Ruang Ujian
+          </div>
+          <div id="dsrModalSubtitle" style="font-size: 11.5px; color: var(--text-secondary); font-weight: 500;">
+            Tentukan jumlah sesi aktif beserta ruang ujian yang menyelenggarakan ujian di masing-masing sesi (mendukung jadwal jurusan SMK yang tidak serentak).
+          </div>
+        </div>
+        <button type="button" class="neu-btn neu-btn-danger" style="padding: 4px 9px; font-size: 12px;" onclick="closeDaySessionRoomModal()" title="Tutup Modal">✕</button>
+      </div>
+
+      <!-- Body Modal (Scrollable) -->
+      <div style="padding: 14px 16px; overflow-y: auto; flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px;">
+        <!-- 1. Baris Tanggal Hari Ujian -->
+        <div class="neu-card-compact" style="margin-bottom: 0;">
+          <div class="form-row" style="margin-bottom: 0; align-items: flex-end;">
+            <div id="dsrDateInputCol" style="flex: 1 1 200px;">
+              <label style="font-size: 11.5px; font-weight: 700; display: block; margin-bottom: 4px;">Pilih Tanggal Ujian (Senin - Jumat)</label>
+              <input id="dsrModalDateInput" class="neu-inset" type="date" onchange="onDsrModalDateChange()" />
+            </div>
+            <div style="flex: 1.4 1 240px;">
+              <label style="font-size: 11.5px; font-weight: 700; display: block; margin-bottom: 4px;">Format Hari / Tanggal Indonesia</label>
+              <input id="dsrModalDateIndoPreview" class="neu-inset" type="text" readonly style="font-weight: 700; color: var(--accent);" />
+            </div>
+            <div style="flex: 1 1 200px;">
+              <label style="font-size: 11.5px; font-weight: 700; display: block; margin-bottom: 4px;">Preset Cepat Jumlah Sesi</label>
+              <select id="dsrModalPresetSelect" class="neu-inset" onchange="onDsrModalPresetChange(this.value)"></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Pilihan Sesi Aktif -->
+        <div class="neu-card-compact" style="margin-bottom: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+            <div>
+              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">1. Pilih Sesi Ujian yang Aktif pada Hari Tersebut</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Klik tombol sesi untuk mengaktifkan atau menonaktifkan sesi pada hari ini.</div>
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" class="neu-btn" style="padding: 3px 8px; font-size: 11px;" onclick="setDsrModalAllSessions()">☑ Aktifkan Semua Sesi</button>
+            </div>
+          </div>
+          <div id="dsrModalSessionPills" class="day-sesi-pills" style="gap: 6px;"></div>
+        </div>
+
+        <!-- 3. Pilihan Ruang Ujian Per Sesi Aktif -->
+        <div class="neu-card-compact" style="margin-bottom: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+            <div>
+              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">2. Pilih Ruang Ujian untuk Setiap Sesi Aktif</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">
+                Sesuaikan ruang yang masih melaksanakan ujian di tiap sesi (misal Sesi 2/3 hanya ruang jurusan tertentu, sedangkan ruang jurusan lain sudah selesai/pulang).
+              </div>
+            </div>
+            <button type="button" class="neu-btn" style="padding: 3px 8px; font-size: 11px;" onclick="setDsrModalAllRoomsAllSessions()">
+              🏫 Semua Sesi Gunakan Semua Ruang
+            </button>
+          </div>
+
+          <div id="dsrModalPerSessionRoomsContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+
+        <!-- 4. Ringkasan Kebutuhan Slot & Pengawas -->
+        <div id="dsrModalSummaryBox" style="padding: 9px 12px; border-radius: 5px; background: var(--accent-soft); border: 1px solid var(--excel-header-border); font-size: 12px; color: var(--text-primary); font-weight: 600;"></div>
+      </div>
+
+      <!-- Footer Modal -->
+      <div style="padding: 10px 16px; background: var(--bg-subtle); border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <button type="button" class="neu-btn" onclick="closeDaySessionRoomModal()">Batal</button>
+        <button type="button" id="dsrModalConfirmBtn" class="neu-btn neu-btn-success" style="padding: 7px 14px;" onclick="confirmDaySessionRoomModal()">
+          ✅ Simpan &amp; Terapkan Jadwal Hari Ini
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- LOGIN VIEW -->
   <div id="loginView" class="login-shell">
     <div class="neu-card login-card">
@@ -1585,46 +1666,34 @@
               <div class="empty-schedule-icon">🗓️</div>
               <div class="empty-schedule-title">Belum ada jadwal tersimpan</div>
               <div class="empty-schedule-desc">
-                Silakan atur sesi, data guru, data ruang, serta tanggal pelaksanaan ujian pada menu <strong>"Buat Jadwal Pengawas"</strong>, lalu klik tombol <strong>"Generate Jadwal Otomatis"</strong>, atau tambahkan hari baru di bawah ini.
+                Silakan atur sesi, data guru, data ruang, serta tanggal pelaksanaan ujian pada menu <strong>"Buat Jadwal Pengawas"</strong>, lalu klik tombol <strong>"Generate Jadwal Otomatis"</strong>, atau tambahkan hari baru melalui tombol di bawah ini.
               </div>
-              <button class="neu-btn neu-btn-primary" style="margin-top:6px; padding:11px 20px;" onclick="switchTab('jadwal')">
-                🗓️ Buat Jadwal Pengawas Sekarang
-              </button>
+              <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:6px;">
+                <button class="neu-btn neu-btn-primary" style="padding:9px 16px;" onclick="switchTab('jadwal')">
+                  🗓️ Buat Jadwal Pengawas Sekarang
+                </button>
+                <button class="neu-btn neu-btn-success" style="padding:9px 16px;" onclick="openAppendDayModal()">
+                  ➕ Tambah Hari ke Jadwal (Atur Sesi &amp; Ruang)
+                </button>
+              </div>
             </div>
 
             <!-- KONTEN JADWAL JIKA SUDAH ADA JADWAL TERSIMPAN -->
             <div id="filledJadwalContainer">
-              <!-- 1. PANEL TAMBAH HARI BARU KE JADWAL YANG SUDAH TERSIMPAN -->
-              <div class="neu-card-compact" style="margin-bottom: 14px;">
-                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
-                  <div>
-                    <div style="font-size:0.88rem; font-weight:800; color:var(--accent);">
-                      ➕ Tambah Hari / Tanggal Baru ke Jadwal Tersimpan
-                    </div>
-                    <div style="font-size:0.78rem; color:var(--text-secondary);">
-                      Tambahkan hari pelaksanaan baru (anti-bentrok) tanpa mengubah atau mereset jadwal hari lain yang sudah tersimpan.
-                    </div>
+              <!-- 1. PANEL TOMBOL TAMBAH HARI BARU KE JADWAL TERSIMPAN (MEMBUKA MODAL SESI & RUANG PER SESI) -->
+              <div class="neu-card-compact" style="margin-bottom: 12px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+                <div>
+                  <div style="font-size:13px; font-weight:700; color:var(--accent);">
+                    ➕ Tambah Hari / Tanggal Baru ke Jadwal Tersimpan (Mendukung Pilih Sesi &amp; Ruang Per Sesi)
+                  </div>
+                  <div style="font-size:11.5px; color:var(--text-secondary);">
+                    Klik tombol di kanan untuk memilih tanggal ujian baru, menentukan jumlah sesi aktif, serta memilih ruang mana saja yang menyelenggarakan ujian di tiap sesi.
                   </div>
                 </div>
-
-                <div class="form-row" style="align-items:flex-end; margin-bottom: 0;">
-                  <div style="flex: 1 1 220px;">
-                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Pilih Tanggal Hari Baru (Senin - Jumat)</label>
-                    <input id="appendJadwalDateInput" class="neu-inset" type="date" onchange="onAppendDateInputChange()" />
-                  </div>
-                  <div style="flex: 1 1 230px;">
-                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Format Hari / Tanggal Indonesia</label>
-                    <input id="appendJadwalDateIndoPreview" class="neu-inset" type="text" readonly style="font-weight:700; color:var(--accent);" />
-                  </div>
-                  <div style="flex: 1 1 210px;">
-                    <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Pilihan Sesi Ujian Hari Tersebut</label>
-                    <select id="appendJadwalSesiComboSelect" class="neu-inset"></select>
-                  </div>
-                  <div style="flex: 0 0 auto;">
-                    <button class="neu-btn neu-btn-success" style="padding:10px 18px;" onclick="appendSingleDayToSavedSchedule()">
-                      ➕ Tambah Hari ke Jadwal Tersimpan
-                    </button>
-                  </div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <button type="button" class="neu-btn neu-btn-success" style="padding:8px 14px; font-size:12.5px;" onclick="openAppendDayModal()">
+                    ➕ Tambah Hari ke Jadwal
+                  </button>
                 </div>
               </div>
 
@@ -1791,6 +1860,7 @@
       ],
       selectedExamDates: [],
       daySessionsMap: {},
+      daySessionRoomsMap: {},
       jadwalList: [],
       presensiList: []
     };
@@ -1799,6 +1869,61 @@
       if (appState.labelsCleared) return [];
       const excluded = Array.isArray(appState.excludedLabelRoomNos) ? appState.excludedLabelRoomNos : [];
       return appState.ruangList.filter(r => !excluded.includes(String(r.noRuang)));
+    }
+
+    function getAllRoomNosSorted() {
+      return appState.ruangList
+        .map(r => String(r.noRuang))
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    }
+
+    function getDaySessionRoomKey(isoDate, sesiKe) {
+      return `${String(isoDate).trim()}__${String(sesiKe).trim()}`;
+    }
+
+    function getActiveRoomNosForDateSession(isoDate, sesiKe) {
+      const allRoomNos = getAllRoomNosSorted();
+      if (allRoomNos.length === 0) return [];
+      const key = getDaySessionRoomKey(isoDate, sesiKe);
+      const saved = appState.daySessionRoomsMap[key];
+      if (Array.isArray(saved) && saved.length > 0) {
+        const valid = saved.map(String).filter(rNo => allRoomNos.includes(rNo));
+        if (valid.length > 0) {
+          return valid.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+        }
+      }
+      return [...allRoomNos];
+    }
+
+    function getActiveRoomObjectsForDateSession(isoDate, sesiKe) {
+      const activeNos = new Set(getActiveRoomNosForDateSession(isoDate, sesiKe));
+      return appState.ruangList
+        .filter(r => activeNos.has(String(r.noRuang)))
+        .sort((a, b) => String(a.noRuang).localeCompare(String(b.noRuang), undefined, { numeric: true }));
+    }
+
+    function setActiveRoomNosForDateSession(isoDate, sesiKe, roomNosArray) {
+      const allRoomNos = getAllRoomNosSorted();
+      const valid = (Array.isArray(roomNosArray) ? roomNosArray : [])
+        .map(String)
+        .filter(rNo => allRoomNos.includes(rNo))
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      const key = getDaySessionRoomKey(isoDate, sesiKe);
+      if (valid.length > 0) {
+        appState.daySessionRoomsMap[key] = valid;
+      } else {
+        delete appState.daySessionRoomsMap[key];
+      }
+    }
+
+    function clearDaySessionRoomsForDate(isoDate) {
+      const prefix = `${String(isoDate).trim()}__`;
+      Object.keys(appState.daySessionRoomsMap).forEach(k => {
+        if (k.startsWith(prefix)) {
+          delete appState.daySessionRoomsMap[k];
+        }
+      });
     }
 
     function getDefaultSessionsForIsoDate(isoDate) {
@@ -2232,12 +2357,14 @@
     function removeExamDate(isoDate) {
       appState.selectedExamDates = appState.selectedExamDates.filter(d => d !== isoDate);
       delete appState.daySessionsMap[isoDate];
+      clearDaySessionRoomsForDate(isoDate);
       renderExamDatesChips();
     }
 
     function clearExamDates() {
       appState.selectedExamDates = [];
       appState.daySessionsMap = {};
+      appState.daySessionRoomsMap = {};
       renderExamDatesChips();
       showToast("Daftar tanggal ujian dikosongkan.");
     }
@@ -2256,27 +2383,36 @@
 
       const combos = buildDaySessionCombinations();
       const allSesiKeys = appState.sesiList.map(s => String(s.sesiKe));
+      const totalAllRooms = appState.ruangList.length;
 
       container.innerHTML = appState.selectedExamDates.map((iso, idx) => {
         const activeSesi = getActiveSessionsForDate(iso);
         const activeKey = activeSesi.join("-");
-        const summaryLabel = `${activeSesi.length} Sesi ujian (${activeKey})`;
+
+        const perSessionRoomInfo = activeSesi.map(sKe => {
+          const rNos = getActiveRoomNosForDateSession(iso, sKe);
+          return `S${sKe}: ${rNos.length}/${totalAllRooms} R`;
+        }).join(" • ");
+
+        const totalDaySlots = activeSesi.reduce((acc, sKe) => acc + getActiveRoomNosForDateSession(iso, sKe).length, 0);
+        const summaryLabel = `${activeSesi.length} Sesi (${activeKey}) • ${totalDaySlots} Slot Ruang`;
 
         const presetOptionsHtml = combos.map(c =>
           `<option value="${c.key}" ${c.key === activeKey ? "selected" : ""}>${c.label}</option>`
         ).join("");
         const hasExactCombo = combos.some(c => c.key === activeKey);
         const customOptionHtml = !hasExactCombo
-          ? `<option value="${activeKey}" selected>${summaryLabel}</option>`
+          ? `<option value="${activeKey}" selected>${activeSesi.length} Sesi ujian (${activeKey})</option>`
           : "";
 
         const pillsHtml = allSesiKeys.map(sKe => {
           const isOn = activeSesi.includes(sKe);
+          const rCount = getActiveRoomNosForDateSession(iso, sKe).length;
           return `
             <button type="button" class="day-sesi-pill ${isOn ? 'active' : ''}"
               onclick="toggleDaySessionPill('${iso}', '${sKe}')"
-              title="Klik untuk mengaktifkan/menonaktifkan Sesi ${sKe} pada ${formatTanggalIndo(iso)}">
-              Sesi ${sKe}
+              title="Klik untuk mengaktifkan/menonaktifkan Sesi ${sKe} (${rCount} Ruang) pada ${formatTanggalIndo(iso)}">
+              Sesi ${sKe} (${rCount}R)
             </button>
           `;
         }).join("");
@@ -2292,6 +2428,7 @@
             </div>
 
             <div class="date-chip-summary">${summaryLabel}</div>
+            <div style="font-size:10.5px; color:var(--text-secondary); font-weight:600;">🏫 ${perSessionRoomInfo}</div>
 
             <div style="display:flex; flex-direction:column; gap:5px; margin-top:2px;">
               <select class="neu-inset" style="padding:5px 8px; font-size:0.76rem; font-weight:600;"
@@ -2302,6 +2439,10 @@
               <div class="day-sesi-pills">
                 ${pillsHtml}
               </div>
+              <button type="button" class="neu-btn" style="width:100%; padding:5px 8px; font-size:11px; margin-top:2px;"
+                onclick="openConfigureDayModal('${iso}')">
+                🏫 Atur Sesi &amp; Ruang Per Sesi
+              </button>
             </div>
           </div>
         `;
@@ -2604,6 +2745,7 @@
 
       const jadwalDates = [];
       const syncedDaySessions = {};
+      const syncedDaySessionRooms = {};
       appState.jadwalList.forEach(j => {
         const iso = parseIsoFromAnyDate(j.hariTanggal);
         if (iso) {
@@ -2613,12 +2755,23 @@
           if (!syncedDaySessions[iso].includes(sKeStr)) {
             syncedDaySessions[iso].push(sKeStr);
           }
+          const dsrKey = getDaySessionRoomKey(iso, sKeStr);
+          if (!syncedDaySessionRooms[dsrKey]) syncedDaySessionRooms[dsrKey] = [];
+          const rNoStr = String(j.noRuang || j.kodeRuang || "").trim();
+          if (rNoStr && !syncedDaySessionRooms[dsrKey].includes(rNoStr)) {
+            syncedDaySessionRooms[dsrKey].push(rNoStr);
+          }
         }
       });
       if (jadwalDates.length > 0) {
         appState.selectedExamDates = jadwalDates.sort();
         Object.keys(syncedDaySessions).forEach(iso => {
           appState.daySessionsMap[iso] = syncedDaySessions[iso].sort((a, b) => Number(a) - Number(b));
+        });
+        Object.keys(syncedDaySessionRooms).forEach(dsrKey => {
+          appState.daySessionRoomsMap[dsrKey] = syncedDaySessionRooms[dsrKey].sort((a, b) =>
+            a.localeCompare(b, undefined, { numeric: true })
+          );
         });
       }
 
@@ -2976,11 +3129,11 @@
 
     // ============================================================================
     // GENERATE JADWAL OTOMATIS ANTI BENTROK -> PINDAH KE HALAMAN "LIHAT JADWAL"
+    // Mendukung pilihan sesi per hari DAN pilihan ruang per sesi (SMK multi-jurusan)
     // ============================================================================
     async function generateAntiConflictSchedule() {
-      const neededPerSession = appState.ruangList.length * 2;
-      if (appState.ruangList.length === 0 || appState.guruList.length < neededPerSession) {
-        showToast(`Pastikan Data Ruang telah diisi dan Jumlah Guru (${appState.guruList.length}) minimal ${neededPerSession} (2 guru/ruang)!`, true);
+      if (appState.ruangList.length === 0) {
+        showToast("Pastikan Data Ruang telah diisi terlebih dahulu!", true);
         return;
       }
       if (appState.selectedExamDates.length === 0) {
@@ -2988,7 +3141,28 @@
         return;
       }
 
-      showLoading("Menyusun Jadwal Pengawas Otomatis...", "Menyiapkan parameter sesi & ruang ujian (0%)", 4);
+      // Hitung jumlah ruang maksimum dalam satu sesi dari seluruh hari terpilih
+      let maxRoomsInSingleSession = 0;
+      appState.selectedExamDates.forEach(isoDate => {
+        const activeSesiKeys = getActiveSessionsForDate(isoDate);
+        activeSesiKeys.forEach(sKe => {
+          const rCount = getActiveRoomObjectsForDateSession(isoDate, sKe).length;
+          if (rCount > maxRoomsInSingleSession) maxRoomsInSingleSession = rCount;
+        });
+      });
+
+      if (maxRoomsInSingleSession === 0) {
+        showToast("Minimal harus ada 1 ruang ujian aktif pada sesi yang dipilih!", true);
+        return;
+      }
+
+      const neededPerSession = maxRoomsInSingleSession * 2;
+      if (appState.guruList.length < neededPerSession) {
+        showToast(`Jumlah Guru (${appState.guruList.length}) belum mencukupi! Dibutuhkan minimal ${neededPerSession} guru untuk ${maxRoomsInSingleSession} ruang aktif dalam satu sesi (2 guru/ruang).`, true);
+        return;
+      }
+
+      showLoading("Menyusun Jadwal Pengawas Otomatis...", "Menyiapkan parameter sesi & ruang ujian per sesi (0%)", 4);
       try {
         await new Promise(r => setTimeout(r, 80));
 
@@ -2999,7 +3173,7 @@
           if (sInp) s.jamSelesai = sanitizeJamValue(sInp.value, s.sesiKe, false);
         });
 
-        updateLoadingProgress(10, "Menghitung total hari, sesi & rotasi pengawas anti-bentrok...");
+        updateLoadingProgress(10, "Menghitung total hari, sesi, ruang per sesi & rotasi pengawas anti-bentrok...");
         await new Promise(r => setTimeout(r, 60));
 
         const newJadwal = [];
@@ -3015,16 +3189,21 @@
 
           for (let sIdx = 0; sIdx < daySesiList.length; sIdx++) {
             const sesi = daySesiList[sIdx];
+            const activeRoomsForSession = getActiveRoomObjectsForDateSession(isoDate, sesi.sesiKe);
+            if (activeRoomsForSession.length === 0) continue;
+
             const rotated = [];
             for (let i = 0; i < appState.guruList.length; i++) {
               rotated.push(appState.guruList[(i + globalOffset) % appState.guruList.length]);
             }
-            globalOffset = (globalOffset + 2) % appState.guruList.length;
+            // Geser rotasi guru agar pembagian jadwal adil dan tidak terus mengulang guru yang sama
+            const stepShift = Math.max(2, Math.min(appState.guruList.length - 1, activeRoomsForSession.length * 2));
+            globalOffset = (globalOffset + stepShift) % appState.guruList.length;
 
             let ptr = 0;
             const cleanJamSesi = `${sesi.jamMulai} - ${sesi.jamSelesai}`;
 
-            appState.ruangList.forEach(ruang => {
+            activeRoomsForSession.forEach(ruang => {
               const p1 = rotated[ptr++];
               const p2 = rotated[ptr++];
               newJadwal.push({
@@ -3064,6 +3243,7 @@
 
         appState.jadwalList = newJadwal;
         updateJadwalFilterDateOptions();
+        initAppendDayControls();
         renderJadwalTable();
         updateCustomCadanganSelectors();
         updateDashboardSummaryStats();
@@ -3103,6 +3283,7 @@
         appState.jadwalList = [];
         appState.selectedExamDates = [];
         appState.daySessionsMap = {};
+        appState.daySessionRoomsMap = {};
         renderExamDatesChips();
         updateJadwalFilterDateOptions();
         initAppendDayControls();
@@ -3119,8 +3300,15 @@
     }
 
     // ============================================================================
-    // KELOLA TAMBAH HARI BARU & HAPUS HARI TERTENTU PADA JADWAL TERSIMPAN
+    // KELOLA TAMBAH HARI BARU, ATUR SESI & RUANG PER SESI (MODAL POP-UP)
     // ============================================================================
+    let dsrModalState = {
+      mode: "append", // "append" (Tambah Hari Baru) atau "config" (Atur Sesi & Ruang untuk Hari Tertentu)
+      isoDate: "",
+      activeSessions: [],
+      roomsBySession: {} // { [sesiKe]: ["01", "02", ...] }
+    };
+
     function getUniqueScheduleDatesSorted() {
       const dateMap = new Map();
       appState.jadwalList.forEach(j => {
@@ -3146,7 +3334,6 @@
       }
       const parts = baseIso.split("-");
       const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-      // Majukan minimal 1 hari kerja (Senin-Jumat) yang belum ada di jadwal
       const existingIndos = new Set(uniqueDates.map(u => u.indo));
       for (let step = 0; step < 30; step++) {
         if (uniqueDates.length > 0 || step > 0) {
@@ -3167,53 +3354,343 @@
     }
 
     function initAppendDayControls() {
-      const dateInp = document.getElementById("appendJadwalDateInput");
-      const previewInp = document.getElementById("appendJadwalDateIndoPreview");
-      const comboSel = document.getElementById("appendJadwalSesiComboSelect");
-      if (!dateInp || !comboSel) return;
-
-      const suggestedIso = getNextSuggestedAppendIsoDate();
-      dateInp.value = suggestedIso;
-      if (previewInp) {
-        previewInp.value = formatTanggalIndo(suggestedIso);
-      }
-
-      const combos = buildDaySessionCombinations();
-      const defaultSessions = getDefaultSessionsForIsoDate(suggestedIso).join("-");
-      comboSel.innerHTML = combos.map(c =>
-        `<option value="${c.key}" ${c.key === defaultSessions ? "selected" : ""}>${c.label}</option>`
-      ).join("");
+      // Kompatibilitas pemanggilan dari renderAll(): kini menggunakan Modal #daySessionRoomModal
     }
 
-    function onAppendDateInputChange() {
-      const dateInp = document.getElementById("appendJadwalDateInput");
-      const previewInp = document.getElementById("appendJadwalDateIndoPreview");
-      const comboSel = document.getElementById("appendJadwalSesiComboSelect");
-      if (!dateInp) return;
+    function loadDsrModalStateForDate(isoDate, resetToDefault = false) {
+      const allSesiKeys = appState.sesiList.map(s => String(s.sesiKe));
+      const allRoomNos = getAllRoomNosSorted();
+      dsrModalState.isoDate = isoDate;
+      dsrModalState.activeSessions = resetToDefault
+        ? getDefaultSessionsForIsoDate(isoDate)
+        : [...getActiveSessionsForDate(isoDate)];
 
-      const iso = dateInp.value || todayIso;
-      if (previewInp) {
-        previewInp.value = formatTanggalIndo(iso);
-      }
-      if (comboSel) {
-        const defaultKey = getDefaultSessionsForIsoDate(iso).join("-");
-        const hasOption = Array.from(comboSel.options).some(opt => opt.value === defaultKey);
-        if (hasOption) comboSel.value = defaultKey;
-      }
+      dsrModalState.roomsBySession = {};
+      allSesiKeys.forEach(sKe => {
+        if (resetToDefault) {
+          dsrModalState.roomsBySession[sKe] = [...allRoomNos];
+        } else {
+          dsrModalState.roomsBySession[sKe] = [...getActiveRoomNosForDateSession(isoDate, sKe)];
+        }
+      });
     }
 
-    async function appendSingleDayToSavedSchedule() {
-      const neededPerSession = appState.ruangList.length * 2;
-      if (appState.ruangList.length === 0 || appState.guruList.length < neededPerSession) {
-        showToast(`Pastikan Data Ruang telah diisi dan Jumlah Guru (${appState.guruList.length}) minimal ${neededPerSession} (2 guru/ruang)!`, true);
+    function openAppendDayModal() {
+      if (appState.ruangList.length === 0) {
+        showToast("Pastikan Data Ruang telah diisi terlebih dahulu!", true);
         return;
       }
+      dsrModalState.mode = "append";
+      const suggestedIso = getNextSuggestedAppendIsoDate();
+      loadDsrModalStateForDate(suggestedIso, true);
 
-      const dateInp = document.getElementById("appendJadwalDateInput");
-      const comboSel = document.getElementById("appendJadwalSesiComboSelect");
-      const isoDate = dateInp?.value || "";
+      const titleEl = document.getElementById("dsrModalTitle");
+      const subEl = document.getElementById("dsrModalSubtitle");
+      const dateInp = document.getElementById("dsrModalDateInput");
+      const confirmBtn = document.getElementById("dsrModalConfirmBtn");
+
+      if (titleEl) titleEl.innerText = "➕ Tambah Hari Baru ke Jadwal (Atur Sesi & Ruang Per Sesi)";
+      if (subEl) subEl.innerText = "Pilih tanggal ujian baru, tentukan sesi mana saja yang aktif, serta pilih ruang ujian yang digunakan di masing-masing sesi.";
+      if (dateInp) {
+        dateInp.disabled = false;
+        dateInp.value = suggestedIso;
+      }
+      if (confirmBtn) {
+        confirmBtn.innerText = "➕ Tambah & Simpan Hari ke Jadwal";
+      }
+
+      renderDsrModalContent();
+      const modal = document.getElementById("daySessionRoomModal");
+      if (modal) modal.classList.add("active");
+    }
+
+    function openConfigureDayModal(isoOrIndoDate) {
+      if (appState.ruangList.length === 0) {
+        showToast("Pastikan Data Ruang telah diisi terlebih dahulu!", true);
+        return;
+      }
+      const resolvedIso = parseIsoFromAnyDate(isoOrIndoDate) || isoOrIndoDate || todayIso;
+      dsrModalState.mode = "config";
+      loadDsrModalStateForDate(resolvedIso, false);
+
+      const indoStr = formatTanggalIndo(resolvedIso);
+      const isAlreadySavedInJadwal = appState.jadwalList.some(j => formatTanggalIndo(j.hariTanggal) === indoStr);
+
+      const titleEl = document.getElementById("dsrModalTitle");
+      const subEl = document.getElementById("dsrModalSubtitle");
+      const dateInp = document.getElementById("dsrModalDateInput");
+      const confirmBtn = document.getElementById("dsrModalConfirmBtn");
+
+      if (titleEl) titleEl.innerText = `🏫 Atur Sesi & Ruang Per Sesi — ${indoStr}`;
+      if (subEl) {
+        subEl.innerText = isAlreadySavedInJadwal
+          ? "Perubahan sesi & ruang pada hari ini akan langsung memperbarui jadwal hari tersebut dan menyinkronkannya ke Google Spreadsheet."
+          : "Atur sesi aktif dan ruang ujian di tiap sesi untuk hari ini sebelum melakukan Generate Jadwal Otomatis.";
+      }
+      if (dateInp) {
+        dateInp.value = resolvedIso;
+        dateInp.disabled = true;
+      }
+      if (confirmBtn) {
+        confirmBtn.innerText = isAlreadySavedInJadwal
+          ? "💾 Simpan & Perbarui Jadwal Hari Ini"
+          : "✅ Simpan Konfigurasi Sesi & Ruang";
+      }
+
+      renderDsrModalContent();
+      const modal = document.getElementById("daySessionRoomModal");
+      if (modal) modal.classList.add("active");
+    }
+
+    function closeDaySessionRoomModal() {
+      const modal = document.getElementById("daySessionRoomModal");
+      if (modal) modal.classList.remove("active");
+    }
+
+    function onDsrModalDateChange() {
+      const dateInp = document.getElementById("dsrModalDateInput");
+      if (!dateInp) return;
+      const newIso = dateInp.value || todayIso;
+      loadDsrModalStateForDate(newIso, true);
+      renderDsrModalContent();
+    }
+
+    function onDsrModalPresetChange(comboKey) {
+      if (!comboKey) return;
+      const chosen = comboKey.split("-").filter(Boolean);
+      if (chosen.length > 0) {
+        dsrModalState.activeSessions = chosen.sort((a, b) => Number(a) - Number(b));
+        renderDsrModalContent();
+      }
+    }
+
+    function toggleDsrModalSession(sesiKe) {
+      const sStr = String(sesiKe);
+      const idx = dsrModalState.activeSessions.indexOf(sStr);
+      if (idx >= 0) {
+        if (dsrModalState.activeSessions.length <= 1) {
+          showToast("Minimal harus ada 1 sesi aktif pada hari ujian ini!", true);
+          return;
+        }
+        dsrModalState.activeSessions.splice(idx, 1);
+      } else {
+        dsrModalState.activeSessions.push(sStr);
+      }
+      dsrModalState.activeSessions.sort((a, b) => Number(a) - Number(b));
+      renderDsrModalContent();
+    }
+
+    function setDsrModalAllSessions() {
+      dsrModalState.activeSessions = appState.sesiList.map(s => String(s.sesiKe));
+      renderDsrModalContent();
+    }
+
+    function toggleDsrModalRoom(sesiKe, noRuang, isChecked) {
+      const sStr = String(sesiKe);
+      const rStr = String(noRuang);
+      const current = Array.isArray(dsrModalState.roomsBySession[sStr])
+        ? [...dsrModalState.roomsBySession[sStr]]
+        : getAllRoomNosSorted();
+
+      if (isChecked) {
+        if (!current.includes(rStr)) current.push(rStr);
+      } else {
+        const idx = current.indexOf(rStr);
+        if (idx >= 0) current.splice(idx, 1);
+      }
+      current.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      dsrModalState.roomsBySession[sStr] = current;
+      renderDsrModalContent();
+    }
+
+    function setDsrModalSessionAllRooms(sesiKe, selectAll) {
+      const sStr = String(sesiKe);
+      dsrModalState.roomsBySession[sStr] = selectAll ? getAllRoomNosSorted() : [];
+      renderDsrModalContent();
+    }
+
+    function setDsrModalAllRoomsAllSessions() {
+      const allRooms = getAllRoomNosSorted();
+      appState.sesiList.forEach(s => {
+        dsrModalState.roomsBySession[String(s.sesiKe)] = [...allRooms];
+      });
+      renderDsrModalContent();
+    }
+
+    function renderDsrModalContent() {
+      const previewInp = document.getElementById("dsrModalDateIndoPreview");
+      const presetSel = document.getElementById("dsrModalPresetSelect");
+      const pillsWrap = document.getElementById("dsrModalSessionPills");
+      const roomsWrap = document.getElementById("dsrModalPerSessionRoomsContainer");
+      const summaryBox = document.getElementById("dsrModalSummaryBox");
+
+      const iso = dsrModalState.isoDate || todayIso;
+      if (previewInp) previewInp.value = formatTanggalIndo(iso);
+
+      const combos = buildDaySessionCombinations();
+      const activeKey = dsrModalState.activeSessions.join("-");
+      if (presetSel) {
+        const hasExact = combos.some(c => c.key === activeKey);
+        const customOpt = !hasExact
+          ? `<option value="${activeKey}" selected>${dsrModalState.activeSessions.length} Sesi (${activeKey})</option>`
+          : "";
+        presetSel.innerHTML = customOpt + combos.map(c =>
+          `<option value="${c.key}" ${c.key === activeKey ? "selected" : ""}>${c.label}</option>`
+        ).join("");
+      }
+
+      if (pillsWrap) {
+        pillsWrap.innerHTML = appState.sesiList.map(s => {
+          const sKe = String(s.sesiKe);
+          const isOn = dsrModalState.activeSessions.includes(sKe);
+          const rCount = (dsrModalState.roomsBySession[sKe] || []).length;
+          return `
+            <button type="button" class="day-sesi-pill ${isOn ? 'active' : ''}"
+              style="padding: 5px 10px; font-size: 12px;"
+              onclick="toggleDsrModalSession('${sKe}')">
+              ${isOn ? '☑' : '☐'} Sesi ${sKe} (${s.jamMulai} - ${s.jamSelesai}) • ${rCount} Ruang
+            </button>
+          `;
+        }).join("");
+      }
+
+      const sortedRuangList = [...appState.ruangList].sort((a, b) =>
+        String(a.noRuang).localeCompare(String(b.noRuang), undefined, { numeric: true })
+      );
+
+      if (roomsWrap) {
+        const activeSesiObjects = appState.sesiList.filter(s =>
+          dsrModalState.activeSessions.includes(String(s.sesiKe))
+        );
+
+        roomsWrap.innerHTML = activeSesiObjects.map(s => {
+          const sKe = String(s.sesiKe);
+          const selectedRooms = dsrModalState.roomsBySession[sKe] || [];
+          const neededGurus = selectedRooms.length * 2;
+          const allSelected = selectedRooms.length === sortedRuangList.length && sortedRuangList.length > 0;
+
+          const checkboxesHtml = sortedRuangList.map(r => {
+            const rNo = String(r.noRuang);
+            const checked = selectedRooms.includes(rNo);
+            const escapedNo = rNo.replace(/'/g, "\\'");
+            return `
+              <label style="display:flex; align-items:center; gap:6px; padding:5px 8px; border-radius:4px; border:1px solid ${checked ? 'var(--accent)' : 'var(--border-color)'}; background:${checked ? 'var(--accent-soft)' : 'var(--bg-card)'}; cursor:pointer; font-size:11.5px; font-weight:${checked ? '700' : '500'}; color:var(--text-primary); user-select:none;">
+                <input type="checkbox" ${checked ? "checked" : ""}
+                  onchange="toggleDsrModalRoom('${sKe}', '${escapedNo}', this.checked)"
+                  style="width:14px; height:14px; accent-color:var(--accent); cursor:pointer;" />
+                <span><strong>R.${r.noRuang}</strong> (${r.namaRuang})</span>
+              </label>
+            `;
+          }).join("");
+
+          return `
+            <div style="border: 1px solid var(--excel-header-border); border-radius: 5px; overflow: hidden; background: var(--bg-card);">
+              <div style="padding: 7px 11px; background: var(--excel-header-bg); border-bottom: 1px solid var(--excel-header-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <span style="font-size:12.5px; font-weight:800; color:var(--text-primary);">
+                    🕒 Sesi ${sKe} (${s.jamMulai} - ${s.jamSelesai})
+                  </span>
+                  <span class="badge ${selectedRooms.length > 0 ? 'badge-role' : 'badge-danger'}">
+                    ${selectedRooms.length} / ${sortedRuangList.length} Ruang Aktif (${neededGurus} Pengawas)
+                  </span>
+                </div>
+                <div style="display:flex; gap:5px;">
+                  <button type="button" class="neu-btn ${allSelected ? 'neu-btn-primary' : ''}" style="padding:2px 7px; font-size:10.5px;"
+                    onclick="setDsrModalSessionAllRooms('${sKe}', true)">
+                    ☑ Pilih Semua Ruang
+                  </button>
+                  <button type="button" class="neu-btn" style="padding:2px 7px; font-size:10.5px;"
+                    onclick="setDsrModalSessionAllRooms('${sKe}', false)">
+                    ☐ Kosongkan
+                  </button>
+                </div>
+              </div>
+              <div style="padding: 8px 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 6px;">
+                ${checkboxesHtml}
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      if (summaryBox) {
+        let totalSlots = 0;
+        let maxRoomsInAnySesi = 0;
+        const perSesiParts = [];
+        dsrModalState.activeSessions.forEach(sKe => {
+          const cnt = (dsrModalState.roomsBySession[sKe] || []).length;
+          totalSlots += cnt;
+          if (cnt > maxRoomsInAnySesi) maxRoomsInAnySesi = cnt;
+          perSesiParts.push(`Sesi ${sKe}: ${cnt} Ruang (${cnt * 2} Pengawas)`);
+        });
+        const maxNeededGurus = maxRoomsInAnySesi * 2;
+        const guruEnough = appState.guruList.length >= maxNeededGurus;
+        summaryBox.innerHTML = `
+          <div>📌 <strong>Ringkasan ${formatTanggalIndo(iso)}:</strong> ${dsrModalState.activeSessions.length} Sesi Aktif • Total <strong>${totalSlots} Slot Ruang</strong> (${perSesiParts.join(" • ")})</div>
+          <div style="margin-top:3px; font-size:11px; color:${guruEnough ? 'var(--success)' : 'var(--danger)'};">
+            ${guruEnough
+              ? `✔ Jumlah Guru Terdaftar (${appState.guruList.length} Guru) mencukupi kebutuhan maksimal per sesi (${maxNeededGurus} Pengawas).`
+              : `⚠️ Jumlah Guru Terdaftar (${appState.guruList.length} Guru) kurang dari kebutuhan sesi tertinggi (${maxNeededGurus} Pengawas untuk ${maxRoomsInAnySesi} Ruang)!`}
+          </div>
+        `;
+      }
+    }
+
+    function buildDayScheduleRowsForDate(isoDate, activeSesiKeys, startIdCounter, startGlobalOffset) {
+      const tanggalIndo = formatTanggalIndo(isoDate);
+      const daySesiList = appState.sesiList.filter(s => activeSesiKeys.includes(String(s.sesiKe)));
+      let nextCounter = startIdCounter;
+      let globalOffset = startGlobalOffset;
+      const generatedRows = [];
+
+      daySesiList.forEach(sesi => {
+        const activeRoomsForSession = getActiveRoomObjectsForDateSession(isoDate, sesi.sesiKe);
+        if (activeRoomsForSession.length === 0) return;
+
+        const rotated = [];
+        for (let i = 0; i < appState.guruList.length; i++) {
+          rotated.push(appState.guruList[(i + globalOffset) % appState.guruList.length]);
+        }
+        const stepShift = Math.max(2, Math.min(appState.guruList.length - 1, activeRoomsForSession.length * 2));
+        globalOffset = (globalOffset + stepShift) % appState.guruList.length;
+
+        let ptr = 0;
+        const cleanJamSesi = `${sesi.jamMulai} - ${sesi.jamSelesai}`;
+
+        activeRoomsForSession.forEach(ruang => {
+          const p1 = rotated[ptr++];
+          const p2 = rotated[ptr++];
+          generatedRows.push({
+            idJadwal: "JDW-" + String(nextCounter++).padStart(3, "0"),
+            namaEvent: appState.eventName,
+            hariTanggal: tanggalIndo,
+            sesiKe: String(sesi.sesiKe),
+            jamSesi: cleanJamSesi,
+            noRuang: ruang.noRuang,
+            kodeRuang: ruang.noRuang,
+            namaRuang: ruang.namaRuang,
+            p1Kode: p1.kodeGuru,
+            p1Nama: p1.namaGuru,
+            p1Nip: p1.nip,
+            p2Kode: p2.kodeGuru,
+            p2Nama: p2.namaGuru,
+            p2Nip: p2.nip,
+            cadanganKode: "",
+            cadanganNama: "",
+            p1AsliNama: "",
+            p2AsliNama: "",
+            catatanPengganti: ""
+          });
+        });
+      });
+
+      return generatedRows;
+    }
+
+    async function confirmDaySessionRoomModal() {
+      const isoDate = dsrModalState.isoDate;
       if (!isoDate) {
-        showToast("Pilih tanggal hari baru terlebih dahulu!", true);
+        showToast("Pilih tanggal hari ujian terlebih dahulu!", true);
         return;
       }
 
@@ -3224,84 +3701,96 @@
         return;
       }
 
+      if (dsrModalState.activeSessions.length === 0) {
+        showToast("Pilih minimal 1 sesi aktif!", true);
+        return;
+      }
+
+      // Validasi setiap sesi aktif memiliki minimal 1 ruang ujian
+      let maxRoomsInAnySession = 0;
+      for (const sKe of dsrModalState.activeSessions) {
+        const rooms = dsrModalState.roomsBySession[sKe] || [];
+        if (rooms.length === 0) {
+          showToast(`Sesi ${sKe} belum memiliki ruang ujian yang dipilih! Centang minimal 1 ruang atau nonaktifkan Sesi ${sKe}.`, true);
+          return;
+        }
+        if (rooms.length > maxRoomsInAnySession) {
+          maxRoomsInAnySession = rooms.length;
+        }
+      }
+
+      const neededPerSession = maxRoomsInAnySession * 2;
+      if (appState.guruList.length < neededPerSession) {
+        showToast(`Jumlah Guru (${appState.guruList.length}) belum mencukupi! Dibutuhkan minimal ${neededPerSession} guru untuk ${maxRoomsInAnySession} ruang aktif dalam satu sesi.`, true);
+        return;
+      }
+
       const tanggalIndo = formatTanggalIndo(isoDate);
-      const alreadyExists = appState.jadwalList.some(j => formatTanggalIndo(j.hariTanggal) === tanggalIndo);
-      if (alreadyExists) {
-        showToast(`Jadwal untuk ${tanggalIndo} sudah ada di daftar jadwal tersimpan!`, true);
+
+      if (dsrModalState.mode === "append") {
+        const alreadyExists = appState.jadwalList.some(j => formatTanggalIndo(j.hariTanggal) === tanggalIndo);
+        if (alreadyExists) {
+          showToast(`Jadwal untuk ${tanggalIndo} sudah ada di daftar jadwal tersimpan! Gunakan tombol "🏫 Atur Sesi & Ruang" pada kartu hari tersebut.`, true);
+          return;
+        }
+      }
+
+      // Simpan konfigurasi sesi & ruang per sesi ke appState
+      appState.daySessionsMap[isoDate] = [...dsrModalState.activeSessions];
+      dsrModalState.activeSessions.forEach(sKe => {
+        setActiveRoomNosForDateSession(isoDate, sKe, dsrModalState.roomsBySession[sKe] || []);
+      });
+      if (!appState.selectedExamDates.includes(isoDate)) {
+        appState.selectedExamDates.push(isoDate);
+        appState.selectedExamDates.sort();
+      }
+
+      const isAlreadyInSavedJadwal = appState.jadwalList.some(j => formatTanggalIndo(j.hariTanggal) === tanggalIndo);
+
+      // Jika mode "config" pada halaman "Buat Jadwal Pengawas" dan hari ini belum ada di jadwalList tersimpan
+      if (dsrModalState.mode === "config" && !isAlreadyInSavedJadwal) {
+        closeDaySessionRoomModal();
+        renderExamDatesChips();
+        showToast(`Konfigurasi sesi & ruang untuk ${tanggalIndo} disimpan!`);
         return;
       }
 
-      const chosenCombo = comboSel?.value || appState.sesiList.map(s => String(s.sesiKe)).join("-");
-      const activeSesiKeys = chosenCombo.split("-").filter(Boolean);
-      const daySesiList = appState.sesiList.filter(s => activeSesiKeys.includes(String(s.sesiKe)));
-      if (daySesiList.length === 0) {
-        showToast("Pilih minimal 1 sesi untuk hari baru tersebut!", true);
-        return;
-      }
-
-      showLoading("Menambahkan Hari Baru ke Jadwal...", `Menyusun jadwal anti-bentrok untuk ${tanggalIndo}`, 20);
+      // Jika mode "append" ATAU hari tersebut sudah ada di jadwalList tersimpan -> susun/perbarui jadwal hari tersebut & sinkronkan ke Spreadsheet
+      closeDaySessionRoomModal();
+      showLoading(
+        dsrModalState.mode === "append" ? "Menambahkan Hari Baru ke Jadwal..." : "Memperbarui Sesi & Ruang Hari Terpilih...",
+        `Menyusun jadwal anti-bentrok untuk ${tanggalIndo}`,
+        25
+      );
       try {
-        // Beri jeda singkat hanya untuk merender overlay 20% -> 100% secara instan (< 0.15 detik)
         await new Promise(r => setTimeout(r, 30));
 
-        // Hitung nomor urut ID berikutnya & offset rotasi guru agar merata dengan hari-hari yang sudah ada
+        // Hapus baris lama untuk tanggal tersebut jika sedang mengedit hari yang sudah ada
+        const remainingJadwal = appState.jadwalList.filter(j => formatTanggalIndo(j.hariTanggal) !== tanggalIndo);
+
         let maxIdNum = 0;
-        appState.jadwalList.forEach(j => {
+        remainingJadwal.forEach(j => {
           const m = String(j.idJadwal || "").match(/(\d+)/);
           if (m) {
             const num = parseInt(m[1], 10);
             if (num > maxIdNum) maxIdNum = num;
           }
         });
-        let nextCounter = maxIdNum + 1;
+        const nextCounter = maxIdNum + 1;
 
         const existingSessionCount = new Set(
-          appState.jadwalList.map(j => `${formatTanggalIndo(j.hariTanggal)}__${j.sesiKe}`)
+          remainingJadwal.map(j => `${formatTanggalIndo(j.hariTanggal)}__${j.sesiKe}`)
         ).size;
-        let globalOffset = (existingSessionCount * 2) % Math.max(1, appState.guruList.length);
+        const startOffset = (existingSessionCount * 2) % Math.max(1, appState.guruList.length);
 
-        const appendedRows = [];
-        daySesiList.forEach((sesi, idx) => {
-          const rotated = [];
-          for (let i = 0; i < appState.guruList.length; i++) {
-            rotated.push(appState.guruList[(i + globalOffset) % appState.guruList.length]);
-          }
-          globalOffset = (globalOffset + 2) % appState.guruList.length;
+        const newDayRows = buildDayScheduleRowsForDate(
+          isoDate,
+          dsrModalState.activeSessions,
+          nextCounter,
+          startOffset
+        );
 
-          let ptr = 0;
-          const cleanJamSesi = `${sesi.jamMulai} - ${sesi.jamSelesai}`;
-
-          appState.ruangList.forEach(ruang => {
-            const p1 = rotated[ptr++];
-            const p2 = rotated[ptr++];
-            appendedRows.push({
-              idJadwal: "JDW-" + String(nextCounter++).padStart(3, "0"),
-              namaEvent: appState.eventName,
-              hariTanggal: tanggalIndo,
-              sesiKe: String(sesi.sesiKe),
-              jamSesi: cleanJamSesi,
-              noRuang: ruang.noRuang,
-              kodeRuang: ruang.noRuang,
-              namaRuang: ruang.namaRuang,
-              p1Kode: p1.kodeGuru,
-              p1Nama: p1.namaGuru,
-              p1Nip: p1.nip,
-              p2Kode: p2.kodeGuru,
-              p2Nama: p2.namaGuru,
-              p2Nip: p2.nip,
-              cadanganKode: "",
-              cadanganNama: "",
-              p1AsliNama: "",
-              p2AsliNama: "",
-              catatanPengganti: ""
-            });
-          });
-          const pct = 35 + Math.round(((idx + 1) / daySesiList.length) * 40);
-          updateLoadingProgress(pct, `Menyusun Sesi ${sesi.sesiKe} untuk ${tanggalIndo}...`);
-        });
-
-        // Gabungkan dan urutkan berdasarkan tanggal ISO lalu sesi lalu ruang
-        const combined = [...appState.jadwalList, ...appendedRows];
+        const combined = [...remainingJadwal, ...newDayRows];
         combined.sort((a, b) => {
           const isoA = parseIsoFromAnyDate(a.hariTanggal) || String(a.hariTanggal);
           const isoB = parseIsoFromAnyDate(b.hariTanggal) || String(b.hariTanggal);
@@ -3312,25 +3801,19 @@
         });
 
         appState.jadwalList = combined;
-        if (!appState.selectedExamDates.includes(isoDate)) {
-          appState.selectedExamDates.push(isoDate);
-          appState.selectedExamDates.sort();
-        }
-        appState.daySessionsMap[isoDate] = activeSesiKeys;
 
         updateLoadingProgress(90, "Memperbarui tampilan kelompok jadwal per hari...");
         renderExamDatesChips();
         updateJadwalFilterDateOptions();
-        initAppendDayControls();
         renderJadwalTable();
         updateCustomCadanganSelectors();
         updateDashboardSummaryStats();
 
-        updateLoadingProgress(100, "Hari baru berhasil ditambahkan!");
-        await new Promise(r => setTimeout(r, 60));
-        showToast(`Hari baru (${tanggalIndo} • ${appendedRows.length} slot ruang) berhasil ditambahkan! Menyinkronkan ke Spreadsheet...`);
+        updateLoadingProgress(100, "Jadwal hari berhasil disimpan!");
+        await new Promise(r => setTimeout(r, 50));
+        showToast(`Jadwal ${tanggalIndo} (${dsrModalState.activeSessions.length} sesi • ${newDayRows.length} slot ruang) berhasil disimpan! Menyinkronkan ke Spreadsheet...`);
 
-        // Sinkronkan ke Google Spreadsheet di latar belakang (non-blocking) agar tidak menahan layar loading
+        // Sinkronkan ke Google Spreadsheet di latar belakang (non-blocking)
         postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
       } finally {
         hideLoading();
@@ -3358,9 +3841,9 @@
         if (isoRemoved) {
           appState.selectedExamDates = appState.selectedExamDates.filter(d => d !== isoRemoved);
           delete appState.daySessionsMap[isoRemoved];
+          clearDaySessionRoomsForDate(isoRemoved);
         }
 
-        // Jika filter sedang memilih hari yang dihapus, kembalikan ke ALL
         const filterSel = document.getElementById("jadwalFilterDateSelect");
         if (filterSel && filterSel.value === tanggalIndoTarget) {
           filterSel.value = "ALL";
@@ -3798,15 +4281,26 @@
           `;
         }).join("");
 
+        const sesiRoomBreakdown = sesiSorted.map(sKe => {
+          const rCount = dayRows.filter(r => String(r.sesiKe) === sKe).length;
+          return `Sesi ${sKe} (${rCount} Ruang)`;
+        }).join(" • ");
+        const escapedIso = (dObj.iso || dObj.indo).replace(/'/g, "\\'");
+
         return `
           <div class="day-group-card">
             <div class="day-group-header">
               <div class="day-group-title-wrap">
                 <span class="day-group-number-badge">HARI KE-${dayIndex}</span>
                 <span class="day-group-date-text">📅 ${dObj.indo}</span>
-                <span class="badge badge-role">${sesiSorted.length} Sesi (Sesi ${sesiSummary}) • ${dayRows.length} Slot Ruang</span>
+                <span class="badge badge-role">${sesiSorted.length} Sesi: ${sesiRoomBreakdown} • Total ${dayRows.length} Slot</span>
               </div>
               <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <button type="button" class="neu-btn neu-btn-primary" style="padding:4px 9px; font-size:11.5px;"
+                  onclick="openConfigureDayModal('${escapedIso}')"
+                  title="Atur jumlah sesi dan pilihan ruang ujian per sesi untuk hari ${dObj.indo}">
+                  🏫 Atur Sesi &amp; Ruang
+                </button>
                 <button type="button" class="neu-btn neu-btn-danger" style="padding:4px 9px; font-size:11.5px;"
                   onclick="deleteSingleSavedDayJadwal('${escapedIndo}')"
                   title="Hapus jadwal hari ${dObj.indo} saja">
