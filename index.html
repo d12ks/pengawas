@@ -1577,9 +1577,6 @@
                 </button>
                 <button class="neu-btn neu-btn-success" onclick="exportJadwalExcel()">📊 Unduh .XLSX</button>
                 <button class="neu-btn neu-btn-primary" onclick="exportJadwalPDF()">📄 Unduh .PDF</button>
-                <button class="neu-btn neu-btn-danger" onclick="deleteAllSavedJadwal()" title="Hapus seluruh jadwal yang tersimpan agar halaman ringan untuk event berikutnya">
-                  🗑️ Hapus Semua Jadwal
-                </button>
               </div>
             </div>
 
@@ -3092,21 +3089,30 @@
         return;
       }
       const total = appState.jadwalList.length;
+      const uniqueDaysCount = getUniqueScheduleDatesSorted().length;
       const confirmed = confirm(
-        `Hapus seluruh hasil generate jadwal yang sudah tersimpan (${total} baris jadwal)?\n\n` +
-        `Data jadwal di halaman web dan Google Spreadsheet akan dikosongkan agar ringan untuk pembuatan jadwal event ujian berikutnya.`
+        `Konfirmasi Penghapusan Semua Jadwal:\n\n` +
+        `Apakah Anda yakin ingin menghapus SELURUH jadwal pengawas yang tersimpan (${uniqueDaysCount} hari • ${total} slot ruang)?\n\n` +
+        `Data jadwal di halaman web dan Google Spreadsheet akan dikosongkan.`
       );
       if (!confirmed) return;
 
-      showLoading("Menghapus Jadwal Tersimpan...", "Mengosongkan data jadwal di halaman web & Google Spreadsheet");
+      showLoading("Menghapus Semua Jadwal...", "Mengosongkan seluruh data jadwal di halaman web & Google Spreadsheet", 35);
       try {
+        await new Promise(r => setTimeout(r, 30));
         appState.jadwalList = [];
+        appState.selectedExamDates = [];
+        appState.daySessionsMap = {};
+        renderExamDatesChips();
         updateJadwalFilterDateOptions();
+        initAppendDayControls();
         renderJadwalTable();
         updateCustomCadanganSelectors();
         updateDashboardSummaryStats();
-        await postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: [] }, "", true);
+        updateLoadingProgress(100, "Seluruh jadwal berhasil dihapus!");
+        await new Promise(r => setTimeout(r, 50));
         showToast("Seluruh jadwal tersimpan berhasil dihapus!");
+        postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: [] }, "", true);
       } finally {
         hideLoading();
       }
@@ -3336,8 +3342,9 @@
       if (targetRows.length === 0) return;
 
       const confirmed = confirm(
-        `Hapus seluruh jadwal pada hari:\n"${tanggalIndoTarget}" (${targetRows.length} slot ruang)?\n\n` +
-        `Jadwal hari lain akan tetap tersimpan.`
+        `Konfirmasi Penghapusan Jadwal Hari Terpilih:\n\n` +
+        `Apakah Anda yakin ingin menghapus jadwal pada hari "${tanggalIndoTarget}" (${targetRows.length} slot ruang)?\n\n` +
+        `Jadwal pada hari lainnya akan tetap tersimpan.`
       );
       if (!confirmed) return;
 
@@ -3803,7 +3810,12 @@
                 <button type="button" class="neu-btn neu-btn-danger" style="padding:4px 9px; font-size:11.5px;"
                   onclick="deleteSingleSavedDayJadwal('${escapedIndo}')"
                   title="Hapus jadwal hari ${dObj.indo} saja">
-                  🗑️ Hapus Hari Ini
+                  🗑️ Hapus Jadwal ${dObj.indo}
+                </button>
+                <button type="button" class="neu-btn neu-btn-danger" style="padding:4px 9px; font-size:11.5px;"
+                  onclick="deleteAllSavedJadwal()"
+                  title="Hapus seluruh jadwal yang tersimpan di semua hari">
+                  🗑️ Hapus Semua Jadwal
                 </button>
               </div>
             </div>
