@@ -3131,6 +3131,250 @@
     // GENERATE JADWAL OTOMATIS ANTI BENTROK -> PINDAH KE HALAMAN "LIHAT JADWAL"
     // Mendukung pilihan sesi per hari DAN pilihan ruang per sesi (SMK multi-jurusan)
     // ============================================================================
+    // ============================================================================
+    // ALGORITMA PENGOPLOSAN PASANGAN PENGAWAS BERBASIS ANTI-REPEAT PAIRING + 2-OPT
+    // Memastikan:
+    // 1. 100% Anti-Bentrok (1 guru hanya di 1 ruang pada sesi yang sama)
+    // 2. Pasangan Pengawas 1 & Pengawas 2 selalu bervariasi (tidak berpasangan dengan
+    //    orang yang sama terus-menerus antar sesi maupun antar hari)
+    // 3. Beban jumlah tugas mengawasi merata di antara seluruh guru
+    // 4. Rotasi ruang dan peran (Pengawas 1 vs Pengawas 2) bervariasi
+    // ============================================================================
+    function makeSortedPairKey(kodeA, kodeB) {
+      const a = String(kodeA || "").trim().toUpperCase();
+      const b = String(kodeB || "").trim().toUpperCase();
+      return a < b ? `${a}__${b}` : `${b}__${a}`;
+    }
+
+    function shuffleArrayCopy(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = tmp;
+      }
+      return copy;
+    }
+
+    function createPairingTracker(existingJadwalRows = []) {
+      const tracker = {
+        totalDutyCount: {},
+        dayDutyCount: {},
+        p1RoleCount: {},
+        p2RoleCount: {},
+        pairCount: {},
+        dayPairCount: {},
+        roomVisitCount: {},
+        lastSessionRoom: {},
+        lastSessionPartner: {}
+      };
+
+      appState.guruList.forEach(g => {
+        const k = String(g.kodeGuru).trim().toUpperCase();
+        tracker.totalDutyCount[k] = 0;
+        tracker.p1RoleCount[k] = 0;
+        tracker.p2RoleCount[k] = 0;
+      });
+
+      existingJadwalRows.forEach(row => {
+        recordAssignmentToTracker(
+          tracker,
+          formatTanggalIndo(row.hariTanggal),
+          row.noRuang,
+          row.p1Kode,
+          row.p2Kode
+        );
+      });
+
+      return tracker;
+    }
+
+    function recordAssignmentToTracker(tracker, tanggalIndo, noRuang, p1KodeRaw, p2KodeRaw) {
+      const k1 = String(p1KodeRaw || "").trim().toUpperCase();
+      const k2 = String(p2KodeRaw || "").trim().toUpperCase();
+      const rNo = String(noRuang || "").trim();
+      if (!k1 || !k2) return;
+
+      tracker.totalDutyCount[k1] = (tracker.totalDutyCount[k1] || 0) + 1;
+      tracker.totalDutyCount[k2] = (tracker.totalDutyCount[k2] || 0) + 1;
+
+      const dKey1 = `${tanggalIndo}__${k1}`;
+      const dKey2 = `${tanggalIndo}__${k2}`;
+      tracker.dayDutyCount[dKey1] = (tracker.dayDutyCount[dKey1] || 0) + 1;
+      tracker.dayDutyCount[dKey2] = (tracker.dayDutyCount[dKey2] || 0) + 1;
+
+      tracker.p1RoleCount[k1] = (tracker.p1RoleCount[k1] || 0) + 1;
+      tracker.p2RoleCount[k2] = (tracker.p2RoleCount[k2] || 0) + 1;
+
+      const pKey = makeSortedPairKey(k1, k2);
+      tracker.pairCount[pKey] = (tracker.pairCount[pKey] || 0) + 1;
+
+      const dpKey = `${tanggalIndo}__${pKey}`;
+      tracker.dayPairCount[dpKey] = (tracker.dayPairCount[dpKey] || 0) + 1;
+
+      const rKey1 = `${k1}__${rNo}`;
+      const rKey2 = `${k2}__${rNo}`;
+      tracker.roomVisitCount[rKey1] = (tracker.roomVisitCount[rKey1] || 0) + 1;
+      tracker.roomVisitCount[rKey2] = (tracker.roomVisitCount[rKey2] || 0) + 1;
+
+      tracker.lastSessionRoom[k1] = rNo;
+      tracker.lastSessionRoom[k2] = rNo;
+      tracker.lastSessionPartner[k1] = k2;
+      tracker.lastSessionPartner[k2] = k1;
+    }
+
+    function evaluateRoomPairPenalty(tracker, tanggalIndo, noRuang, guruA, guruB) {
+      const kA = String(guruA.kodeGuru).trim().toUpperCase();
+      const kB = String(guruB.kodeGuru).trim().toUpperCase();
+      const rNo = String(noRuang || "").trim();
+      const pKey = makeSortedPairKey(kA, kB);
+      const dpKey = `${tanggalIndo}__${pKey}`;
+
+      const prevPaired = tracker.pairCount[pKey] || 0;
+      const sameDayPaired = tracker.dayPairCount[dpKey] || 0;
+      const isBackToBackPartner = (tracker.lastSessionPartner[kA] === kB || tracker.lastSessionPartner[kB] === kA) ? 1 : 0;
+
+      const roomVisitsA = tracker.roomVisitCount[`${kA}__${rNo}`] || 0;
+      const roomVisitsB = tracker.roomVisitCount[`${kB}__${rNo}`] || 0;
+      const backToBackRoomA = tracker.lastSessionRoom[kA] === rNo ? 1 : 0;
+      const backToBackRoomB = tracker.lastSessionRoom[kB] === rNo ? 1 : 0;
+
+      return (
+        (prevPaired * 5000) +
+        (sameDayPaired * 15000) +
+        (isBackToBackPartner * 20000) +
+        ((roomVisitsA + roomVisitsB) * 45) +
+        ((backToBackRoomA + backToBackRoomB) * 90)
+      );
+    }
+
+    function assignVariedSessionPairs(tracker, activeRoomsForSession, tanggalIndo) {
+      const roomCount = activeRoomsForSession.length;
+      const neededTeachers = roomCount * 2;
+
+      // 1. Acak urutan awal guru, lalu urutkan berdasarkan beban tugas paling sedikit
+      //    agar pembagian tugas adil dan setiap klik Generate menghasilkan kombinasi segar
+      const shuffledGurus = shuffleArrayCopy(appState.guruList);
+      shuffledGurus.sort((gA, gB) => {
+        const kA = String(gA.kodeGuru).trim().toUpperCase();
+        const kB = String(gB.kodeGuru).trim().toUpperCase();
+        const totalDiff = (tracker.totalDutyCount[kA] || 0) - (tracker.totalDutyCount[kB] || 0);
+        if (totalDiff !== 0) return totalDiff;
+        const dayDiff = (tracker.dayDutyCount[`${tanggalIndo}__${kA}`] || 0) - (tracker.dayDutyCount[`${tanggalIndo}__${kB}`] || 0);
+        return dayDiff;
+      });
+
+      const sessionPool = shuffledGurus.slice(0, neededTeachers);
+      const unassigned = [...sessionPool];
+      const roomAssignments = [];
+
+      // 2. Pembentukan pasangan awal dengan penalti minimum (hindari pasangan yang pernah bertemu)
+      for (let rIdx = 0; rIdx < roomCount; rIdx++) {
+        const ruang = activeRoomsForSession[rIdx];
+        const rNo = String(ruang.noRuang || "").trim();
+
+        // Pilih kandidat pertama yang paling jarang masuk ke ruang ini
+        let bestIdx1 = 0;
+        let bestScore1 = Infinity;
+        for (let i = 0; i < unassigned.length; i++) {
+          const g = unassigned[i];
+          const k = String(g.kodeGuru).trim().toUpperCase();
+          const rVisits = tracker.roomVisitCount[`${k}__${rNo}`] || 0;
+          const b2bRoom = tracker.lastSessionRoom[k] === rNo ? 1 : 0;
+          const roleBalance = (tracker.p1RoleCount[k] || 0) - (tracker.p2RoleCount[k] || 0);
+          const score = (rVisits * 45) + (b2bRoom * 90) + (roleBalance * 8);
+          if (score < bestScore1) {
+            bestScore1 = score;
+            bestIdx1 = i;
+          }
+        }
+        const firstGuru = unassigned.splice(bestIdx1, 1)[0];
+
+        // Pilih pasangan kedua yang belum pernah (atau paling jarang) berpasangan dengan firstGuru
+        let bestIdx2 = 0;
+        let bestScore2 = Infinity;
+        for (let j = 0; j < unassigned.length; j++) {
+          const candidate = unassigned[j];
+          const penalty = evaluateRoomPairPenalty(tracker, tanggalIndo, rNo, firstGuru, candidate);
+          if (penalty < bestScore2) {
+            bestScore2 = penalty;
+            bestIdx2 = j;
+          }
+        }
+        const secondGuru = unassigned.splice(bestIdx2, 1)[0];
+
+        roomAssignments.push({
+          ruang: ruang,
+          p1: firstGuru,
+          p2: secondGuru
+        });
+      }
+
+      // 3. Optimasi 2-Opt Swap antar ruang dalam sesi yang sama:
+      //    Jika menukar pasangan antar dua ruang menurunkan skor pengulangan pasangan/ruang, lakukan pertukaran
+      for (let pass = 0; pass < 3; pass++) {
+        let improved = false;
+        for (let i = 0; i < roomAssignments.length; i++) {
+          for (let j = i + 1; j < roomAssignments.length; j++) {
+            const slotA = roomAssignments[i];
+            const slotB = roomAssignments[j];
+            const rNoA = slotA.ruang.noRuang;
+            const rNoB = slotB.ruang.noRuang;
+
+            const currentCost =
+              evaluateRoomPairPenalty(tracker, tanggalIndo, rNoA, slotA.p1, slotA.p2) +
+              evaluateRoomPairPenalty(tracker, tanggalIndo, rNoB, slotB.p1, slotB.p2);
+
+            // Coba opsi 1: tukar p2 antara ruang A dan ruang B
+            const swapP2Cost =
+              evaluateRoomPairPenalty(tracker, tanggalIndo, rNoA, slotA.p1, slotB.p2) +
+              evaluateRoomPairPenalty(tracker, tanggalIndo, rNoB, slotB.p1, slotA.p2);
+
+            // Coba opsi 2: tukar p2 ruang A dengan p1 ruang B
+            const swapCrossCost =
+              evaluateRoomPairPenalty(tracker, tanggalIndo, rNoA, slotA.p1, slotB.p1) +
+              evaluateRoomPairPenalty(tracker, tanggalIndo, rNoB, slotA.p2, slotB.p2);
+
+            if (swapP2Cost < currentCost && swapP2Cost <= swapCrossCost) {
+              const tmp = slotA.p2;
+              slotA.p2 = slotB.p2;
+              slotB.p2 = tmp;
+              improved = true;
+            } else if (swapCrossCost < currentCost) {
+              const tmp = slotA.p2;
+              slotA.p2 = slotB.p1;
+              slotB.p1 = tmp;
+              improved = true;
+            }
+          }
+        }
+        if (!improved) break;
+      }
+
+      // 4. Seimbangkan peran Pengawas 1 & Pengawas 2 di dalam setiap pasangan, lalu catat ke tracker
+      roomAssignments.forEach(slot => {
+        const k1 = String(slot.p1.kodeGuru).trim().toUpperCase();
+        const k2 = String(slot.p2.kodeGuru).trim().toUpperCase();
+        const diff1 = (tracker.p1RoleCount[k1] || 0) - (tracker.p2RoleCount[k1] || 0);
+        const diff2 = (tracker.p1RoleCount[k2] || 0) - (tracker.p2RoleCount[k2] || 0);
+        if (diff1 > diff2) {
+          const tmp = slot.p1;
+          slot.p1 = slot.p2;
+          slot.p2 = tmp;
+        }
+        recordAssignmentToTracker(
+          tracker,
+          tanggalIndo,
+          slot.ruang.noRuang,
+          slot.p1.kodeGuru,
+          slot.p2.kodeGuru
+        );
+      });
+
+      return roomAssignments;
+    }
+
     async function generateAntiConflictSchedule() {
       if (appState.ruangList.length === 0) {
         showToast("Pastikan Data Ruang telah diisi terlebih dahulu!", true);
@@ -3162,7 +3406,7 @@
         return;
       }
 
-      showLoading("Menyusun Jadwal Pengawas Otomatis...", "Menyiapkan parameter sesi & ruang ujian per sesi (0%)", 4);
+      showLoading("Menyusun Jadwal Pengawas Otomatis...", "Menyiapkan pengoplosan pasangan pengawas bervariasi & anti-bentrok (0%)", 4);
       try {
         await new Promise(r => setTimeout(r, 80));
 
@@ -3173,12 +3417,12 @@
           if (sInp) s.jamSelesai = sanitizeJamValue(sInp.value, s.sesiKe, false);
         });
 
-        updateLoadingProgress(10, "Menghitung total hari, sesi, ruang per sesi & rotasi pengawas anti-bentrok...");
+        updateLoadingProgress(10, "Mengoplos pasangan Pengawas 1 & 2 agar bervariasi di setiap sesi & hari...");
         await new Promise(r => setTimeout(r, 60));
 
         const newJadwal = [];
         let counter = 1;
-        let globalOffset = 0;
+        const pairingTracker = createPairingTracker([]);
         const totalDates = Math.max(1, appState.selectedExamDates.length);
 
         for (let dIdx = 0; dIdx < appState.selectedExamDates.length; dIdx++) {
@@ -3192,20 +3436,14 @@
             const activeRoomsForSession = getActiveRoomObjectsForDateSession(isoDate, sesi.sesiKe);
             if (activeRoomsForSession.length === 0) continue;
 
-            const rotated = [];
-            for (let i = 0; i < appState.guruList.length; i++) {
-              rotated.push(appState.guruList[(i + globalOffset) % appState.guruList.length]);
-            }
-            // Geser rotasi guru agar pembagian jadwal adil dan tidak terus mengulang guru yang sama
-            const stepShift = Math.max(2, Math.min(appState.guruList.length - 1, activeRoomsForSession.length * 2));
-            globalOffset = (globalOffset + stepShift) % appState.guruList.length;
-
-            let ptr = 0;
             const cleanJamSesi = `${sesi.jamMulai} - ${sesi.jamSelesai}`;
+            const variedAssignments = assignVariedSessionPairs(
+              pairingTracker,
+              activeRoomsForSession,
+              tanggalIndo
+            );
 
-            activeRoomsForSession.forEach(ruang => {
-              const p1 = rotated[ptr++];
-              const p2 = rotated[ptr++];
+            variedAssignments.forEach(({ ruang, p1, p2 }) => {
               newJadwal.push({
                 idJadwal: "JDW-" + String(counter++).padStart(3, "0"),
                 namaEvent: appState.eventName,
@@ -3233,10 +3471,12 @@
           const stepPct = 10 + Math.round(((dIdx + 1) / totalDates) * 45);
           updateLoadingProgress(
             stepPct,
-            `Menyusun rotasi Hari ke-${dIdx + 1}/${totalDates} (${tanggalIndo}) • ${newJadwal.length} slot`
+            `Menyusun pasangan bervariasi Hari ke-${dIdx + 1}/${totalDates} (${tanggalIndo}) • ${newJadwal.length} slot`
           );
           await new Promise(r => setTimeout(r, 45));
         }
+
+        const uniquePairsCount = Object.keys(pairingTracker.pairCount).length;
 
         updateLoadingProgress(62, "Merender tabel jadwal & kelompok hari pelaksanaan...");
         await new Promise(r => setTimeout(r, 50));
@@ -3257,7 +3497,7 @@
 
         // Otomatis arahkan ke halaman "Lihat Jadwal" setelah jadwal selesai digenerate
         switchTab("lihatJadwal");
-        showToast(`Jadwal Otomatis (${appState.selectedExamDates.length} hari, ${newJadwal.length} slot ruang) berhasil dibuat!`);
+        showToast(`Jadwal Otomatis (${appState.selectedExamDates.length} hari • ${newJadwal.length} slot ruang • ${uniquePairsCount} kombinasi pasangan unik) berhasil dibuat!`);
       } finally {
         hideLoading();
       }
@@ -3636,30 +3876,25 @@
       }
     }
 
-    function buildDayScheduleRowsForDate(isoDate, activeSesiKeys, startIdCounter, startGlobalOffset) {
+    function buildDayScheduleRowsForDate(isoDate, activeSesiKeys, startIdCounter, existingJadwalRows = []) {
       const tanggalIndo = formatTanggalIndo(isoDate);
       const daySesiList = appState.sesiList.filter(s => activeSesiKeys.includes(String(s.sesiKe)));
       let nextCounter = startIdCounter;
-      let globalOffset = startGlobalOffset;
       const generatedRows = [];
+      const pairingTracker = createPairingTracker(existingJadwalRows);
 
       daySesiList.forEach(sesi => {
         const activeRoomsForSession = getActiveRoomObjectsForDateSession(isoDate, sesi.sesiKe);
         if (activeRoomsForSession.length === 0) return;
 
-        const rotated = [];
-        for (let i = 0; i < appState.guruList.length; i++) {
-          rotated.push(appState.guruList[(i + globalOffset) % appState.guruList.length]);
-        }
-        const stepShift = Math.max(2, Math.min(appState.guruList.length - 1, activeRoomsForSession.length * 2));
-        globalOffset = (globalOffset + stepShift) % appState.guruList.length;
-
-        let ptr = 0;
         const cleanJamSesi = `${sesi.jamMulai} - ${sesi.jamSelesai}`;
+        const variedAssignments = assignVariedSessionPairs(
+          pairingTracker,
+          activeRoomsForSession,
+          tanggalIndo
+        );
 
-        activeRoomsForSession.forEach(ruang => {
-          const p1 = rotated[ptr++];
-          const p2 = rotated[ptr++];
+        variedAssignments.forEach(({ ruang, p1, p2 }) => {
           generatedRows.push({
             idJadwal: "JDW-" + String(nextCounter++).padStart(3, "0"),
             namaEvent: appState.eventName,
@@ -3759,7 +3994,7 @@
       closeDaySessionRoomModal();
       showLoading(
         dsrModalState.mode === "append" ? "Menambahkan Hari Baru ke Jadwal..." : "Memperbarui Sesi & Ruang Hari Terpilih...",
-        `Menyusun jadwal anti-bentrok untuk ${tanggalIndo}`,
+        `Mengoplos pasangan pengawas bervariasi & anti-bentrok untuk ${tanggalIndo}`,
         25
       );
       try {
@@ -3778,16 +4013,11 @@
         });
         const nextCounter = maxIdNum + 1;
 
-        const existingSessionCount = new Set(
-          remainingJadwal.map(j => `${formatTanggalIndo(j.hariTanggal)}__${j.sesiKe}`)
-        ).size;
-        const startOffset = (existingSessionCount * 2) % Math.max(1, appState.guruList.length);
-
         const newDayRows = buildDayScheduleRowsForDate(
           isoDate,
           dsrModalState.activeSessions,
           nextCounter,
-          startOffset
+          remainingJadwal
         );
 
         const combined = [...remainingJadwal, ...newDayRows];
