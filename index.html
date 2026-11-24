@@ -319,12 +319,12 @@
     }
 
     .nav-tab-btn {
-      background: rgba(255, 255, 255, 0.12);
-      color: #E0F2FE;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: var(--radius-md);
       padding: 5px 11px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 12px;
       cursor: pointer;
       transition: all 0.12s ease;
@@ -332,6 +332,7 @@
       align-items: center;
       gap: 6px;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .nav-tab-btn:hover {
@@ -1414,20 +1415,24 @@
 
         <!-- Baris 2: Tombol Menu Navigasi (TIDAK IKUT TER-SCROLL) & Input Nama Event -->
         <div class="nav-bar-row">
-          <nav class="nav-tabs" aria-label="Menu Navigasi Utama">
-            <button id="tabBtnJadwal" class="nav-tab-btn active" onclick="switchTab('jadwal')">
-              <span>🗓️ Buat Jadwal Pengawas</span>
+          <nav class="nav-tabs" aria-label="Menu Navigasi Utama" style="flex: 0 0 auto;">
+            <button type="button" id="tabBtnJadwal" class="nav-tab-btn active" onclick="switchTab('jadwal')">
+              <span>🗓️</span>
+              <span style="color: #FFFFFF; font-weight: 700;">Buat Jadwal Pengawas</span>
             </button>
-            <button id="tabBtnLihatJadwal" class="nav-tab-btn" onclick="switchTab('lihatJadwal')">
-              <span>📅 </span>
+            <button type="button" id="tabBtnLihatJadwal" class="nav-tab-btn" onclick="switchTab('lihatJadwal')">
+              <span>📅</span>
+              <span style="color: #FFFFFF; font-weight: 700;">Lihat Jadwal</span>
               <span id="navJadwalCountBadge" class="nav-tab-badge">0</span>
             </button>
-            <button id="tabBtnLabel" class="nav-tab-btn" onclick="switchTab('label')">
-              <span>🏷️ Buat Label Ruang</span>
+            <button type="button" id="tabBtnLabel" class="nav-tab-btn" onclick="switchTab('label')">
+              <span>🏷️</span>
+              <span style="color: #FFFFFF; font-weight: 700;">Buat Label Ruang</span>
               <span id="navRuangCountBadge" class="nav-tab-badge">0</span>
             </button>
-            <button id="tabBtnPresensi" class="nav-tab-btn" onclick="switchTab('presensi')">
-              <span>✅ Presensi Pengawas</span>
+            <button type="button" id="tabBtnPresensi" class="nav-tab-btn" onclick="switchTab('presensi')">
+              <span>✅</span>
+              <span style="color: #FFFFFF; font-weight: 700;">Presensi Pengawas</span>
               <span id="navPresensiCountBadge" class="nav-tab-badge">0</span>
             </button>
           </nav>
@@ -1436,7 +1441,7 @@
             <span class="event-inline-label">🎯 Nama Event:</span>
             <input id="eventNameInput" class="neu-inset" type="text" placeholder="Ketik Nama Event Jadwal Ujian..." style="max-width: 240px; flex: 1 1 170px; padding: 6px 10px;" />
             <input id="tahunPelajaranInput" class="neu-inset" type="text" placeholder="Thn Pelajaran (2025/2026)" style="max-width: 155px; flex: 1 1 120px; padding: 6px 10px;" />
-            <button class="neu-btn neu-btn-primary" style="padding: 6px 12px;" onclick="saveEventName()">💾 Simpan</button>
+            <button type="button" class="neu-btn neu-btn-primary" style="padding: 6px 12px;" onclick="saveEventName()">💾 Simpan</button>
           </div>
         </div>
       </div>
@@ -1700,7 +1705,7 @@
 
               <div style="flex: 0 0 auto;">
                 <button class="neu-btn neu-btn-primary" onclick="addSingleExamDate()">
-                  ⚙️ Atur Hari/Tanggal Ini
+                  ⚙️ + Atur Hari/Tanggal Ini
                 </button>
               </div>
 
@@ -1722,7 +1727,7 @@
 
             <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
               <button type="button" class="neu-btn neu-btn-primary" style="padding: 8px 16px; font-size: 12.5px;" onclick="openNextDayConfigModal()">
-                ➕ Hari (Tambah &amp; Atur Hari Tanggal Berikutnya)
+                ➕ + Hari (Tambah &amp; Atur Hari Tanggal Berikutnya)
               </button>
               <span style="font-size: 11.5px; color: var(--text-secondary);">
                 Klik <strong>"+ Hari"</strong> untuk membuka modal pengaturan jumlah sesi, ruang ujian, dan ceklist guru pada hari/tanggal berikutnya.
@@ -1764,18 +1769,18 @@
                   🗓️ Buat Jadwal Pengawas Sekarang
                 </button>
                 <button class="neu-btn neu-btn-success" style="padding:9px 16px;" onclick="openAppendDayModal()">
-                  ➕ Hari (Tambah Hari ke Jadwal)
+                  ➕ + Hari (Tambah Hari ke Jadwal)
                 </button>
               </div>
             </div>
 
             <!-- KONTEN JADWAL JIKA SUDAH ADA JADWAL TERSIMPAN -->
             <div id="filledJadwalContainer">
-              <!-- 1. PANEL TOMBOL TAMBAH HARI BARU KE JADWAL TERSIMPAN
+              <!-- 1. PANEL TOMBOL TAMBAH HARI BARU KE JADWAL TERSIMPAN (MEMBUKA MODAL SESI, RUANG & CEKLIST GURU) -->
               <div class="neu-card-compact" style="margin-bottom: 12px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
                 <div>
                   <div style="font-size:13px; font-weight:700; color:var(--accent);">
-                    ➕ Tambah Hari / Tanggal Baru ke Jadwal Tersimpan
+                    ➕ Tambah Hari / Tanggal Baru ke Jadwal Tersimpan (Pilih Sesi, Ruang &amp; Ceklist Guru)
                   </div>
                   <div style="font-size:11.5px; color:var(--text-secondary);">
                     Klik tombol di kanan untuk memilih tanggal ujian baru, mengatur jumlah sesi, ruang tiap sesi, dan ceklist guru pengawas.
@@ -1783,7 +1788,7 @@
                 </div>
                 <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                   <button type="button" class="neu-btn neu-btn-success" style="padding:8px 14px; font-size:12.5px;" onclick="openAppendDayModal()">
-                    ➕ Hari (Tambah Hari ke Jadwal)
+                    ➕ + Hari (Tambah Hari ke Jadwal)
                   </button>
                 </div>
               </div>
@@ -1793,10 +1798,10 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
                   <div>
                     <div style="font-size:13px; font-weight:800; color:var(--text-primary);">
-                      🖨️ Pratinjau Tabel Matriks Jadwal Pengawas
+                      🖨️ Pratinjau Tabel Matriks Jadwal Pengawas (Format Unduhan Excel F4 Landscape)
                     </div>
                     <div style="font-size:11.5px; color:var(--text-secondary);">
-                       Format Unduhan Excel F4 Landscape.
+                      Format tabel di bawah ini sama persis dengan hasil unduhan file Excel (<code>.xlsx</code>) kertas F4 Landscape beserta Keterangan Kode Guru &amp; Pengesahan Kepala Sekolah.
                     </div>
                   </div>
                   <button type="button" class="neu-btn neu-btn-success" onclick="exportJadwalExcel()">
@@ -5626,7 +5631,7 @@
               <div class="a4-inner-frame" style="justify-content: space-evenly;">
                 <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:4px;">
                   <div style="font-size:0.74rem; font-weight:800; letter-spacing:2px; color:#64748B;">
-                    SMKN 1 MONDOKAN <br> PRESENSI PENGAWAS RUANG
+                    SMKN 1 MONDOKAN • PRESENSI PENGAWAS RUANG
                   </div>
                 </div>
 
