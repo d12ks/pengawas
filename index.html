@@ -226,9 +226,10 @@
     .sticky-header-zone {
       flex: 0 0 auto;
       z-index: 1200;
-      background: var(--bg-header-glass);
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      background: linear-gradient(135deg, #1E3A8A 0%, #172554 100%);
+      border-bottom: 1px solid #1E40AF;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+      color: #FFFFFF;
       padding: 8px 16px;
     }
 
@@ -258,8 +259,9 @@
       width: 30px;
       height: 30px;
       border-radius: 4px;
-      background: var(--accent);
+      background: rgba(255, 255, 255, 0.18);
       color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.32);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -272,11 +274,12 @@
       font-size: 14px;
       font-weight: 700;
       line-height: 1.2;
+      color: #FFFFFF;
     }
 
     .brand-sub {
       font-size: 11.5px;
-      color: var(--text-muted);
+      color: #DBEAFE;
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -290,9 +293,9 @@
       gap: 4px;
       padding: 1px 7px;
       border-radius: 3px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border: 1px solid rgba(2, 132, 199, 0.3);
+      background: rgba(255, 255, 255, 0.16);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.35);
       font-weight: 700;
       font-size: 11px;
     }
@@ -305,7 +308,7 @@
       justify-content: space-between;
       gap: 8px;
       padding-top: 6px;
-      border-top: 1px solid var(--border-color);
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
     }
 
     .nav-tabs {
@@ -316,9 +319,9 @@
     }
 
     .nav-tab-btn {
-      background: var(--bg-subtle);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.12);
+      color: #E0F2FE;
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: var(--radius-md);
       padding: 5px 11px;
       font-weight: 600;
@@ -332,15 +335,15 @@
     }
 
     .nav-tab-btn:hover {
-      background: var(--excel-hover);
-      border-color: var(--accent);
-      color: var(--accent);
+      background: rgba(255, 255, 255, 0.24);
+      border-color: #38BDF8;
+      color: #FFFFFF;
     }
 
     .nav-tab-btn.active {
-      background: var(--accent);
+      background: #0284C7;
       color: #FFFFFF !important;
-      border-color: var(--accent-strong);
+      border-color: #38BDF8;
     }
 
     .nav-tab-badge {
@@ -348,12 +351,12 @@
       border-radius: 3px;
       font-size: 11px;
       font-weight: 700;
-      background: rgba(15, 23, 42, 0.12);
-      color: inherit;
+      background: rgba(15, 23, 42, 0.35);
+      color: #FFFFFF;
     }
 
     .nav-tab-btn.active .nav-tab-badge {
-      background: rgba(255, 255, 255, 0.24);
+      background: rgba(255, 255, 255, 0.25);
       color: #FFFFFF;
     }
 
@@ -369,7 +372,7 @@
     .event-inline-label {
       font-size: 12px;
       font-weight: 700;
-      color: var(--text-primary);
+      color: #FFFFFF;
       white-space: nowrap;
     }
 
@@ -737,20 +740,24 @@
     .ganti-btn-label {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      padding: 2px 7px;
+      justify-content: center;
+      padding: 1px 5px;
       border-radius: 3px;
       font-size: 11px;
-      font-weight: 600;
-      color: #FFFFFF;
-      background: var(--accent);
-      border: 1px solid var(--accent-strong);
+      font-weight: 800;
+      line-height: 1.1;
+      color: #0F172A;
+      background: #FFFFFF;
+      border: 1px solid #94A3B8;
+      box-shadow: 0 1px 1px rgba(15, 23, 42, 0.08);
       cursor: pointer;
       white-space: nowrap;
     }
 
     .ganti-dropdown-wrap:hover .ganti-btn-label {
-      background: var(--accent-strong);
+      background: #F8FAFC;
+      border-color: #0284C7;
+      color: #0284C7;
     }
 
     .ganti-select-overlay {
@@ -1224,45 +1231,6 @@
     </div>
   </div>
 
-  <!-- MODAL PILIHAN MODE PENGAWASAN SAAT HALAMAN DIBUKA (MODE 2 PENGAWAS vs MODE 1 PENGAWAS) -->
-  <div id="supervisorModeModal" class="loading-overlay" style="z-index: 9900; padding: 14px;" onclick="if(event.target===this) closeSupervisorModeModal()">
-    <div class="neu-card" style="width: 100%; max-width: 580px; padding: 0; overflow: hidden; box-shadow: 0 14px 36px rgba(15, 23, 42, 0.34);">
-      <div style="padding: 14px 18px; background: var(--excel-header-bg); border-bottom: 1px solid var(--excel-header-border); display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">
-            👥 Pilih Mode Pengawasan Ujian
-          </div>
-          <div style="font-size: 11.5px; color: var(--text-secondary); font-weight: 500;">
-            Pilih jumlah pengawas dalam setiap ruang ujian. Jadwal &amp; Presensi disimpan di tab Spreadsheet terpisah.
-          </div>
-        </div>
-        <button type="button" class="neu-btn" style="padding: 4px 9px;" onclick="closeSupervisorModeModal()">✕</button>
-      </div>
-      <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 12px;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
-          <button type="button" id="modalBtnMode2" class="neu-btn" style="flex-direction: column; align-items: flex-start; padding: 14px; text-align: left; gap: 6px; border-width: 2px; white-space: normal;" onclick="selectSupervisorMode('2', true)">
-            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-              <span style="font-size: 14px; font-weight: 800; color: var(--accent);">👥 Mode 2 Pengawas</span>
-              <span class="badge badge-role">2 Guru / Ruang</span>
-            </div>
-            <div style="font-size: 11.5px; color: var(--text-secondary); font-weight: 500; line-height: 1.4;">
-              Setiap ruang ujian diawasi oleh <strong>2 guru pengawas</strong> (Pengawas 1 &amp; Pengawas 2). Data tersimpan di tab <code>Jadwal_Pengawas_2</code> &amp; <code>Presensi_Pengawas_2</code>.
-            </div>
-          </button>
-
-          <button type="button" id="modalBtnMode1" class="neu-btn" style="flex-direction: column; align-items: flex-start; padding: 14px; text-align: left; gap: 6px; border-width: 2px; white-space: normal;" onclick="selectSupervisorMode('1', true)">
-            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-              <span style="font-size: 14px; font-weight: 800; color: var(--success);">👤 Mode 1 Pengawas</span>
-              <span class="badge badge-hadir">1 Guru / Ruang</span>
-            </div>
-            <div style="font-size: 11.5px; color: var(--text-secondary); font-weight: 500; line-height: 1.4;">
-              Setiap ruang ujian hanya diawasi oleh <strong>1 guru pengawas</strong>. Data tersimpan di tab <code>Jadwal_Pengawas_1</code> &amp; <code>Presensi_Pengawas_1</code>.
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- MODAL KONFIGURASI HARI, JUMLAH SESI, PILIHAN RUANG UJIAN PER SESI & CEKLIST GURU PENGAWAS -->
   <div id="daySessionRoomModal" class="loading-overlay" style="z-index: 9850; padding: 14px;" onclick="if(event.target===this) closeDaySessionRoomModal()">
@@ -1414,15 +1382,15 @@
               <div class="brand-sub">
                 <span>Status Event:</span>
                 <span class="event-pill-active" id="activeEventHeader">Memuat Event...</span>
-                <span class="badge badge-role" id="activeModeHeaderBadge" style="cursor:pointer;" onclick="openSupervisorModeModal()" title="Klik untuk ganti Mode Pengawasan">Mode 2 Pengawas</span>
+                <span class="badge badge-role" id="activeModeHeaderBadge">Mode 2 Pengawas</span>
               </div>
             </div>
           </div>
 
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <!-- Tombol Cepat Mode Pengawasan di Topbar -->
-            <div style="display:inline-flex; align-items:center; gap:4px; background:var(--bg-subtle); padding:3px; border-radius:5px; border:1px solid var(--border-strong);">
-              <span style="font-size:11px; font-weight:700; padding:0 6px; color:var(--text-secondary);">Mode Pengawasan:</span>
+            <div style="display:inline-flex; align-items:center; gap:4px; background:rgba(255, 255, 255, 0.14); padding:3px; border-radius:5px; border:1px solid rgba(255, 255, 255, 0.28);">
+              <span style="font-size:11px; font-weight:700; padding:0 6px; color:#E0F2FE;">Mode Pengawasan:</span>
               <button type="button" id="topBtnMode2" class="neu-btn neu-btn-primary" style="padding:4px 9px; font-size:11.5px;" onclick="selectSupervisorMode('2', false)">
                 👥 Mode 2 Pengawas
               </button>
@@ -1521,9 +1489,6 @@
                 <span>🎛️ Pilihan Mode Pengawasan &amp; Pengaturan Kepala Sekolah (Format Cetak Excel F4 Landscape)</span>
                 <span id="cardModeStatusBadge" class="badge badge-role">Mode 2 Pengawas (2 Guru/Ruang)</span>
               </div>
-              <button type="button" class="neu-btn" onclick="openSupervisorModeModal()">
-                🔄 Buka Dialog Pilih Mode Pengawasan
-              </button>
             </div>
 
             <div class="form-row" style="align-items: flex-end; margin-bottom: 0;">
@@ -1735,7 +1700,7 @@
 
               <div style="flex: 0 0 auto;">
                 <button class="neu-btn neu-btn-primary" onclick="addSingleExamDate()">
-                  ⚙️ + Atur Hari/Tanggal Ini
+                  ⚙️ Atur Hari/Tanggal Ini
                 </button>
               </div>
 
@@ -1757,7 +1722,7 @@
 
             <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
               <button type="button" class="neu-btn neu-btn-primary" style="padding: 8px 16px; font-size: 12.5px;" onclick="openNextDayConfigModal()">
-                ➕ + Hari (Tambah &amp; Atur Hari Tanggal Berikutnya)
+                ➕ Hari (Tambah &amp; Atur Hari Tanggal Berikutnya)
               </button>
               <span style="font-size: 11.5px; color: var(--text-secondary);">
                 Klik <strong>"+ Hari"</strong> untuk membuka modal pengaturan jumlah sesi, ruang ujian, dan ceklist guru pada hari/tanggal berikutnya.
@@ -1799,18 +1764,18 @@
                   🗓️ Buat Jadwal Pengawas Sekarang
                 </button>
                 <button class="neu-btn neu-btn-success" style="padding:9px 16px;" onclick="openAppendDayModal()">
-                  ➕ + Hari (Tambah Hari ke Jadwal)
+                  ➕ Hari (Tambah Hari ke Jadwal)
                 </button>
               </div>
             </div>
 
             <!-- KONTEN JADWAL JIKA SUDAH ADA JADWAL TERSIMPAN -->
             <div id="filledJadwalContainer">
-              <!-- 1. PANEL TOMBOL TAMBAH HARI BARU KE JADWAL TERSIMPAN (MEMBUKA MODAL SESI, RUANG & CEKLIST GURU) -->
+              <!-- 1. PANEL TOMBOL TAMBAH HARI BARU KE JADWAL TERSIMPAN
               <div class="neu-card-compact" style="margin-bottom: 12px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
                 <div>
                   <div style="font-size:13px; font-weight:700; color:var(--accent);">
-                    ➕ Tambah Hari / Tanggal Baru ke Jadwal Tersimpan (Pilih Sesi, Ruang &amp; Ceklist Guru)
+                    ➕ Tambah Hari / Tanggal Baru ke Jadwal Tersimpan
                   </div>
                   <div style="font-size:11.5px; color:var(--text-secondary);">
                     Klik tombol di kanan untuk memilih tanggal ujian baru, mengatur jumlah sesi, ruang tiap sesi, dan ceklist guru pengawas.
@@ -1818,7 +1783,7 @@
                 </div>
                 <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                   <button type="button" class="neu-btn neu-btn-success" style="padding:8px 14px; font-size:12.5px;" onclick="openAppendDayModal()">
-                    ➕ + Hari (Tambah Hari ke Jadwal)
+                    ➕ Hari (Tambah Hari ke Jadwal)
                   </button>
                 </div>
               </div>
@@ -1828,10 +1793,10 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
                   <div>
                     <div style="font-size:13px; font-weight:800; color:var(--text-primary);">
-                      🖨️ Pratinjau Tabel Matriks Jadwal Pengawas (Format Unduhan Excel F4 Landscape)
+                      🖨️ Pratinjau Tabel Matriks Jadwal Pengawas
                     </div>
                     <div style="font-size:11.5px; color:var(--text-secondary);">
-                      Format tabel di bawah ini sama persis dengan hasil unduhan file Excel (<code>.xlsx</code>) kertas F4 Landscape beserta Keterangan Kode Guru &amp; Pengesahan Kepala Sekolah.
+                       Format Unduhan Excel F4 Landscape.
                     </div>
                   </div>
                   <button type="button" class="neu-btn neu-btn-success" onclick="exportJadwalExcel()">
@@ -5099,9 +5064,9 @@
             <span title="${tooltipText}" style="font-weight:800; font-size:12px; letter-spacing:0.2px;">
               ${code}${isReplaced ? " 🔄" : ""}
             </span>
-            <div class="ganti-dropdown-wrap no-print" style="padding:1px 5px; border-radius:3px; background:rgba(255,255,255,0.85); border:1px solid rgba(15,23,42,0.28); box-shadow:0 1px 1px rgba(0,0,0,0.06);"
+            <div class="ganti-dropdown-wrap no-print"
               title="Ganti ${code} (${nama}) dengan Pengawas Cadangan Sesi ${sKe} (Anti-Bentrok)">
-              <span class="ganti-btn-label" style="font-size:9.5px; padding:0; color:#0F172A; font-weight:800;">Ganti ▾</span>
+              <span class="ganti-btn-label" style="background:#FFFFFF; color:#0F172A; border:1px solid rgba(15,23,42,0.3); padding:1px 4px; font-size:10px; line-height:1;">▾</span>
               <select class="ganti-select-overlay" onchange="handleSupervisorChange('${slot.idJadwal}', ${roleNum}, this.value, this)">
                 ${optionsHtml}
               </select>
@@ -5210,7 +5175,7 @@
           <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px; padding-bottom:8px; border-bottom:1px dashed var(--border-color);">
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
               <span class="badge badge-role">🖨️ Pratinjau Tabel Jadwal Pengawas (F4 Landscape • ${isMode1 ? "Mode 1 Pengawas" : "Mode 2 Pengawas"})</span>
-              <span style="font-size:11.5px; color:var(--text-secondary);">💡 Klik tombol <strong>"Ganti ▾"</strong> pada sel kode guru untuk mengganti dengan Pengawas Cadangan sesi tersebut (anti-bentrok).</span>
+              <span style="font-size:11.5px; color:var(--text-secondary);">💡 Klik tombol <strong>"▾"</strong> pada sel kode guru untuk mengganti dengan Pengawas Cadangan sesi tersebut (anti-bentrok).</span>
             </div>
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
               <button type="button" class="neu-btn neu-btn-primary" onclick="printJadwalMatrixPreview()">
@@ -5418,7 +5383,7 @@
                     ${isP2Replaced ? `<div class="supervisor-orig-note">Semula: ${j.p2AsliNama}</div>` : ""}
                   </div>
                   <div class="ganti-dropdown-wrap" title="Ganti Pengawas 2 dengan Pengawas Cadangan Sesi ${j.sesiKe}">
-                    <span class="ganti-btn-label">🔄 Ganti ▾</span>
+                    <span class="ganti-btn-label">▾</span>
                     <select class="ganti-select-overlay" onchange="handleSupervisorChange('${j.idJadwal}', 2, this.value, this)">
                       ${buildCadanganOptions("Pengawas 2", j.p2Nama)}
                     </select>
@@ -5449,7 +5414,7 @@
                     ${isP1Replaced ? `<div class="supervisor-orig-note">Semula: ${j.p1AsliNama}</div>` : ""}
                   </div>
                   <div class="ganti-dropdown-wrap" title="Ganti ${isMode1 ? "Pengawas Ruang" : "Pengawas 1"} dengan Pengawas Cadangan Sesi ${j.sesiKe}">
-                    <span class="ganti-btn-label">🔄 Ganti ▾</span>
+                    <span class="ganti-btn-label">▾</span>
                     <select class="ganti-select-overlay" onchange="handleSupervisorChange('${j.idJadwal}', 1, this.value, this)">
                       ${buildCadanganOptions(isMode1 ? "Pengawas Ruang" : "Pengawas 1", j.p1Nama)}
                     </select>
@@ -6351,7 +6316,6 @@
 
     renderAll();
     startPresensiAutoRefreshTimer();
-    openSupervisorModeModal();
     syncFromSpreadsheet(true);
   </script>
 </body>
