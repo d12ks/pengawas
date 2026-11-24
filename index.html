@@ -2143,18 +2143,25 @@
       try {
         const parsed = typeof rawStr === "string" ? JSON.parse(rawStr) : rawStr;
         if (!parsed || typeof parsed !== "object") return false;
-        if (Array.isArray(parsed.selectedExamDates) && parsed.selectedExamDates.length > 0) {
-          appState.selectedExamDates = parsed.selectedExamDates;
+        if (Array.isArray(parsed.selectedExamDates)) {
+          appState.selectedExamDates = [...parsed.selectedExamDates];
+          appState.hasExplicitDayConfig = true;
         }
         if (parsed.daySessionsMap && typeof parsed.daySessionsMap === "object") {
-          appState.daySessionsMap = { ...appState.daySessionsMap, ...parsed.daySessionsMap };
+          appState.daySessionsMap = { ...parsed.daySessionsMap };
         }
         if (parsed.daySessionRoomsMap && typeof parsed.daySessionRoomsMap === "object") {
-          appState.daySessionRoomsMap = { ...appState.daySessionRoomsMap, ...parsed.daySessionRoomsMap };
+          appState.daySessionRoomsMap = { ...parsed.daySessionRoomsMap };
         }
         if (parsed.dayGurusMap && typeof parsed.dayGurusMap === "object") {
-          appState.dayGurusMap = { ...appState.dayGurusMap, ...parsed.dayGurusMap };
+          appState.dayGurusMap = { ...parsed.dayGurusMap };
         }
+        localStorage.setItem("mondokan_day_config_json", JSON.stringify({
+          selectedExamDates: appState.selectedExamDates,
+          daySessionsMap: appState.daySessionsMap,
+          daySessionRoomsMap: appState.daySessionRoomsMap,
+          dayGurusMap: appState.dayGurusMap
+        }));
         return true;
       } catch (_) {
         return false;
@@ -2623,23 +2630,71 @@
     }
 
     function removeExamDate(isoDate) {
+      const tanggalIndoTarget = formatTanggalIndo(isoDate);
+      appState.hasExplicitDayConfig = true;
       appState.selectedExamDates = appState.selectedExamDates.filter(d => d !== isoDate);
       delete appState.daySessionsMap[isoDate];
       delete appState.dayGurusMap[isoDate];
       clearDaySessionRoomsForDate(isoDate);
-      serializeDayConfigJson();
+
+      // Hapus juga baris jadwal pada tanggal tersebut bila sudah pernah ter-generate
+      const beforeLen = appState.jadwalList.length;
+      appState.jadwalList = appState.jadwalList.filter(
+        j => formatTanggalIndo(j.hariTanggal) !== tanggalIndoTarget && parseIsoFromAnyDate(j.hariTanggal) !== isoDate
+      );
+      if (String(appState.supervisorMode) === "1") {
+        appState.jadwalListMode1 = [...appState.jadwalList];
+      } else {
+        appState.jadwalListMode2 = [...appState.jadwalList];
+      }
+
+      const dayConfigJsonStr = serializeDayConfigJson();
       renderExamDatesChips();
-      showToast(`Hari ${formatTanggalIndo(isoDate)} dihapus dari daftar.`);
+      updateJadwalFilterDateOptions();
+      renderJadwalTable();
+      updateDashboardSummaryStats();
+      showToast(`Hari ${tanggalIndoTarget} berhasil dihapus.`);
+
+      // Sinkronkan penghapusan hari & jadwal ke Google Spreadsheet agar saat di-refresh tidak muncul lagi
+      if (beforeLen !== appState.jadwalList.length) {
+        postToSpreadsheet({
+          action: "saveBulkJadwal",
+          supervisorMode: appState.supervisorMode,
+          jadwalList: appState.jadwalList,
+          dayConfigJson: dayConfigJsonStr
+        }, "", true);
+      } else {
+        postToSpreadsheet({
+          action: "updateEventName",
+          eventName: appState.eventName,
+          tahunPelajaran: appState.tahunPelajaran,
+          kepsekNama: appState.kepsekNama,
+          kepsekNip: appState.kepsekNip,
+          supervisorMode: appState.supervisorMode,
+          dayConfigJson: dayConfigJsonStr
+        }, "", true);
+      }
     }
 
     function clearExamDates() {
+      appState.hasExplicitDayConfig = true;
       appState.selectedExamDates = [];
       appState.daySessionsMap = {};
       appState.daySessionRoomsMap = {};
       appState.dayGurusMap = {};
-      serializeDayConfigJson();
+      const dayConfigJsonStr = serializeDayConfigJson();
       renderExamDatesChips();
       showToast("Daftar tanggal ujian dikosongkan.");
+
+      postToSpreadsheet({
+        action: "updateEventName",
+        eventName: appState.eventName,
+        tahunPelajaran: appState.tahunPelajaran,
+        kepsekNama: appState.kepsekNama,
+        kepsekNip: appState.kepsekNip,
+        supervisorMode: appState.supervisorMode,
+        dayConfigJson: dayConfigJsonStr
+      }, "", true);
     }
 
     function renderExamDatesChips() {
@@ -2982,14 +3037,20 @@
         }
       });
       if (jadwalDates.length > 0) {
-        appState.selectedExamDates = jadwalDates.sort();
+        if (!appState.hasExplicitDayConfig) {
+          appState.selectedExamDates = jadwalDates.sort();
+        }
         Object.keys(syncedDaySessions).forEach(iso => {
-          appState.daySessionsMap[iso] = syncedDaySessions[iso].sort((a, b) => Number(a) - Number(b));
+          if (!appState.daySessionsMap[iso]) {
+            appState.daySessionsMap[iso] = syncedDaySessions[iso].sort((a, b) => Number(a) - Number(b));
+          }
         });
         Object.keys(syncedDaySessionRooms).forEach(dsrKey => {
-          appState.daySessionRoomsMap[dsrKey] = syncedDaySessionRooms[dsrKey].sort((a, b) =>
-            a.localeCompare(b, undefined, { numeric: true })
-          );
+          if (!appState.daySessionRoomsMap[dsrKey]) {
+            appState.daySessionRoomsMap[dsrKey] = syncedDaySessionRooms[dsrKey].sort((a, b) =>
+              a.localeCompare(b, undefined, { numeric: true })
+            );
+          }
         });
         Object.keys(syncedDayGurus).forEach(iso => {
           if (!Array.isArray(appState.dayGurusMap[iso]) || appState.dayGurusMap[iso].length === 0) {
@@ -4511,7 +4572,8 @@
         appState.selectedExamDates.push(isoDate);
         appState.selectedExamDates.sort();
       }
-      serializeDayConfigJson();
+      appState.hasExplicitDayConfig = true;
+      const savedDayConfigJson = serializeDayConfigJson();
 
       // Geser tanggal di date picker ke hari kerja berikutnya agar siap untuk "+ Hari"
       const nextSuggested = getNextWeekdayAfterIso(isoDate);
@@ -4527,6 +4589,15 @@
         closeDaySessionRoomModal();
         renderExamDatesChips();
         showToast(`Pengaturan ${tanggalIndo} (${dsrModalState.activeSessions.length} sesi • ${checkedGurusCount} guru ditugaskan) berhasil disimpan!`);
+        postToSpreadsheet({
+          action: "updateEventName",
+          eventName: appState.eventName,
+          tahunPelajaran: appState.tahunPelajaran,
+          kepsekNama: appState.kepsekNama,
+          kepsekNip: appState.kepsekNip,
+          supervisorMode: appState.supervisorMode,
+          dayConfigJson: savedDayConfigJson
+        }, "", true);
         return;
       }
 
@@ -4615,11 +4686,19 @@
         appState.jadwalList = appState.jadwalList.filter(
           j => formatTanggalIndo(j.hariTanggal) !== tanggalIndoTarget
         );
+        if (String(appState.supervisorMode) === "1") {
+          appState.jadwalListMode1 = [...appState.jadwalList];
+        } else {
+          appState.jadwalListMode2 = [...appState.jadwalList];
+        }
         if (isoRemoved) {
+          appState.hasExplicitDayConfig = true;
           appState.selectedExamDates = appState.selectedExamDates.filter(d => d !== isoRemoved);
           delete appState.daySessionsMap[isoRemoved];
+          delete appState.dayGurusMap[isoRemoved];
           clearDaySessionRoomsForDate(isoRemoved);
         }
+        const dayConfigJsonStr = serializeDayConfigJson();
 
         const filterSel = document.getElementById("jadwalFilterDateSelect");
         if (filterSel && filterSel.value === tanggalIndoTarget) {
@@ -4639,7 +4718,12 @@
         showToast(`Jadwal hari ${tanggalIndoTarget} berhasil dihapus!`);
 
         // Sinkronkan ke Google Spreadsheet di latar belakang
-        postToSpreadsheet({ action: "saveBulkJadwal", jadwalList: appState.jadwalList }, "", true);
+        postToSpreadsheet({
+          action: "saveBulkJadwal",
+          supervisorMode: appState.supervisorMode,
+          jadwalList: appState.jadwalList,
+          dayConfigJson: dayConfigJsonStr
+        }, "", true);
       } finally {
         hideLoading();
       }
